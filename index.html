@@ -1000,7 +1000,7 @@
       operations, accelerate workflows, and scale with predictable ROI.</p>
 
     <div class="bar">
-      <input class="search" id="q" type="search" placeholder="Search 14 automations (e.g. WhatsApp, Voice, Payment Recovery...)"
+      <input class="search" id="q" type="search" placeholder="Search 12 automations (e.g. Voice, Invoice, Payment Recovery...)"
         aria-label="Search automations">
       <span class="count" id="count"></span>
     </div>
@@ -1279,16 +1279,7 @@
         includes: "Helpdesk connection, category and priority classification, knowledge-base AI reply drafting, SLA escalation and routing tags, up to 1,500 tickets/mo.",
         needs: "Helpdesk with API access (Freshdesk, Zendesk, Intercom), company knowledge base or FAQ documentation, escalation rules and routing tags."
       },
-      {
-        id: "whatsapp",
-        name: "WhatsApp Automation",
-        headline: "See how bookings work on WhatsApp.",
-        desc: "Conversational AI booking, customer support, and sales follow-up directly inside WhatsApp with official Cloud API and live CRM sync. Monthly maintenance: ₹9,500/mo.",
-        setup: 59000,
-        maintenance: 9500,
-        includes: "Official Meta WhatsApp Cloud API setup, interactive menus, automated appointment booking, 24/7 FAQ responses, human handoff trigger, CRM sync.",
-        needs: "Meta Business Manager account, dedicated phone number for WhatsApp API, booking schedule or catalog data, CRM webhook destination."
-      },
+
       {
         id: "voice",
         name: "AI Voice Receptionist",
@@ -1339,16 +1330,7 @@
         includes: "CRM visit completion webhook, automated WhatsApp star rating poll, smart routing (5★ -> Google Maps; 1-3★ -> Manager private alert), AI SEO review reply generator.",
         needs: "Google Business Profile admin access, CRM or POS checkout webhook, WhatsApp Cloud API."
       },
-      {
-        id: "hr-onboarding",
-        name: "HR Onboarding & Verification Bot",
-        headline: "See how autonomous employee onboarding works.",
-        desc: "Verifies candidate Aadhaar & PAN government records via OCR, auto-generates signed PDF offer letters, provisions Google Workspace & Slack, and syncs payroll.",
-        setup: 69000,
-        maintenance: 9900,
-        includes: "Candidate intake form, OCR + government verification API (Aadhaar & PAN), DocuSign / e-Sign contract generator, automated Google Workspace & Slack account provisioning, Keka / Darwinbox payroll sync.",
-        needs: "Candidate intake portal or Typeform, Google Workspace admin credentials, HR / payroll software API, Aadhaar & PAN verification API."
-      },
+
       {
         id: "content-repurposer",
         name: "Social Media AI Content Repurposer",
@@ -1369,13 +1351,11 @@
       lead: "automations/lead_enrichment_live.html",
       invoice: "automations/invoice_bot_live.html",
       support: "automations/support_triage_live.html",
-      whatsapp: "automations/whatsapp_workflow_live.html",
       voice: "automations/voice_workflow_live.html",
       sales: "automations/sales_workflow_live.html",
       "payment-recovery": "automations/payment_recovery_live.html",
       "rto-reduction": "automations/rto_reduction_live.html",
       "review-booster": "automations/review_booster_live.html",
-      "hr-onboarding": "automations/hr_onboarding_live.html",
       "content-repurposer": "automations/content_repurposer_live.html",
       // Aliases
       "daily-dashboard": "automations/dashboard_workflow_live.html",
@@ -1387,7 +1367,6 @@
       "payment": "automations/payment_recovery_live.html",
       "rto": "automations/rto_reduction_live.html",
       "review": "automations/review_booster_live.html",
-      "hr": "automations/hr_onboarding_live.html",
       "content": "automations/content_repurposer_live.html"
     };
 
@@ -1492,7 +1471,7 @@
     customOpt.textContent = 'Custom AI Automation / Bespoke System';
     contactSelect.appendChild(customOpt);
 
-    function openContactModal(id = 'whatsapp') {
+    function openContactModal(id = 'dashboard') {
       const normId = id.replace(/^(daily-|tender-|email-|invoice-|support-)/, '').replace(/-.+$/, '');
       const found = AUTOMATIONS.find(a => a.id === id || a.id === normId);
       const targetId = found ? found.id : (id === 'custom' ? 'custom' : AUTOMATIONS[0].id);
@@ -1544,13 +1523,8 @@
         `Hi Aivatika Team,\n\nI am interested in "${autoObj.name}".\n\nContact Details:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n- Automation: ${autoObj.name}\n\nPlease reach out for next steps!\n\nThanks,\n${name}`
       );
 
-      const waText = encodeURIComponent(
-        `Hi Aivatika Team, I want to get the *${autoObj.name}* for *${biz}*.\nName: ${name}\nPhone: ${phone}`
-      );
-
       document.getElementById('success-summary').textContent =
         `Thank you, ${name}! We have received your request for "${autoObj.name}". Our team will contact you within one business day.`;
-      document.getElementById('success-wa-btn').href = `https://wa.me/918050473346?text=${waText}`;
 
       document.getElementById('contact-form').style.display = 'none';
       document.getElementById('contact-success').style.display = 'block';
