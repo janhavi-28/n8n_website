@@ -131,6 +131,16 @@ async function go(i,cls,ms=500){await fly(i,cls,ms);EDG[i].p.classList.add("ok")
 async function run(id,ms){const c=D[id].g.classList;c.add("run");await sleep(ms);c.remove("run");c.add("ok")}
 
 let leadsCount=1480,matchRate=96.8,vipCount=86,paused=false,showDetails=true;
+const shown={};
+function setK(id,val,f){
+  const c=$(id),from=shown[id]??val,t0=performance.now();
+  shown[id]=val;
+  (function a(t){
+    const k=Math.min(1,(t-t0)/700);
+    c.textContent=f(from+(val-from)*k);
+    k<1&&requestAnimationFrame(a);
+  })(t0);
+}
 
 function logItem(txt,badge="INFO"){
   const ul=$("log");
@@ -175,8 +185,8 @@ async function cycle(isVIP=false){
 
   leadsCount+=1;
   if(isVIP)vipCount+=1;
-  $("k-leads").textContent=leadsCount.toLocaleString();
-  $("k-vip").textContent=vipCount;
+  setK("k-leads",leadsCount,n=>Math.round(n).toLocaleString());
+  setK("k-vip",vipCount,n=>Math.round(n).toLocaleString());
   logItem("Lead enriched, scored 94/100, synced to CRM & notified #sales-vip.","SUCCESS");
 
   renderBars();

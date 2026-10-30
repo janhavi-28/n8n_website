@@ -130,6 +130,16 @@ async function go(i,cls,ms=500){await fly(i,cls,ms);EDG[i].p.classList.add("ok")
 async function run(id,ms){const c=D[id].g.classList;c.add("run");await sleep(ms);c.remove("run");c.add("ok")}
 
 let tktCount=1482,defRate=68.4,paused=false,showDetails=true;
+const shown={};
+function setK(id,val,f){
+  const c=$(id),from=shown[id]??val,t0=performance.now();
+  shown[id]=val;
+  (function a(t){
+    const k=Math.min(1,(t-t0)/700);
+    c.textContent=f(from+(val-from)*k);
+    k<1&&requestAnimationFrame(a);
+  })(t0);
+}
 
 function logItem(txt,badge="INFO"){
   const ul=$("log");
@@ -207,7 +217,7 @@ async function cycle(isUrgent=false){
     logItem("Ticket #9902 flagged P1 CRITICAL. Paged on-call engineer in Slack.","ESCALATED");
   }
 
-  $("k-tkt").textContent=tktCount.toLocaleString();
+  setK("k-tkt", tktCount, n => Math.round(n).toLocaleString());
   renderBars();
 }
 

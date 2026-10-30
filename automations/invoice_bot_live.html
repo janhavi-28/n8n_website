@@ -129,7 +129,17 @@ function fly(i,cls,ms){
 async function go(i,cls,ms=500){await fly(i,cls,ms);EDG[i].p.classList.add("ok");EDG[i].t&&EDG[i].t.classList.add("show")}
 async function run(id,ms){const c=D[id].g.classList;c.add("run");await sleep(ms);c.remove("run");c.add("ok")}
 
-let invCount=428,poMatched=92.6,paused=false,showDetails=true;
+let invCount=428,poMatched=92.6,accVal=99.4,procTime=3.8,paused=false,showDetails=true;
+const shown={};
+function setK(id,val,f,delta){
+  const c=$(id),from=shown[id]??val,t0=performance.now();
+  shown[id]=val;
+  (function a(t){
+    const k=Math.min(1,(t-t0)/700);
+    c.textContent=f(from+(val-from)*k);
+    k<1&&requestAnimationFrame(a);
+  })(t0);
+}
 
 function logItem(txt,badge="INFO"){
   const ul=$("log");
@@ -183,7 +193,7 @@ async function cycle(simulateMismatch=false){
     logItem("PO discrepancy detected in #INV-8834. Routed to CFO for review.","EXCEPTION");
   }
 
-  $("k-inv").textContent=invCount;
+  setK("k-inv", invCount, n => Math.round(n).toLocaleString());
   renderBars();
 }
 

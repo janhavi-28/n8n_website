@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Live Workflow: E-Commerce NDR & RTO Reduction Bot</title>
+  <style>
+    :root {
+      --bg: #f3f5fb; --card: rgba(255, 255, 255, .82); --text: #0f172a; --mut: #64748b; --line: #dde3f0;
+      --accent: #ff6d5a; --accent-dark: #ee513d; --good: #059669; --bad: #e11d48; --badbg: #ffe9ee; --gold: #d97706;
+      --canvas: #f7f8fb; --dot: #d3d8e4; --nb: #fff; --nl: #c5cad8; --edge: #9aa1b5; --coral: #ff6d5a;
+      --ok: #059669; color-scheme: light; box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #070b16; --card: rgba(20, 28, 50, .72); --text: #eef2ff; --mut: #94a3c4; --line: rgba(148, 163, 210, .22);
+        --accent: #ff7d6d; --good: #34d399; --bad: #fb7185; --badbg: rgba(244, 63, 94, .14); --gold: #fbbf24;
+        --canvas: #14161f; --dot: #2c3040; --nb: #262938; --nl: #454a5e; --edge: #6b7390; color-scheme: dark;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; color: var(--text); font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(900px 480px at 12% -8%, rgba(255, 109, 90, .18), transparent),
+                  radial-gradient(700px 420px at 100% 0, rgba(79, 70, 229, .12), transparent), var(--bg);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    main { max-width: 1040px; margin: 0 auto; padding: 26px 14px 30px; }
+    .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    h1 {
+      font-size: 28px; margin: 0; font-weight: 800; letter-spacing: -.035em;
+      background: linear-gradient(90deg, var(--text) 30%, #ff6d5a, #4f46e5);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .live {
+      font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: var(--good);
+      border: 1px solid var(--good); padding: 4px 11px; border-radius: 999px; display: inline-flex; gap: 7px; align-items: center;
+    }
+    .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--good); animation: pu 1.4s infinite; }
+    @keyframes pu { 50% { opacity: .25; transform: scale(1.6); } }
+    p.sub { margin: 6px 0 16px; color: var(--mut); font-size: 14px; }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    button {
+      font: inherit; font-weight: 600; padding: 10px 18px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--card); color: var(--text);
+      cursor: pointer; transition: transform .15s;
+    }
+    button:active { transform: scale(.96); }
+    button.p {
+      background: linear-gradient(135deg, #ff6d5a, #ee513d); border: 0; color: #fff;
+      box-shadow: 0 10px 24px -10px #ff6d5a;
+    }
+    .card {
+      background: var(--card); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+      border: 1px solid var(--line); border-radius: 20px; padding: 18px;
+      box-shadow: 0 18px 40px -20px rgba(15, 23, 42, .35);
+    }
+    .cvw { position: relative; }
+    .cv {
+      position: relative; border-radius: 20px; border: 1px solid var(--line); overflow-x: auto;
+      background-color: var(--canvas); background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
+      background-size: 22px 22px;
+    }
+    .cv svg { min-width: 960px; width: 100%; display: block; }
+    .chip {
+      position: sticky; left: 12px; top: 12px; display: inline-flex; gap: 10px; align-items: center;
+      margin: 12px; padding: 6px 12px; border-radius: 10px; background: var(--nb);
+      border: 1px solid var(--nl); font-size: 12px; font-weight: 600; z-index: 2;
+    }
+    .chip b { color: var(--ok); font-weight: 600; }
+    .nd .b { fill: var(--nb); stroke: var(--nl); stroke-width: 1.5; transition: stroke .25s; }
+    .nd text { fill: var(--text); font-size: 12px; font-weight: 600; text-anchor: middle; }
+    .nd .s { fill: var(--mut); font-size: 10px; font-weight: 400; }
+    .nd.run .b {
+      stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 4;
+      animation: d .6s linear infinite; filter: drop-shadow(0 0 6px var(--accent));
+    }
+    .nd.ok .b { stroke: var(--ok); stroke-width: 2; }
+    .nd.gold .b { stroke: var(--gold); stroke-width: 2; filter: drop-shadow(0 0 6px var(--gold)); }
+    .bg { display: none; }
+    .nd.ok .bg { display: block; }
+    .bg circle { fill: var(--ok); }
+    .ed { fill: none; stroke: var(--edge); stroke-width: 1.8; transition: stroke .3s; }
+    .ed.ok { stroke: var(--ok); }
+    @keyframes d { to { stroke-dashoffset: -10; } }
+    .mk { fill: var(--edge); }
+    .pt { fill: var(--nb); stroke: var(--edge); stroke-width: 1.5; }
+    .il { fill: var(--ok); font-size: 10px; font-weight: 600; opacity: 0; transition: .3s; }
+    .il.show { opacity: 1; }
+    .pk { fill: var(--accent); filter: drop-shadow(0 0 7px var(--accent)); }
+    .pk.gold { fill: var(--gold); filter: drop-shadow(0 0 8px var(--gold)); }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+    .k { position: relative; overflow: hidden; }
+    .k::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, #ff6d5a, #4f46e5); }
+    .k .l { color: var(--mut); text-transform: uppercase; letter-spacing: .07em; font-size: 11px; font-weight: 600; }
+    .k .v { font-size: 28px; font-weight: 800; letter-spacing: -.035em; margin: 4px 0; font-variant-numeric: tabular-nums; }
+    .k .d { font-size: 12px; color: var(--good); }
+    .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+    h2 { font-size: 11.5px; margin: 0 0 8px; color: var(--mut); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+    ul { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+    li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+    li:last-child { border: 0; }
+    li b { color: var(--mut); font-weight: 500; margin-right: 6px; }
+    li.good { color: var(--good); }
+    li.gold { color: var(--gold); }
+    li.bad { color: var(--bad); }
+    .bars rect { fill: #ff6d5a; opacity: .5; transform-box: fill-box; transform-origin: bottom; }
+    .bars rect.new { opacity: 1; animation: g .6s ease-out; filter: drop-shadow(0 0 6px #ff6d5a); }
+    @keyframes g { from { transform: scaleY(0); } }
+    .bars text { fill: var(--mut); font-size: 10px; text-anchor: middle; }
+    .ndv {
+      position: absolute; left: 50%; top: 50%; width: min(600px, 94%); max-height: 96%; overflow: hidden;
+      transform: translate(-50%, -46%) scale(.94); opacity: 0; pointer-events: none;
+      transition: opacity .25s, transform .25s; background: var(--nb); border: 1px solid var(--nl);
+      border-radius: 16px; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .5); z-index: 5;
+    }
+    .ndv.open { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+    .nh { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--nl); }
+    .nh svg { width: 32px; height: 32px; flex: none; }
+    .nh b { display: block; font-size: 15px; }
+    .nh small { color: var(--mut); font-size: 11px; }
+    .pill {
+      margin-left: auto; padding: 3px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;
+      border: 1px solid var(--accent); color: var(--accent);
+    }
+    .pill.ok { border-color: var(--ok); color: var(--ok); }
+    .nb { padding: 12px 16px; display: grid; gap: 10px; max-height: 360px; overflow-y: auto; font-size: 12.5px; }
+    .nb h4 { margin: 0 0 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--mut); }
+    .pm { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pm span { font-size: 11.5px; padding: 3px 9px; border-radius: 8px; background: rgba(255, 109, 90, .12); }
+    .pm span b { color: var(--mut); font-weight: 600; margin-right: 5px; }
+    .ln {
+      font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace; padding: 6px 10px; border-left: 3px solid #ff6d5a;
+      background: rgba(255, 109, 90, .06); border-radius: 0 8px 8px 0;
+    }
+    .ln em { font-style: normal; font-weight: 700; color: #ee513d; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <h1>Live Workflow: E-Commerce NDR & RTO Reduction Bot</h1>
+    <span class="live"><i></i>LIVE SIMULATION</span>
+  </div>
+  <p class="sub">Autonomous D2C logistics protection engine in n8n. Verifies customer address & GPS pin drop via WhatsApp, intercepts courier non-delivery reports (NDR) instantly via automated AI voice calls, and prevents costly RTO returns.</p>
+  
+  <div class="bar">
+    <button class="p" id="order">+ New COD Order</button>
+    <button id="ndr">Simulate Courier NDR (Failed Delivery)</button>
+    <button id="pin">Simulate WhatsApp GPS Pin Verification</button>
+    <button id="toggle">Pause</button>
+    <button id="det">Node details: On</button>
+  </div>
+
+  <div class="cvw">
+    <div class="cv">
+      <div class="chip">Logistics Protection AI <b>● Active</b></div>
+      <svg id="w" viewBox="0 0 960 440" role="img" aria-label="E-Commerce RTO workflow"></svg>
+    </div>
+    <div class="ndv" id="ndv"></div>
+  </div>
+
+  <div class="kpis" id="kpis">
+    <div class="card k" id="krto"><div class="l">RTO Reduced</div><div class="v">-</div><div class="d">From 26% down to 9.2%</div></div>
+    <div class="card k" id="ksaved"><div class="l">Shipping Costs Saved</div><div class="v">-</div><div class="d">Courier reverse fees saved</div></div>
+    <div class="card k" id="kaddr"><div class="l">Address Quality</div><div class="v">-</div><div class="d">Validated pincode & landmarks</div></div>
+    <div class="card k" id="krec"><div class="l">NDR Re-attempt Success</div><div class="v">-</div><div class="d">Delivered on 2nd attempt</div></div>
+  </div>
+
+  <div class="two">
+    <div class="card"><h2>RTOs intercepted per day</h2><svg class="bars" id="ch" viewBox="0 0 340 130"></svg></div>
+    <div class="card"><h2>Fulfillment Stream Log</h2><ul id="log"></ul></div>
+  </div>
+</main>
+
+<script>
+const NS="http://www.w3.org/2000/svg", $ = id => document.getElementById(id);
+const el = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const st = (c, w = 2) => `stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+const fmt = n => "₹" + Math.round(n).toLocaleString("en-IN");
+
+const svg = $("w"), defs = el("defs", {}, svg);
+el("path", { d: "M0 0L8 4L0 8z", class: "mk" }, el("marker", { id: "ar", markerWidth: 8, markerHeight: 8, refX: 7, refY: 4, orient: "auto" }, defs));
+const gE = el("g", {}, svg), gN = el("g", {}, svg), gP = el("g", {}, svg);
+
+const IC_CART = '<circle cx="9" cy="21" r="1" fill="#ff6d5a"/><circle cx="20" cy="21" r="1" fill="#ff6d5a"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" '+st("#ff6d5a",1.8)+'/>';
+const IC_MAP = '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="#0284c7"/><circle cx="12" cy="10" r="3" fill="#fff"/>';
+const IC_WA = '<path d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="#25d366"/><path d="M16.4 14.3c-.25-.13-1.46-.72-1.68-.8-.23-.08-.39-.13-.56.13-.16.25-.64.8-.78.96-.15.16-.29.18-.54.06-.25-.13-1.05-.39-2-1.24-.74-.66-1.24-1.48-1.39-1.73-.14-.25-.02-.38.11-.5.11-.11.25-.29.38-.43.12-.15.16-.25.25-.42.08-.16.04-.31-.02-.43-.06-.13-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.66.31-.23.25-.87.85-.87 2.08 0 1.23.89 2.42 1.02 2.59.13.16 1.76 2.69 4.27 3.77.6.26 1.06.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.46-.6 1.67-1.18.2-.57.2-1.07.14-1.18-.06-.11-.22-.18-.47-.3z" fill="#fff"/>';
+const IC_TRUCK = '<rect x="1" y="3" width="15" height="13" rx="2" fill="#d97706"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" fill="#d97706"/><circle cx="5.5" cy="18.5" r="2.5" fill="#475569"/><circle cx="18.5" cy="18.5" r="2.5" fill="#475569"/>';
+const IC_VOICE = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="#6366f1"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" '+st("#6366f1",1.8)+'/>';
+const IC_RESTOCK = '<path d="M23 4v6h-6M1 20v-6h6" '+st("#059669",2)+'/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" '+st("#059669",2)+'/>';
+const IC_SYNC = '<rect x="3" y="3" width="18" height="18" rx="3" fill="#10b981"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" fill="none"/>';
+
+const NODES = [
+  ["order", "Shopify Order", "New Webhook", 30, 180, IC_CART],
+  ["vfy", "AI Address Sanitizer", "Google Maps + Pin", 180, 180, IC_MAP],
+  ["wa", "WhatsApp Verification", "Confirm COD Order", 340, 180, IC_WA],
+  ["ndr", "Shiprocket NDR Webhook", "Delivery Failed", 500, 90, IC_TRUCK],
+  ["voice", "AI Voice Re-Attempt", "Call Customer Instantly", 680, 90, IC_VOICE],
+  ["restock", "RTO Restock & Return", "Inventory Control", 500, 270, IC_RESTOCK],
+  ["sync", "Shopify & ERP Sync", "Update Order Status", 840, 180, IC_SYNC]
+];
+
+const D = {};
+function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
+
+NODES.forEach(([id, name, sub, x, y, ic]) => {
+  const g = el("g", { class: "nd" }, gN);
+  el("path", { class: "b", d: `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
+  el("g", { transform: `translate(${x+16},${y+16}) scale(1.33)` }, g).innerHTML = ic;
+  const L = wrap(name);
+  L.forEach((t, i) => el("text", { x: x+32, y: y+80+i*13 }, g).textContent = t);
+  el("text", { x: x+32, y: y+80+L.length*13, class: "s" }, g).textContent = sub;
+  const b = el("g", { class: "bg" }, g);
+  el("circle", { cx: x+64, cy: y+4, r: 9 }, b);
+  el("path", { d: `M${x+59.5} ${y+4}l3.2 3.2 6-6.2`, fill: "none", stroke: "#fff", "stroke-width": 2, "stroke-linecap": "round" }, b);
+  D[id] = { g, x, y };
+});
+
+const out = id => [D[id].x + 64, D[id].y + 32], inn = id => [D[id].x, D[id].y + 32];
+const EDG = [];
+function edge(a, b, lab){
+  const [x1, y1] = a, [x2, y2] = b, dx = Math.max(35, (x2 - x1) / 2);
+  const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
+  const t = lab ? el("text", { x: x1 + 10, y: y1 - 8, class: "il" }, gE) : null;
+  if(t) t.textContent = lab;
+  EDG.push({ p, t });
+  return EDG.length - 1;
+}
+
+const e1 = edge(out("order"), inn("vfy"), "COD ₹2,499");
+const e2 = edge(out("vfy"), inn("wa"), "address incomplete");
+const e3 = edge(out("wa"), inn("ndr"), "order shipped");
+const e4 = edge(out("wa"), inn("restock"), "customer cancelled");
+const e5 = edge(out("ndr"), inn("voice"), "customer unreachable");
+const e6 = edge(out("voice"), inn("sync"), "re-attempt booked");
+const e7 = edge(out("restock"), inn("sync"), "inventory updated");
+
+function fly(i, cls, ms){
+  return new Promise(res => {
+    const p = EDG[i].p, L = p.getTotalLength(), c = el("circle", { r: 6, class: "pk " + (cls || "") }, gP), t0 = performance.now();
+    (function f(t){
+      const k = Math.min(1, (t - t0) / ms), q = p.getPointAtLength(L * k);
+      c.setAttribute("cx", q.x);
+      c.setAttribute("cy", q.y);
+      k < 1 ? requestAnimationFrame(f) : (c.remove(), res());
+    })(t0);
+  });
+}
+
+async function go(i, cls, ms = 500){
+  await fly(i, cls, ms);
+  EDG[i].p.classList.add("ok");
+  EDG[i].t && EDG[i].t.classList.add("show");
+}
+
+async function run(id, ms, cls){
+  const c = D[id].g.classList;
+  c.add("run");
+  if(cls) c.add(cls);
+  await sleep(ms);
+  c.remove("run");
+  c.add("ok");
+}
+
+function reset(){
+  Object.values(D).forEach(n => n.g.setAttribute("class", "nd"));
+  EDG.forEach(e => { e.p.classList.remove("ok"); e.t && e.t.classList.remove("show"); });
+}
+
+const S = { rto: 58.2, saved: 342000, addr: 98.4, rec: 74.6, hist: [24, 38, 42, 55, 60, 52, 68, 75] };
+const shown = {};
+function setK(id, val, f, delta){
+  const c = $("k" + id), v = c.querySelector(".v"), from = shown[id] ?? val, t0 = performance.now();
+  shown[id] = val;
+  (function a(t){
+    const k = Math.min(1, (t - t0) / 700);
+    v.textContent = f(from + (val - from) * k);
+    k < 1 && requestAnimationFrame(a);
+  })(t0);
+  if(c.querySelector(".d")) c.querySelector(".d").textContent = delta || "\u00a0";
+}
+
+function chart(){
+  const m = Math.max(...S.hist), g = $("ch"); g.innerHTML = "";
+  S.hist.forEach((v, i) => {
+    const h = (v / m) * 90, x = 10 + i * 41;
+    el("rect", { x, y: 104 - h, width: 28, height: h, rx: 4, class: i === S.hist.length - 1 ? "new" : "" }, g);
+    el("text", { x: x + 14, y: 98 - h }, g).textContent = v;
+    el("text", { x: x + 14, y: 120 }, g).textContent = "D" + (i + 1);
+  });
+}
+
+function log(m, c){
+  const li = document.createElement("li");
+  if(c) li.className = c;
+  li.innerHTML = `<b>${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</b> ${m}`;
+  const u = $("log"); u.prepend(li);
+  while(u.children.length > 8) u.lastChild.remove();
+}
+
+let paused = false, running = false, detail = true;
+
+const ndv = $("ndv");
+async function view(title, sub, params, lines){
+  if(!detail) return;
+  ndv.innerHTML = `
+    <div class="nh"><svg viewBox="0 0 24 24">${IC_TRUCK}</svg><div><b>${title}</b><small>${sub}</small></div><span class="pill ok">NDR Engine</span></div>
+    <div class="nb">
+      <div><h4>Parameters</h4><div class="pm">${Object.entries(params).map(([k,v])=>`<span><b>${k}</b>${v}</span>`).join("")}</div></div>
+      <div><h4>Logistics Recovery Flow</h4><div id="vlines">${lines.map(l=>`<div class="ln">${l}</div>`).join("")}</div></div>
+    </div>`;
+  ndv.classList.add("open");
+  await sleep(1400);
+  ndv.classList.remove("open");
+  await sleep(250);
+}
+
+async function cycle(type = "order"){
+  if(running || paused) return;
+  running = true;
+  reset();
+
+  const isNdr = type === "ndr", isPin = type === "pin";
+  const orderNum = "#ORD-" + Math.floor(8000 + Math.random() * 2000);
+  const city = isNdr ? "Lucknow, UP" : "Surat, Gujarat";
+
+  log(`Shopify Webhook: <b>${orderNum}</b> (Cash on Delivery: ₹2,499) for ${city}`, isNdr ? "gold" : "good");
+  await run("order", 400);
+  await go(e1);
+
+  await run("vfy", 500);
+  if(detail) await view("AI Address Sanitizer", "Geocoding & Postal API", { Pincode: "226010", MatchConfidence: "78% (Missing landmark)" }, [
+    `Checking street address completeness...`,
+    `Flagged: <b>House number / Landmark missing</b> in address field`,
+    `Triggering immediate WhatsApp interactive confirmation message`
+  ]);
+  await go(e2);
+
+  await run("wa", 600);
+  if(detail) await view("WhatsApp Order & Pin Verification", "Meta Cloud API", { Template: "cod_address_check_v2", Interactive: "Pin Drop + Yes/No" }, [
+    "Customer replied: 'House #42, Near Reliance Digital, Gomti Nagar'",
+    "Pinned exact GPS coordinates for delivery rider",
+    "Customer clicked <b>'CONFIRM COD ORDER'</b>"
+  ]);
+
+  if(isNdr){
+    await go(e3, "gold");
+    await run("ndr", 650, "gold");
+    log(`Shiprocket NDR Alert: Rider reported 'Customer Phone Switched Off / Door Locked'`, "bad");
+    await go(e5, "gold");
+
+    await run("voice", 700, "gold");
+    if(detail) await view("Automated AI Voice NDR Dispatch", "Telephony Outbound Agent", { Courier: "Delhivery", Attempt: "1 of 3" }, [
+      "Outbound voice agent called customer: +91-98xxxxxx",
+      "Customer answered: 'I was at office, please deliver tomorrow morning at 11 AM'",
+      "Updated courier API delivery schedule to tomorrow 11:00 AM"
+    ]);
+    await go(e6, "gold");
+    log(`NDR Intercepted: Re-attempt scheduled for tomorrow 11 AM. ₹140 RTO return cost saved!`, "good");
+    S.saved += 140;
+  } else {
+    await go(e3);
+    await run("ndr", 500);
+    await go(e6);
+  }
+
+  await run("sync", 450);
+  log(`Shopify order ${orderNum} tagged 'Address Verified (GPS Confirmed)' & manifested.`, "good");
+
+  S.hist[S.hist.length - 1] += 1;
+  setK("rto", S.rto, n => n.toFixed(1) + "%", "From 26% down to 9.2%");
+  setK("saved", S.saved, fmt, "Courier reverse fees saved");
+  setK("addr", S.addr, n => n.toFixed(1) + "%", "Validated pincode & landmarks");
+  setK("rec", S.rec, n => n.toFixed(1) + "%", "Delivered on 2nd attempt");
+  chart();
+
+  await sleep(1500);
+  reset();
+  running = false;
+}
+
+setK("rto", S.rto, n => n.toFixed(1) + "%", "From 26% down to 9.2%");
+setK("saved", S.saved, fmt, "Courier reverse fees saved");
+setK("addr", S.addr, n => n.toFixed(1) + "%", "Validated pincode & landmarks");
+setK("rec", S.rec, n => n.toFixed(1) + "%", "Delivered on 2nd attempt");
+chart();
+log("E-Commerce RTO Reduction engine active. Click '+ New COD Order' to test.", "good");
+
+$("order").onclick = () => cycle("order");
+$("ndr").onclick = () => cycle("ndr");
+$("pin").onclick = () => cycle("pin");
+$("toggle").onclick = function(){ paused = !paused; this.textContent = paused ? "Resume" : "Pause"; };
+$("det").onclick = function(){ detail = !detail; this.textContent = "Node details: " + (detail ? "On" : "Off"); };
+
+setInterval(() => { if(!paused && !running) cycle(Math.random() > 0.65 ? "ndr" : "order"); }, 9500);
+</script>
+</body>
+</html>
