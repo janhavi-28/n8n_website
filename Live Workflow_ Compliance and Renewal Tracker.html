@@ -149,7 +149,7 @@
 
   <div class="cv">
     <div class="chip">Compliance and Renewal Tracker Auto-Flow <b>● Active</b></div>
-    <svg id="w" viewBox="0 0 960 400" role="img" aria-label="Compliance and Renewal Tracker workflow"></svg>
+    <svg id="w" viewBox="0 0 960 480" role="img" aria-label="Compliance and Renewal Tracker workflow"></svg>
   </div>
 
   <div class="kpis">
@@ -190,8 +190,8 @@ const gE = el("g", {}, svg);
 const gN = el("g", {}, svg);
 const gP = el("g", {}, svg);
 
-const RAW_NODES = [["cron","Morning Cron","Daily 8:30 AM Check",40,180,"<circle cx=\"12\" cy=\"12\" r=\"9\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"12,6 12,12 16,14\" stroke=\"#6366f1\" stroke-width=\"2\"/>"],["db","Airtable / Notion","Scan Expiry Dates",210,180,"<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><line x1=\"3\" y1=\"9\" x2=\"21\" y2=\"9\" stroke=\"#059669\" stroke-width=\"1.5\"/>"],["switch","Switch Node","60d / 30d / 15d / 7d",390,180,"<path d=\"M4 12h6M10 12l6-6M10 12l6 6\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/>"],["email","Email Notification","Owner Alert (60/30d)",600,90,"<path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"],["sms","SMS / WhatsApp Alert","Facility Mgr (15d)",600,180,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"],["slack","Slack Urgent Desk","Director Escalation (7d)",600,270,"<path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\" fill=\"#ef4444\"/>"]];
-const RAW_EDGES = [["cron","db","daily query"],["db","switch","calculate days remaining"],["switch","email","30 days left"],["switch","sms","15 days left"],["switch","slack","7 days left: URGENT"]];
+const RAW_NODES = [["cron","Morning Cron","Daily 8:30 AM Check",50,200,"<circle cx=\"12\" cy=\"12\" r=\"9\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"12,6 12,12 16,14\" stroke=\"#6366f1\" stroke-width=\"2\"/>"],["db","Airtable / Notion","Scan Expiry Dates",230,200,"<ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/><path d=\"M21 12c0 1.66-4 3-9 3s-9-1.34-9-3\" stroke=\"#8b5cf6\" stroke-width=\"2\"/><path d=\"M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5\" stroke=\"#8b5cf6\" stroke-width=\"2\"/>"],["switch","Switch Node","60d / 30d / 15d / 7d",410,200,"<path d=\"M4 12h6M10 12l6-6M10 12l6 6\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"],["email","Email Notification","Owner Alert (60/30d)",640,50,"<path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"],["sms","SMS / WhatsApp Alert","Facility Mgr (15d)",640,200,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"],["slack","Slack Urgent Desk","Director Escalation (7d)",640,350,"<path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\" fill=\"#ef4444\"/>"]];
+const RAW_EDGES = [["cron","db","daily query"],["db","switch","calculate days remaining"],["switch","email","60/30 Days"],["switch","sms","15 Days"],["switch","slack","7 Days (Urgent)"]];
 const RAW_LOGS = ["Daily compliance check initiated across 164 tracked enterprise documents.","Identified: Factory Fire Safety NOC expires in 15 days (Nov 14).","Triggered automated WhatsApp alert directly to Head of Facilities with vendor renewal link.","High-priority warning dispatched to Executive Slack channel for board visibility."];
 
 const D = {};
@@ -216,7 +216,7 @@ const EDG = [];
 RAW_EDGES.forEach(([fromId, toId, lab]) => {
   const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(30, (x2 - x1) / 2);
   const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: (x1 + x2)/2, y: Math.min(y1, y2) - 8, class: "il" }, gE) : null;
+  const t = lab ? el("text", { x: (x1 + x2)/2, y: (y1 + y2)/2 - 8, class: "il" }, gE) : null;
   if(t) t.textContent = lab;
   EDG.push({ p, t, from: fromId, to: toId });
 });

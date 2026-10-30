@@ -138,12 +138,12 @@
     <h1>Student Admission and Parent Update Bot</h1>
     <span class="live"><i></i>LIVE SIMULATION</span>
   </div>
-  <p class="sub">Educational institute enrollment pipeline in n8n. Delivers instant curriculum documentation to interested parents, schedules counselor callbacks, and tracks tuition fee compliance.</p>
+  <p class="sub">Omnichannel student enrollment pipeline in n8n. Dispatches tailored curriculum brochures instantly upon web inquiry, creates counselor phone follow-ups, and confirms tuition payments.</p>
   
   <div class="bar">
-    <button class="p" id="lead">+ Ingest Parent Inquiry</button>
-    <button class="" id="counsel">Simulate Counselor Assignment</button>
-    <button class="" id="fee">Simulate Fee Payment (₹45,000)</button>
+    <button class="p" id="lead">+ Ingest Grade 11 Inquiry (Science Stream)</button>
+    <button class="" id="task">Simulate Academic Counselor Task Entry</button>
+    <button class="" id="pay">Simulate Razorpay Tuition Fee Clearance</button>
     <button id="toggle">Pause</button>
   </div>
 
@@ -153,10 +153,10 @@
   </div>
 
   <div class="kpis">
-    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">780</div><div class="d">Inquiries Handled</div></div>
-    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">38%</div><div class="d">Inquiry-to-Admission Rate</div></div>
-    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">15 sec</div><div class="d">Prospectus Delivery</div></div>
-    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">100%</div><div class="d">Fee Reconciliation</div></div>
+    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">1,820</div><div class="d">Student Inquiries Handled</div></div>
+    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">3.2x</div><div class="d">Brochure-to-Visit Rate</div></div>
+    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">100%</div><div class="d">Payment Fee Tracking</div></div>
+    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">₹2.8Cr</div><div class="d">Fees Collected</div></div>
   </div>
 
   <div class="two">
@@ -190,9 +190,9 @@ const gE = el("g", {}, svg);
 const gN = el("g", {}, svg);
 const gP = el("g", {}, svg);
 
-const RAW_NODES = [["lead","Landing Page Webhook","Parent Inquiry Inbound",40,180,"<path d=\"M22 10v6M2 10l10-5 10 5-10 5z\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><path d=\"M6 12v5c3 3 9 3 12 0v-5\" stroke=\"#6366f1\" stroke-width=\"1.5\"/>"],["docs","WhatsApp & Email","Deliver Prospectus PDF",210,180,"<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"],["task","ClickUp / Tasks","Assign Counselor Callback",390,180,"<path d=\"M9 11l3 3L22 4\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" stroke=\"#d97706\" stroke-width=\"1.5\" fill=\"none\"/>"],["pay","Razorpay / Instamojo","Fee Payment Webhook",570,180,"<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/><line x1=\"2\" y1=\"10\" x2=\"22\" y2=\"10\" stroke=\"#8b5cf6\" stroke-width=\"2\"/>"],["confirm","WhatsApp Confirmation","Seat Confirmed & Receipt",760,180,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"]];
-const RAW_EDGES = [["lead","docs","Pooja Hegde (Grade 5)"],["docs","task","curriculum delivered"],["task","pay","counselor call completed"],["pay","confirm","₹45,000 paid via UPI"]];
-const RAW_LOGS = ["Inbound inquiry captured for Grade 5 admission from Pooja Hegde.","Dispatched school fee structure & curriculum brochure PDF via WhatsApp in 5.4s.","Created high-priority follow-up task for Admissions Counselor in ClickUp.","Razorpay webhook: Term 1 fee ₹45,000 received. Admission letter & receipt generated."];
+const RAW_NODES = [["lead","Landing Page Webhook","Course Inquiry Ingest",40,180,"<circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><line x1=\"2\" y1=\"12\" x2=\"22\" y2=\"12\" stroke=\"#6366f1\" stroke-width=\"1.5\"/>"],["docs","Gmail & WhatsApp","Instant Brochure PDF",210,180,"<path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"],["task","Google Tasks / ClickUp","Counselor Call Task",390,180,"<polyline points=\"9 11 12 14 22 4\" stroke=\"#059669\" stroke-width=\"2\"/><path d=\"M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"],["pay","Razorpay / Instamojo","Fee Compliance Monitor",570,180,"<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><line x1=\"2\" y1=\"10\" x2=\"22\" y2=\"10\" stroke=\"#059669\" stroke-width=\"2\"/>"],["confirm","WhatsApp Confirmation","Parent Receipt & ID Card",760,180,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"]];
+const RAW_EDGES = [["lead","docs","Priya Verma: Grade 11 Science"],["docs","task","brochure delivered in 6 sec"],["task","pay","Counselor mapped for tomorrow"],["pay","confirm","Fee ₹65,000 cleared via UPI"]];
+const RAW_LOGS = ["Parent admission inquiry received for Grade 11 CBSE Science (PCM).","Delivered customized curriculum brochure and fee structure via WhatsApp & Gmail within 6 seconds.","Assigned high-priority discovery call task to Senior Academic Counselor in ClickUp.","Admission finalized: Razorpay payment link cleared ₹65,000 tuition fee. ID card generated."];
 
 const D = {};
 function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
@@ -216,7 +216,7 @@ const EDG = [];
 RAW_EDGES.forEach(([fromId, toId, lab]) => {
   const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(30, (x2 - x1) / 2);
   const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: (x1 + x2)/2, y: Math.min(y1, y2) - 8, class: "il" }, gE) : null;
+  const t = lab ? el("text", { x: (x1 + x2)/2, y: (y1 + y2)/2 - 8, class: "il" }, gE) : null;
   if(t) t.textContent = lab;
   EDG.push({ p, t, from: fromId, to: toId });
 });
@@ -312,8 +312,8 @@ chart();
 log("Student Admission and Parent Update Bot pipeline online. Ready for execution.", "good");
 
 if($("lead")) $("lead").onclick = () => cycle(0);
-if($("counsel")) $("counsel").onclick = () => cycle(1);
-if($("fee")) $("fee").onclick = () => cycle(2);
+if($("task")) $("task").onclick = () => cycle(1);
+if($("pay")) $("pay").onclick = () => cycle(2);
 $("toggle").onclick = function() {
   paused = !paused;
   this.textContent = paused ? "Resume" : "Pause";

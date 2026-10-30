@@ -1,223 +1,876 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Live Workflow: Invoice Processing Bot</title>
-<style>
-:root{--bg:#f3f5fb;--card:rgba(255,255,255,.82);--text:#0f172a;--mut:#64748b;--line:#dde3f0;--accent:#ff6d5a;--good:#059669;--bad:#e11d48;--badbg:#ffe9ee;--gold:#d97706;--canvas:#f7f8fb;--dot:#d3d8e4;--nb:#fff;--nl:#c5cad8;--edge:#9aa1b5;--coral:#ff6d5a;--ok:#2fae6b;color-scheme:light;box-sizing:border-box}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070b16;--card:rgba(20,28,50,.72);--text:#eef2ff;--mut:#94a3c4;--line:rgba(148,163,210,.22);--accent:#ff7d6d;--good:#34d399;--bad:#fb7185;--badbg:rgba(244,63,94,.14);--gold:#fbbf24;--canvas:#14161f;--dot:#2c3040;--nb:#262938;--nl:#454a5e;--edge:#6b7390;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#070b16;--card:rgba(20,28,50,.72);--text:#eef2ff;--mut:#94a3c4;--line:rgba(148,163,210,.22);--accent:#ff7d6d;--good:#34d399;--bad:#fb7185;--badbg:rgba(244,63,94,.14);--gold:#fbbf24;--canvas:#14161f;--dot:#2c3040;--nb:#262938;--nl:#454a5e;--edge:#6b7390;color-scheme:dark}
-*{box-sizing:border-box}
-body{margin:0;color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(900px 480px at 12% -8%,rgba(255,109,90,.15),transparent),radial-gradient(700px 420px at 100% 0,rgba(79,70,229,.12),transparent),var(--bg);background-attachment:fixed;min-height:100vh}
-main{max-width:1040px;margin:0 auto;padding:26px 14px 30px}
-.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-h1{font-size:28px;margin:0;font-weight:800;letter-spacing:-.035em;background:linear-gradient(90deg,var(--text) 40%,var(--coral));-webkit-background-clip:text;background-clip:text;color:transparent}
-.live{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--good);border:1px solid var(--good);padding:4px 11px;border-radius:999px;display:inline-flex;gap:7px;align-items:center}
-.live i{width:7px;height:7px;border-radius:50%;background:var(--good);animation:pu 1.4s infinite}@keyframes pu{50%{opacity:.25;transform:scale(1.6)}}
-p.sub{margin:6px 0 16px;color:var(--mut);font-size:14px}
-.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-button{font:inherit;font-weight:600;padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;transition:transform .15s}
-button:active{transform:scale(.96)}button.p{background:linear-gradient(135deg,#ff6d5a,#ee513d);border:0;color:#fff;box-shadow:0 10px 24px -10px #ff6d5a}
-.card{background:var(--card);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 18px 40px -20px rgba(15,23,42,.35)}
-.cv{position:relative;border-radius:20px;border:1px solid var(--line);overflow-x:auto;background-color:var(--canvas);background-image:radial-gradient(var(--dot) 1.2px,transparent 1.2px);background-size:22px 22px}
-.cv svg{min-width:860px;width:100%;display:block}
-.chip{position:sticky;left:12px;top:12px;display:inline-flex;gap:10px;align-items:center;margin:12px;padding:6px 12px;border-radius:10px;background:var(--nb);border:1px solid var(--nl);font-size:12px;font-weight:600;z-index:2}.chip b{color:var(--ok);font-weight:600}
-.nd .b{fill:var(--nb);stroke:var(--nl);stroke-width:1.5;transition:stroke .25s}
-.nd text{fill:var(--text);font-size:12px;font-weight:600;text-anchor:middle}.nd .s{fill:var(--mut);font-size:10px;font-weight:400}
-.nd.run .b{stroke:var(--coral);stroke-width:2;stroke-dasharray:6 4;animation:d .6s linear infinite;filter:drop-shadow(0 0 6px var(--coral))}
-.nd.ok .b{stroke:var(--ok);stroke-width:2}.nd.gold .b{stroke:var(--gold);stroke-width:2;filter:drop-shadow(0 0 6px var(--gold))}
-.bg{display:none}.nd.ok .bg{display:block}.bg circle{fill:var(--ok)}
-.ed{fill:none;stroke:var(--edge);stroke-width:1.8;transition:stroke .3s}.ed.ok{stroke:var(--ok)}@keyframes d{to{stroke-dashoffset:-10}}
-.mk{fill:var(--edge)}.pt{fill:var(--nb);stroke:var(--edge);stroke-width:1.5}
-.il{fill:var(--ok);font-size:10px;font-weight:600;opacity:0;transition:.3s}.il.show{opacity:1}.pl{fill:var(--mut);font-size:9.5px}
-.pk{fill:var(--coral);filter:drop-shadow(0 0 7px var(--coral))}.pk.gold{fill:var(--gold);filter:drop-shadow(0 0 8px var(--gold))}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
-.k{position:relative;overflow:hidden}.k::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--coral),#ff8a5a)}
-.k .l{color:var(--mut);text-transform:uppercase;letter-spacing:.07em;font-size:11px;font-weight:600}.k .v{font-size:28px;font-weight:800;letter-spacing:-.035em;margin:4px 0;font-variant-numeric:tabular-nums}.k .d{font-size:12px;color:var(--good)}
-.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
-h2{font-size:11.5px;margin:0 0 8px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
-ul{list-style:none;margin:0;padding:0;font-size:13px}li{padding:6px 0;border-bottom:1px solid var(--line)}li:last-child{border:0}li b{color:var(--mut);font-weight:500;margin-right:6px}
-.bars rect{fill:var(--coral);opacity:.5;transform-box:fill-box;transform-origin:bottom}.bars rect.new{opacity:1;animation:g .6s ease-out;filter:drop-shadow(0 0 6px var(--coral))}@keyframes g{from{transform:scaleY(0)}}.bars text{fill:var(--mut);font-size:10px;text-anchor:middle}
-.ndv{position:absolute;left:50%;top:50%;width:min(600px,94%);max-height:96%;overflow:hidden;transform:translate(-50%,-46%) scale(.94);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;background:var(--nb);border:1px solid var(--nl);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);z-index:5}
-.ndv.open{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.nh{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--nl)}.nh b{display:block;font-size:15px}.nh small{color:var(--mut);font-size:11px}
-.pill{margin-left:auto;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--coral);color:var(--coral)}.pill.ok{border-color:var(--ok);color:var(--ok)}
-.nb{padding:12px 16px;display:grid;gap:10px;max-height:360px;overflow-y:auto;font-size:12.5px}
-.ln{font:12px/1.5 ui-monospace,monospace;padding:6px 10px;border-left:3px solid var(--coral);background:rgba(255,109,90,.06);border-radius:0 8px 8px 0}
-  .ndv { display: none !important; }
-</style></head><body><main>
-<div class="top"><h1>Invoice Processing Bot</h1><span class="live"><i></i>LIVE SIMULATION</span></div>
-<p class="sub">Demo of automated PDF invoice parsing inside n8n. Ingests billing attachments, extracts line items via Vision OCR, runs 3-way PO matching, and syncs to ERP.</p>
-<div class="bar"><button class="p" id="inv">+ Process new invoice PDF</button><button id="mismatch">Simulate PO exception</button><button id="play">Pause</button></div>
-<div class="cv"><div class="chip">Invoice 3-Way Match & ERP <b>● Active</b></div><svg id="w" viewBox="0 0 960 480" role="img" aria-label="invoice processing workflow"></svg></div>
-<div class="ndv" id="ndv"></div>
-<div class="kpis" id="kpis">
-  <div class="card k"><div class="l">Invoices Processed</div><div class="v" id="k-inv">428</div><div class="d">Today: 38 processed</div></div>
-  <div class="card k"><div class="l">Extraction Accuracy</div><div class="v" id="k-acc">99.4%</div><div class="d">Vision OCR + LLM verify</div></div>
-  <div class="card k"><div class="l">Auto-Matched POs</div><div class="v" id="k-po">92.6%</div><div class="d">Zero manual entry</div></div>
-  <div class="card k"><div class="l">Avg Processing Time</div><div class="v" id="k-time">3.8s</div><div class="d">vs 15 min manual</div></div>
-</div>
-<div class="two">
-  <div class="card"><h2>Processed invoices per batch</h2><svg class="bars" id="ch" viewBox="0 0 340 130"></svg></div>
-  <div class="card"><h2>Reconciliation Log</h2><ul id="log"></ul></div>
-</div>
-</main>
-<script>
-const NS="http://www.w3.org/2000/svg",$=i=>document.getElementById(i);
-const el=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const st=(c,w=2)=>`stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+<html lang="en">
 
-const svg=$("w"),defs=el("defs",{},svg);
-el("path",{d:"M0 0L8 4L0 8z",class:"mk"},el("marker",{id:"ar",markerWidth:8,markerHeight:8,refX:7,refY:4,orient:"auto"},defs));
-const gE=el("g",{},svg),gN=el("g",{},svg),gP=el("g",{},svg);
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Live Workflow: Invoice Processing Bot</title>
+  <style>
+    :root {
+      --bg: #f3f5fb;
+      --card: rgba(255, 255, 255, .82);
+      --text: #0f172a;
+      --mut: #64748b;
+      --line: #dde3f0;
+      --accent: #ff6d5a;
+      --good: #059669;
+      --bad: #e11d48;
+      --badbg: #ffe9ee;
+      --gold: #d97706;
+      --canvas: #f7f8fb;
+      --dot: #d3d8e4;
+      --nb: #fff;
+      --nl: #c5cad8;
+      --edge: #9aa1b5;
+      --coral: #ff6d5a;
+      --ok: #2fae6b;
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
 
-const IC_EMAIL='<rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="#ea4335"/><path d="M3 7.5l9 6.5 9-6.5" '+st("#fff",1.8)+'/>';
-const IC_OCR='<rect x="3" y="3" width="18" height="18" rx="2" fill="#2563eb"/><circle cx="12" cy="12" r="4" stroke="#fff" stroke-width="1.8" fill="none"/>';
-const IC_PARSE='<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="#0284c7"/><polyline points="14 2 14 8 20 8" fill="#38bdf8"/>';
-const IC_MATCH='<path d="M9 11l3 3L22 4" '+st("#059669",2)+'/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" '+st("#059669")+'>';
-const IC_ROUTE='<path d="M3 12h6M9 12l8-6M9 12l8 6" '+st("#8b5cf6")+'>';
-const IC_ERP='<rect x="3" y="3" width="18" height="18" rx="2" fill="#059669"/><text x="12" y="16" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">ERP</text>';
-const IC_ALERT='<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="#f59e0b"/>';
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #070b16;
+        --card: rgba(20, 28, 50, .72);
+        --text: #eef2ff;
+        --mut: #94a3c4;
+        --line: rgba(148, 163, 210, .22);
+        --accent: #ff7d6d;
+        --good: #34d399;
+        --bad: #fb7185;
+        --badbg: rgba(244, 63, 94, .14);
+        --gold: #fbbf24;
+        --canvas: #14161f;
+        --dot: #2c3040;
+        --nb: #262938;
+        --nl: #454a5e;
+        --edge: #6b7390;
+        color-scheme: dark
+      }
+    }
 
-const NODES=[
-  ["trig","Inbound Billing Email","Gmail / IMAP",30,190,IC_EMAIL],
-  ["ocr","Document Vision OCR","AWS Textract",180,190,IC_OCR],
-  ["parse","Extract Line Items","Claude / LLM",350,190,IC_PARSE],
-  ["match","3-Way PO Matching","Database Query",520,190,IC_MATCH],
-  ["route","Auto-Approval Router","Logic Filter",690,190,IC_ROUTE],
-  ["erp","Sync Zoho / Tally","ERP Connector",840,110,IC_ERP],
-  ["alert","Route to Finance CFO","Approval Queue",840,270,IC_ALERT]
-];
+    :root[data-theme="dark"] {
+      --bg: #070b16;
+      --card: rgba(20, 28, 50, .72);
+      --text: #eef2ff;
+      --mut: #94a3c4;
+      --line: rgba(148, 163, 210, .22);
+      --accent: #ff7d6d;
+      --good: #34d399;
+      --bad: #fb7185;
+      --badbg: rgba(244, 63, 94, .14);
+      --gold: #fbbf24;
+      --canvas: #14161f;
+      --dot: #2c3040;
+      --nb: #262938;
+      --nl: #454a5e;
+      --edge: #6b7390;
+      color-scheme: dark
+    }
 
-const D={};
-function wrap(s){if(s.length<=16)return[s];const w=s.split(" "),l=[""];w.forEach(x=>{const c=l[l.length-1];if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim();else l.push(x)});return l}
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
 
-NODES.forEach(([id,name,sub,x,y,ic])=>{
-  const g=el("g",{class:"nd"},gN);
-  el("path",{class:"b",d:`M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z`},g);
-  el("g",{transform:`translate(${x+16},${y+16}) scale(1.33)`},g).innerHTML=ic;
-  const L=wrap(name);
-  L.forEach((t,i)=>el("text",{x:x+32,y:y+80+i*13},g).textContent=t);
-  el("text",{x:x+32,y:y+80+L.length*13,class:"s"},g).textContent=sub;
-  const b=el("g",{class:"bg"},g);
-  el("circle",{cx:x+64,cy:y+4,r:9},b);
-  el("path",{d:`M${x+59.5} ${y+4}l3.2 3.2 6-6.2`,fill:"none",stroke:"#fff","stroke-width":2,"stroke-linecap":"round"},b);
-  D[id]={g,x,y};
-});
+    * {
+      box-sizing: border-box
+    }
 
-const out=id=>[D[id].x+64,D[id].y+32],inn=id=>[D[id].x,D[id].y+32];
-const EDG=[];
-function edge(a,b,lab){
-  const[x1,y1]=a,[x2,y2]=b,dx=Math.max(30,(x2-x1)/2);
-  const p=el("path",{class:"ed",d:`M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`,"marker-end":"url(#ar)"},gE);
-  const t=lab?el("text",{x:x1+8,y:y1-7,class:"il"},gE):null;if(t)t.textContent=lab;
-  EDG.push({p,t});return EDG.length-1;
-}
+    body {
+      margin: 0;
+      color: var(--text);
+      font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: radial-gradient(900px 480px at 12% -8%, rgba(255, 109, 90, .16), transparent), radial-gradient(700px 420px at 100% 0, rgba(79, 70, 229, .12), transparent), var(--bg);
+      background-attachment: fixed;
+      min-height: 100vh
+    }
 
-const e1=edge(out("trig"),inn("ocr"),"PDF attached");
-const e2=edge(out("ocr"),inn("parse"),"raw text & tables");
-const e3=edge(out("parse"),inn("match"),"line items");
-const e4=edge(out("match"),inn("route"),"reconciliation");
-const e5=edge(out("route"),inn("erp"),"Matched 100%");
-const e6=edge(out("route"),inn("alert"),"Variance > 5%");
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 26px 14px 30px
+    }
 
-function fly(i,cls,ms){
-  return new Promise(res=>{
-    const p=EDG[i].p,L=p.getTotalLength(),c=el("circle",{r:6,class:"pk "+(cls||"")},gP),t0=performance.now();
-    (function f(t){const k = Math.min(1, (t - t0) / ms);
-      const ease = k < 0.5 ? 2 * k * k : -1 + (4 - 2 * k) * k;
-      const q = p.getPointAtLength(L * ease);c.setAttribute("cx",q.x);c.setAttribute("cy",q.y);k<1?requestAnimationFrame(f):(c.remove(),res())})(t0);
-  });
-}
-async function go(i,cls,ms=500){await fly(i,cls,ms);EDG[i].p.classList.add("ok");EDG[i].t&&EDG[i].t.classList.add("show")}
-async function run(id,ms){const c=D[id].g.classList;c.add("run");await sleep(ms);c.remove("run");c.add("ok")}
+    .top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap
+    }
 
-let invCount=428,poMatched=92.6,accVal=99.4,procTime=3.8,paused=false,showDetails = false;
-const shown={};
-function setK(id,val,f,delta){
-  const c=$(id),from=shown[id]??val,t0=performance.now();
-  shown[id]=val;
-  (function a(t){
-    const k=Math.min(1,(t-t0)/700);
-    c.textContent=f(from+(val-from)*k);
-    k<1&&requestAnimationFrame(a);
-  })(t0);
-}
+    h1 {
+      font-size: 30px;
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: -.035em;
+      background: linear-gradient(90deg, var(--text) 40%, var(--coral));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent
+    }
 
-function logItem(txt,badge="INFO"){
-  const ul=$("log");
-  const li=document.createElement("li");
-  const time=new Date().toLocaleTimeString();
-  li.innerHTML=`<b>${time}</b> [${badge}] ${txt}`;
-  ul.insertBefore(li,ul.firstChild);
-  if(ul.children.length>7)ul.removeChild(ul.lastChild);
-}
+    .live {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      color: var(--good);
+      border: 1px solid var(--good);
+      padding: 4px 11px;
+      border-radius: 999px;
+      display: inline-flex;
+      gap: 7px;
+      align-items: center
+    }
 
-function showNodeDetail(){ return; }
+    .live i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--good);
+      animation: pu 1.4s infinite
+    }
 
-async function cycle(simulateMismatch=false){
-  if(paused)return;
-  EDG.forEach(e=>{e.p.classList.remove("ok");e.t&&e.t.classList.remove("show")});
-  NODES.forEach(([id])=>D[id].g.classList.remove("ok","run"));
+    @keyframes pu {
+      50% {
+        opacity: .25;
+        transform: scale(1.6)
+      }
+    }
 
-  logItem(simulateMismatch?"Inbound Vendor Invoice #INV-8834 (Google Cloud)":"Inbound Vendor Invoice #INV-4921 (AWS Services)","INGEST");
-  await run("trig",400);
-  await go(e1);
+    p.sub {
+      margin: 6px 0 16px;
+      color: var(--mut);
+      font-size: 14px
+    }
 
-  showNodeDetail("Textract OCR Engine",["Processing multi-page PDF table...","Extracted 8 itemized rows, Tax GSTIN, Total ₹48,500"]);
-  await run("ocr",600);
-  await go(e2);
+    .bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px
+    }
 
-  showNodeDetail("LLM Structure Normalizer",["Mapping vendor fields to ERP schema...","Currency: INR, Due Date: 30 days, PO Reference: PO-9912"]);
-  await run("parse",550);
-  await go(e3);
+    button {
+      font: inherit;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform .15s
+    }
 
-  showNodeDetail("3-Way Reconciliation",["Querying PO #9912 in accounting database...","Line items quantity & pricing match: "+(simulateMismatch?"MISMATCH (qty diff)":"100% OK")]);
-  await run("match",650);
-  await go(e4);
-  await run("route",400);
+    button:active {
+      transform: scale(.96)
+    }
 
-  if(!simulateMismatch){
-    await go(e5);
-    showNodeDetail("ERP Connector (Zoho Books)",["Creating Bill #BILL-7712...","Status: Approved & Scheduled for Payment Batch"]);
-    await run("erp",600);
-    invCount+=1;
-    logItem("Invoice #INV-4921 matched PO-9912 and synced to Zoho Books.","SUCCESS");
-  } else {
-    await go(e6);
-    showNodeDetail("CFO Finance Exception",["Flagged variance: Quantity billed 12 vs PO 10","Notification sent to finance-lead@company.com"]);
-    await run("alert",600);
-    logItem("PO discrepancy detected in #INV-8834. Routed to CFO for review.","EXCEPTION");
-  }
+    button:focus-visible {
+      outline: 2px solid var(--coral);
+      outline-offset: 2px
+    }
 
-  setK("k-inv", invCount, n => Math.round(n).toLocaleString());
-  renderBars();
-}
+    button.p {
+      background: linear-gradient(135deg, #ff6d5a, #ff8a5a);
+      border: 0;
+      color: #fff;
+      box-shadow: 0 10px 24px -10px #ff6d5a
+    }
 
-function renderBars(){
-  const ch=$("ch");ch.innerHTML="";
-  const vals=[8,14,26,38,32,45,50,42];
-  const w=28,gap=14;
-  vals.forEach((v,i)=>{
-    const h=(v/60)*100;
-    const r=el("rect",{x:i*(w+gap)+10,y:115-h,width:w,height:h,rx:4,class:i===vals.length-1?"new":""},ch);
-    el("text",{x:i*(w+gap)+10+w/2,y:128},ch).textContent=`${(i+9)%12||12}${i<3?"am":"pm"}`;
-  });
-}
+    .card {
+      background: var(--card);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 18px 40px -20px rgba(15, 23, 42, .35)
+    }
 
-$("inv").onclick=()=>cycle(false);
-$("mismatch").onclick=()=>cycle(true);
-$("play").onclick=function(){
-  paused=!paused;
-  this.textContent=paused?"Resume":"Pause";
-};
-$("det").onclick=function(){
-  showDetails=!showDetails;
-  this.textContent=showDetails?"Node details: On":"Node details: Off";
-  if(!showDetails)$("ndv").classList.remove("open");
-};
+    .cvw {
+      position: relative
+    }
 
-renderBars();
-cycle(false);
-setInterval(()=>{if(!paused)cycle(false)},14000);
-</script></body></html>
+    .cv {
+      position: relative;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      overflow-x: auto;
+      background-color: var(--canvas);
+      background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
+      background-size: 22px 22px
+    }
+
+    .cv svg {
+      min-width: 860px;
+      width: 100%;
+      display: block;
+      transition: opacity .25s
+    }
+
+    .cv.dim svg {
+      opacity: .25
+    }
+
+    .chip {
+      position: sticky;
+      left: 12px;
+      top: 12px;
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      margin: 12px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: var(--nb);
+      border: 1px solid var(--nl);
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 2
+    }
+
+    .chip b {
+      color: var(--ok);
+      font-weight: 600
+    }
+
+    .nd .b {
+      fill: var(--nb);
+      stroke: var(--nl);
+      stroke-width: 1.5;
+      transition: stroke .25s
+    }
+
+    .nd text {
+      fill: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      text-anchor: middle
+    }
+
+    .nd .s {
+      fill: var(--mut);
+      font-size: 10px;
+      font-weight: 400
+    }
+
+    .nd.run .b {
+      stroke: var(--coral);
+      stroke-width: 2;
+      stroke-dasharray: 6 4;
+      animation: d .6s linear infinite;
+      filter: drop-shadow(0 0 6px var(--coral))
+    }
+
+    .nd.ok .b {
+      stroke: var(--ok);
+      stroke-width: 2
+    }
+
+    .nd.gold .b {
+      stroke: var(--gold);
+      stroke-width: 2;
+      filter: drop-shadow(0 0 6px var(--gold))
+    }
+
+    .bg {
+      display: none
+    }
+
+    .nd.ok .bg {
+      display: block
+    }
+
+    .bg circle {
+      fill: var(--ok)
+    }
+
+    .ed {
+      fill: none;
+      stroke: var(--edge);
+      stroke-width: 1.8;
+      transition: stroke .3s
+    }
+
+    .ed.ok {
+      stroke: var(--ok)
+    }
+
+    @keyframes d {
+      to {
+        stroke-dashoffset: -10
+      }
+    }
+
+    .mk {
+      fill: var(--edge)
+    }
+
+    .il {
+      fill: var(--ok);
+      font-size: 10px;
+      font-weight: 600;
+      opacity: 0;
+      transition: .3s
+    }
+
+    .il.show {
+      opacity: 1
+    }
+
+    .pk {
+      fill: var(--coral);
+      filter: drop-shadow(0 0 7px var(--coral))
+    }
+
+    .pk.gold {
+      fill: var(--gold);
+      filter: drop-shadow(0 0 8px var(--gold))
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin: 12px 0
+    }
+
+    .k {
+      position: relative;
+      overflow: hidden
+    }
+
+    .k::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--coral), #ff8a5a)
+    }
+
+    .k .l {
+      color: var(--mut);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-size: 11px;
+      font-weight: 600
+    }
+
+    .k .v {
+      font-size: 29px;
+      font-weight: 800;
+      letter-spacing: -.035em;
+      margin: 4px 0;
+      font-variant-numeric: tabular-nums
+    }
+
+    .k .d {
+      font-size: 12px;
+      color: var(--good)
+    }
+
+    .k.flag {
+      border-color: var(--gold)
+    }
+
+    .k.flag::before {
+      background: var(--gold)
+    }
+
+    .k.flag .d {
+      color: var(--gold)
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 10px
+    }
+
+    h2 {
+      font-size: 11.5px;
+      margin: 0 0 8px;
+      color: var(--mut);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 13px
+    }
+
+    li {
+      padding: 5px 0;
+      border-bottom: 1px solid var(--line)
+    }
+
+    li:last-child {
+      border: 0
+    }
+
+    li b {
+      color: var(--mut);
+      font-weight: 500;
+      margin-right: 6px
+    }
+
+    li.gold {
+      color: var(--gold)
+    }
+
+    li.bad {
+      color: var(--bad)
+    }
+
+    li.good {
+      color: var(--good)
+    }
+
+    .bars rect {
+      fill: var(--coral);
+      opacity: .5;
+      transform-box: fill-box;
+      transform-origin: bottom
+    }
+
+    .bars rect.vip {
+      fill: var(--gold);
+      opacity: .85
+    }
+
+    .bars rect.new {
+      opacity: 1;
+      animation: g .6s ease-out;
+      filter: drop-shadow(0 0 6px var(--coral))
+    }
+
+    @keyframes g {
+      from {
+        transform: scaleY(0)
+      }
+    }
+
+    .bars text {
+      fill: var(--mut);
+      font-size: 10px;
+      text-anchor: middle
+    }
+
+    .ndv {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(640px, 94%);
+      max-height: 96%;
+      overflow: hidden;
+      transform: translate(-50%, -46%) scale(.94);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      background: var(--nb);
+      border: 1px solid var(--nl);
+      border-radius: 16px;
+      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .5);
+      z-index: 5
+    }
+
+    .ndv.open {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1)
+    }
+
+    .nh {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--nl)
+    }
+
+    .nh svg {
+      width: 32px;
+      height: 32px;
+      flex: none
+    }
+
+    .nh b {
+      display: block;
+      font-size: 15px
+    }
+
+    .nh small {
+      color: var(--mut);
+      font-size: 11px
+    }
+
+    .pill {
+      margin-left: auto;
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid var(--coral);
+      color: var(--coral)
+    }
+
+    .pill.ok {
+      border-color: var(--ok);
+      color: var(--ok)
+    }
+
+    .nb {
+      padding: 12px 16px;
+      display: grid;
+      gap: 12px;
+      max-height: 390px;
+      overflow-y: auto
+    }
+
+    .nb h4 {
+      margin: 0 0 6px;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--mut)
+    }
+
+    .pm {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .pm span {
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: 8px;
+      background: rgba(255, 109, 90, .12)
+    }
+
+    .pm span b {
+      color: var(--mut);
+      font-weight: 600;
+      margin-right: 5px
+    }
+
+    .ln {
+      font: 12px/1.6 ui-monospace, Menlo, Consolas, monospace;
+      padding: 6px 10px;
+      border-left: 3px solid var(--coral);
+      margin-bottom: 4px;
+      opacity: 0;
+      transform: translateX(-8px);
+      animation: cr .35s forwards;
+      background: rgba(127, 127, 127, .08);
+      border-radius: 0 8px 8px 0
+    }
+
+    .ln em {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--coral)
+    }
+
+    .ln em.w {
+      color: var(--bad)
+    }
+
+    .ln b {
+      color: var(--mut)
+    }
+
+    @keyframes cr {
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .ot table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px
+    }
+
+    .ot th {
+      text-align: left;
+      color: var(--mut);
+      font-weight: 600;
+      padding: 3px 6px;
+      border-bottom: 1px solid var(--nl)
+    }
+
+    .ot td {
+      padding: 3px 6px
+    }
+
+    .ot p {
+      margin: 6px 0 0;
+      font-size: 11.5px;
+      color: var(--ok);
+      font-weight: 700
+    }
+
+    .em {
+      border: 1px solid var(--nl);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 12px
+    }
+
+    .em .eh2 {
+      padding: 8px 12px;
+      background: rgba(127, 127, 127, .08);
+      line-height: 1.7
+    }
+
+    .em .eh2 b {
+      display: inline-block;
+      width: 56px;
+      color: var(--mut);
+      font-weight: 600
+    }
+
+    .em .eb {
+      padding: 10px 12px;
+      line-height: 1.6
+    }
+
+    .dl {
+      display: flex;
+      gap: 14px;
+      padding: 8px 12px;
+      border-top: 1px solid var(--nl);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ok)
+    }
+
+    .dl span {
+      opacity: 0;
+      animation: cr .4s forwards
+    }
+
+    .dl span:nth-child(2) {
+      animation-delay: .5s
+    }
+
+    .dl span:nth-child(3) {
+      animation-delay: 1s
+    }
+
+    .inb {
+      margin: 12px 0 0
+    }
+
+    .ib {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      opacity: 0;
+      animation: cr .5s forwards
+    }
+
+    .ib:last-child {
+      border: 0
+    }
+
+    .ib i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin-top: 6px;
+      flex: none
+    }
+
+    .ib b {
+      display: block;
+      font-size: 13px
+    }
+
+    .ib small {
+      color: var(--mut);
+      font-size: 12px
+    }
+
+    .ib .t {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--mut);
+      white-space: nowrap
+    }
+
+    .cnt {
+      display: inline-block;
+      min-width: 20px;
+      text-align: center;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: var(--gold);
+      color: #fff;
+      font-size: 11px;
+      margin-left: 6px
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      * {
+        animation-duration: .01ms !important
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div class="top">
+      <h1>Invoice Processing Bot</h1><span class="live"><i></i>LIVE SIMULATION</span>
+    </div>
+    <p class="sub">Demo of the automation as it looks inside n8n. A billing email arrives, the PDF is read with OCR,
+      line items are extracted, matched against the purchase order and goods receipt, then booked in the ERP or sent to
+      Finance.</p>
+    <div class="bar"><button class="p" id="inv">+ Process new invoice</button><button id="exc">Simulate PO
+        exception</button><button id="dup">Simulate duplicate invoice</button><button id="play">Pause</button><button
+        id="det">Node details: On</button></div>
+    <div class="cvw">
+      <div class="cv">
+        <div class="chip">Invoice 3-Way Match &amp; ERP <b>● Active</b></div><svg id="w" viewBox="0 0 990 470"
+          role="img" aria-label="n8n style invoice processing workflow"></svg>
+      </div>
+      <div class="ndv" id="ndv"></div>
+    </div>
+    <div class="card inb" id="inbox" style="display:none">
+      <h2>Finance approval queue <span class="cnt" id="icnt">0</span></h2>
+      <div id="ibl"></div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="two">
+      <div class="card">
+        <h2>Invoice value per run (₹ thousand)</h2><svg class="bars" id="ch" viewBox="0 0 340 130"></svg>
+      </div>
+      <div class="card">
+        <h2>Reconciliation log</h2>
+        <ul id="log"></ul>
+      </div>
+    </div>
+  </main>
+  <script>
+    const NS = "http://www.w3.org/2000/svg", $ = i => document.getElementById(i);
+    const el = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e };
+    const sleep = ms => new Promise(r => setTimeout(r, ms)), nf = n => Math.round(n).toLocaleString("en-IN"), fmt = n => "₹" + nf(n), pf = n => n.toFixed(1) + "%";
+    const st = (c, w = 2) => `stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+    const EM = '<rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="#ea4335"/><path d="M3 7.5l9 6.5 9-6.5" ' + st("#fff", 1.8) + '/>';
+    const OC = '<rect x="3" y="3" width="18" height="18" rx="3" fill="#2563eb"/><circle cx="12" cy="12" r="4" ' + st("#fff", 1.8) + '/><path d="M7 7h3M14 17h3" ' + st("#fff", 1.6) + '/>';
+    const AI = '<path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z" fill="#8b5cf6"/>';
+    const DB = '<ellipse cx="12" cy="6" rx="8" ry="3" fill="#0284c7"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" ' + st("#0284c7") + '/>';
+    const CD = `<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14" ${st("#ff6d5a")}/>`;
+    const IF = `<path d="M3 12h6M9 12l8-6M9 12l8 6" ${st("#2fae6b")}/><circle cx="19" cy="6" r="2" fill="#2fae6b"/><circle cx="19" cy="18" r="2" fill="#2fae6b"/>`;
+    const ER = '<rect x="3" y="3" width="18" height="18" rx="3" fill="#059669"/><path d="M8 8h8M8 12h8M8 16h5" ' + st("#fff", 1.8) + '/>';
+    const AL = '<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" fill="#f59e0b"/><path d="M12 9v5M12 17.5v.01" ' + st("#fff", 2) + '/>';
+    const IC = { trig: EM, ocr: OC, parse: AI, po: DB, grn: DB, match: CD, iff: IF, erp: ER, alert: AL };
+    const svg = $("w"), defs = el("defs", {}, svg);
+    el("path", { d: "M0 0L8 4L0 8z", class: "mk" }, el("marker", { id: "ar", markerWidth: 8, markerHeight: 8, refX: 7, refY: 4, orient: "auto" }, defs));
+    const gE = el("g", {}, svg), gN = el("g", {}, svg), gP = el("g", {}, svg);
+    const N = [["trig", "Inbound Billing Email", "Gmail / IMAP", 20, 200, 1], ["ocr", "Document Vision OCR", "AWS Textract", 160, 200], ["parse", "Extract Line Items", "Claude LLM", 300, 200], ["po", "Fetch Purchase Order", "Database", 440, 90], ["grn", "Fetch Goods Receipt", "Database", 440, 310], ["match", "3-Way Match", "Code", 590, 200], ["iff", "Variance 5% or less?", "If", 730, 200], ["erp", "Book in Zoho Books", "ERP Connector", 880, 80], ["alert", "Route to Finance", "Approval Queue", 880, 320]];
+    const D = {};
+    function wrap(s) { if (s.length <= 16) return [s]; const w = s.split(" "), l = [""]; w.forEach(x => { const c = l[l.length - 1]; if ((c + " " + x).trim().length <= 16) l[l.length - 1] = (c + " " + x).trim(); else l.push(x) }); return l }
+    N.forEach(([id, name, sub, x, y, tr]) => {
+      const g = el("g", { class: "nd" }, gN);
+      el("path", { class: "b", d: tr ? `M${x + 32} ${y}H${x + 52}a12 12 0 0 1 12 12V${y + 52}a12 12 0 0 1-12 12H${x + 32}a32 32 0 0 1 0-64z` : `M${x + 12} ${y}H${x + 52}a12 12 0 0 1 12 12V${y + 52}a12 12 0 0 1-12 12H${x + 12}a12 12 0 0 1-12-12V${y + 12}a12 12 0 0 1 12-12z` }, g);
+      el("g", { transform: `translate(${x + 16},${y + 16}) scale(1.33)` }, g).innerHTML = IC[id];
+      const L = wrap(name); L.forEach((t, i) => el("text", { x: x + 32, y: y + 80 + i * 13 }, g).textContent = t); el("text", { x: x + 32, y: y + 80 + L.length * 13, class: "s" }, g).textContent = sub;
+      const b = el("g", { class: "bg" }, g); el("circle", { cx: x + 64, cy: y + 4, r: 9 }, b); el("path", { d: `M${x + 59.5} ${y + 4}l3.2 3.2 6-6.2`, fill: "none", stroke: "#fff", "stroke-width": 2, "stroke-linecap": "round" }, b);
+      D[id] = { g, x, y }
+    });
+    const out = id => [D[id].x + 64, D[id].y + 32], inn = id => [D[id].x, D[id].y + 32], EDG = [];
+    function edge(a, b, lab, dy = -7) {
+      const [x1, y1] = a, [x2, y2] = b, dx = Math.max(30, (x2 - x1) / 2);
+      const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1 + dx} ${y1} ${x2 - dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
+      const t = lab ? el("text", { x: x1 + 8, y: y1 + dy, class: "il" }, gE) : null; if (t) t.textContent = lab; EDG.push({ p, t }); return EDG.length - 1
+    }
+    const eT = edge(out("trig"), inn("ocr"), "PDF"), eO = edge(out("ocr"), inn("parse"), "text, tables"), eP = edge(out("parse"), inn("po"), "PO ref", -12), eG = edge(out("parse"), inn("grn"), "PO ref", 18),
+      eMP = edge(out("po"), inn("match"), "PO lines"), eMG = edge(out("grn"), inn("match"), "received"), eM = edge(out("match"), inn("iff"), "variance"),
+      eOk = edge(out("iff"), inn("erp"), "matched", -12), eEx = edge(out("iff"), inn("alert"), "exception", 18);
+    function fly(i, cls, ms) { return new Promise(res => { const p = EDG[i].p, L = p.getTotalLength(), c = el("circle", { r: 6, class: "pk " + (cls || "") }, gP), t0 = performance.now(); (function f(t) { const k = Math.min(1, (t - t0) / ms), q = p.getPointAtLength(L * k); c.setAttribute("cx", q.x); c.setAttribute("cy", q.y); k < 1 ? requestAnimationFrame(f) : (c.remove(), res()) })(t0) }) }
+    async function go(i, cls, ms = 500) { await fly(i, cls, ms); EDG[i].p.classList.add("ok"); EDG[i].t && EDG[i].t.classList.add("show") }
+    function reset() { Object.values(D).forEach(n => n.g.setAttribute("class", "nd")); EDG.forEach(e => { e.p.classList.remove("ok"); e.t && e.t.classList.remove("show") }) }
+    /* data */
+    const V = [{ v: "AWS Services", e: "billing@aws-services.in", l: [["Compute hours", 10, 3000], ["Storage (TB)", 5, 1200], ["Support plan", 1, 12500]] },
+    { v: "Google Cloud", e: "invoices@gcloud-india.com", l: [["BigQuery slots", 8, 4500], ["Cloud Run", 20, 350], ["Networking", 1, 6200]] },
+    { v: "Zoho Corp", e: "ar@zoho-billing.com", l: [["CRM seats", 40, 900], ["Desk seats", 25, 700], ["Onboarding", 1, 8000]] }];
+    const S = { n: 8830, last: "INV-8830", inv: 428, auto: 396, ft: 7632, fo: 7586, t: 3.8, hist: [38, 44, 29, 52, 41, 35, 47, 33], xh: [0, 0, 0, 0, 0, 1, 0, 0], session: 0 };
+    const shown = {};
+    [["inv", "Invoices processed"], ["acc", "Extraction accuracy"], ["po", "Auto-matched POs"], ["time", "Avg processing time"]].forEach(([i, l]) => { const d = document.createElement("div"); d.className = "card k"; d.id = "k" + i; d.innerHTML = `<div class="l">${l}</div><div class="v">-</div><div class="d">&nbsp;</div>`; $("kpis").appendChild(d) });
+    function setK(id, val, f, delta, flag) { const c = $("k" + id), v = c.querySelector(".v"), from = shown[id] ?? val, t0 = performance.now(); shown[id] = val; (function a(t) { const k = Math.min(1, (t - t0) / 700); v.textContent = f(from + (val - from) * k); k < 1 && requestAnimationFrame(a) })(t0); c.querySelector(".d").textContent = delta || "\u00a0"; c.classList.toggle("flag", !!flag) }
+    function kpis(d) { setK("inv", S.inv, nf, d.inv); setK("acc", S.fo / S.ft * 100, pf, "Vision OCR + LLM verify"); setK("po", S.auto / S.inv * 100, pf, d.po, d.flag); setK("time", S.t, n => n.toFixed(1) + "s", "vs 15 min manual") }
+    function chart() { const g = $("ch"); g.innerHTML = ""; const m = Math.max(...S.hist); S.hist.forEach((v, i) => { const h = v / m * 84, x = 8 + i * 41, last = i == S.hist.length - 1; el("rect", { x, y: 104 - h, width: 30, height: h, rx: 4, class: (S.xh[i] ? "vip " : "") + (last ? "new" : "") }, g); el("text", { x: x + 15, y: 98 - h }, g).textContent = v; el("text", { x: x + 15, y: 120 }, g).textContent = last ? "now" : "-" + (S.hist.length - 1 - i) }) }
+    function log(m, c) { const li = document.createElement("li"); if (c) li.className = c; li.innerHTML = `<b>${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</b>${m}`; const u = $("log"); u.prepend(li); while (u.children.length > 8) u.lastChild.remove() }
+    const Pm = o => Object.entries(o).map(([k, v]) => `<span><b>${k}</b>${v}</span>`).join("");
+    const Tb = (f, r, c) => `<table><tr>${f.map(x => `<th>${x}</th>`).join("")}</tr>${r.map(a => `<tr>${a.map(x => `<td>${x}</td>`).join("")}</tr>`).join("")}</table>${c ? `<p>${c}</p>` : ""}`;
+    const ndv = $("ndv"), cvEl = document.querySelector(".cv"); let detail = true, playing = true, running = false, pending = [], queue = 0;
+    async function view(id, sp) {
+      const n = N.find(d => d[0] == id);
+      ndv.innerHTML = `<div class="nh"><svg viewBox="0 0 24 24">${IC[id]}</svg><div><b>${n[1]}</b><small>${n[2]} node</small></div><span class="pill" id="pl">Running...</span></div><div class="nb"><div><h4>Parameters</h4><div class="pm">${Pm(sp.params)}</div></div><div><h4>What happens inside</h4><div id="lns"></div></div><div class="ot" id="oo" style="display:none"><h4>Output</h4>${sp.out}</div></div>`;
+      cvEl.classList.add("dim"); ndv.classList.add("open"); await sleep(450);
+      const L = $("lns"); for (const h of sp.lines) { const d = document.createElement("div"); d.className = "ln"; d.innerHTML = h; L.appendChild(d); await sleep(380) }
+      $("oo").style.display = "block"; const p = $("pl"); p.textContent = "Success"; p.className = "pill ok"; await sleep(1000);
+      ndv.classList.remove("open"); cvEl.classList.remove("dim"); await sleep(300)
+    }
+    async function runV(id, sp, cls) { const c = D[id].g.classList; c.add("run"); if (cls) c.add(cls); if (detail) await view(id, sp); else await sleep(550); c.remove("run"); c.add("ok") }
+    function mailCard(v, num, reason, tot) { return `<div class="em"><div class="eh2"><b>To</b>finance-lead@company.com<br><b>Subject</b>Approval needed: ${num} (${v})</div><div class="eb"><b>Reason:</b> ${reason}<br>Invoice total: ${fmt(tot)}<br>Open the approval queue to release or reject.</div><div class="dl"><span>✓ Composed</span><span>✓ Sent</span><span>✓ Queued</span></div></div>` }
+    function queued(v, num, reason) { queue++; $("inbox").style.display = "block"; $("icnt").textContent = queue; const d = document.createElement("div"); d.className = "ib"; d.innerHTML = `<i></i><div><b>${num} from ${v}</b><small>${reason}</small></div><span class="t">${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · waiting</span>`; const b = $("ibl"); b.prepend(d); while (b.children.length > 4) b.lastChild.remove() }
+    async function cycle(kind) {
+      if (running) { pending.push(kind); return } running = true; reset();
+      const v = V[Math.floor(Math.random() * V.length)], dup = kind == "dup", exc = kind == "exc", num = dup ? S.last : "INV-" + (++S.n), ref = "PO-" + (9900 + Math.floor(Math.random() * 90));
+      const drift = exc || dup ? 0 : Math.random() * .03, inv = v.l.map(([d, q, r], i) => [d, exc && i == 0 ? Math.ceil(q * 1.2) : q, Math.round(r * (1 + drift))]);
+      const tot = a => a.reduce((s, x) => s + x[1] * x[2], 0), invT = tot(inv), poT = tot(v.l), base = v.l.reduce((s, x, i) => s + Math.min(x[1], inv[i][1]) * x[2], 0), vr = Math.abs(invT - base) / base * 100;
+      const bad = dup || vr > 5, reason = dup ? "Duplicate of " + num + " already in the ledger" : `Variance ${vr.toFixed(1)}% is over the 5% limit (${inv[0][0]}: ${inv[0][1]} billed vs ${v.l[0][1]} on PO)`;
+      const low = Math.random() < .12 ? 1 : 0, secs = +(3.2 + Math.random() * 1.4).toFixed(1), rows = inv.map(r => [r[0], r[1], fmt(r[2]), fmt(r[1] * r[2])]);
+      log(dup ? `Duplicate of ${num} from ${v.v} arrived` : exc ? `Invoice ${num} from ${v.v} arrived (PO exception test)` : `Invoice ${num} from ${v.v} arrived`, kind ? "gold" : "");
+      await runV("trig", { params: { Trigger: "Email received", Mailbox: "billing@company.com", Filter: "has PDF attachment" }, lines: ["Poll the mailbox for new mail", "Attachment found: <em>" + num + ".pdf</em>", "Pass the PDF to OCR"], out: Tb(["From", "Subject", "Attachment"], [[v.e, "Invoice " + num, num + ".pdf"]], "1 item") });
+      await go(eT);
+      await runV("ocr", { params: { Operation: "AnalyzeExpense", Pages: "2" }, lines: ["Upload the PDF to Textract", "Detect the line-item table: <em>" + inv.length + " rows</em>", `Confidence: <em>${low ? "98.2" : "99.6"}%</em>${low ? " (1 field low)" : ""}`], out: Tb(["Description", "Qty", "Rate"], inv.map(r => [r[0], r[1], fmt(r[2])]), inv.length + " rows read") });
+      await go(eO);
+      await runV("parse", { params: { Model: "Claude", Output: "JSON", Schema: "erp_invoice" }, lines: [`<b>1.</b> Vendor <em>${v.v}</em>, invoice <em>${num}</em>`, `<b>2.</b> PO reference <em>${ref}</em>, due in 30 days`, `<b>3.</b> Total ${fmt(invT)} (${inv.length} lines)`, `<b>4.</b> Duplicate check: <em class="${dup ? "w" : ""}">${dup ? "ALREADY BOOKED" : "new invoice"}</em>`], out: Tb(["vendor", "invoice", "po_ref", "total"], [[v.v, num, ref, fmt(invT)]], "1 item") }, dup ? "gold" : "");
+      await Promise.all([go(eP), go(eG)]);
+      const po = () => runV("po", { params: { Operation: "Select", Table: "purchase_orders" }, lines: [`Query PO <em>${ref}</em>`, `Found <em>${v.l.length} lines</em>, total ${fmt(poT)}`], out: Tb(["Description", "Qty", "Rate"], v.l.map(r => [r[0], r[1], fmt(r[2])]), "PO " + ref) });
+      const gr = () => runV("grn", { params: { Operation: "Select", Table: "goods_receipts" }, lines: [`Query receipts for <em>${ref}</em>`, "All lines received in full"], out: Tb(["Description", "Received"], v.l.map(r => [r[0], r[1]]), "3 lines received") });
+      if (detail) { await po(); await gr() } else await Promise.all([po(), gr()]);
+      await Promise.all([go(eMP), go(eMG)]);
+      await runV("match", { params: { Language: "JavaScript", Tolerance: "5%" }, lines: [`<b>1. Duplicate</b> ${num} in ledger? <em class="${dup ? "w" : ""}">${dup ? "YES" : "NO"}</em>`, `<b>2. Quantity</b> ${inv[0][0]}: billed ${inv[0][1]} vs PO ${v.l[0][1]} vs received ${v.l[0][1]}`, `<b>3. Price</b> invoice ${fmt(invT)} vs matched ${fmt(base)}`, `<b>4. Variance</b> <em class="${vr > 5 ? "w" : ""}">${vr.toFixed(1)}%</em> (limit 5%)`], out: Tb(["Invoice", "PO", "Variance", "Duplicate"], [[fmt(invT), fmt(base), pf(vr), dup ? "yes" : "no"]], "1 item") }, bad ? "gold" : "");
+      await go(eM);
+      await runV("iff", { params: { Condition: "Variance <= 5% and not duplicate" }, lines: [`Variance = <em>${vr.toFixed(1)}%</em>, duplicate = <em>${dup}</em>`, `Result: <em class="${bad ? "w" : ""}">${bad ? "FALSE" : "TRUE"}</em>`, bad ? "Branch FALSE: send to Finance" : "Branch TRUE: book in the ERP"], out: Tb(["Matched"], [[bad ? "no" : "yes"]]) });
+      S.inv++; S.ft += 24; S.fo += 24 - low; S.t = (S.t * (S.inv - 1) + secs) / S.inv; if (!bad) S.auto++; S.hist.push(Math.round(invT / 1000)); S.xh.push(bad ? 1 : 0); if (S.hist.length > 8) { S.hist.shift(); S.xh.shift() } S.session++;
+      if (!bad) {
+        S.last = num; await go(eOk, "", 600);
+        await runV("erp", { params: { App: "Zoho Books", Operation: "Create bill" }, lines: [`Create bill for <em>${v.v}</em>`, `Attach the PDF and ${inv.length} line items`, "Status: <em>Approved, scheduled for payment run</em>"], out: Tb(["Bill", "Vendor", "Amount", "Status"], [["BILL-" + (7700 + S.session), v.v, fmt(invT), "Scheduled"]], "1 bill created") });
+        log(`${num} matched ${ref}, booked in Zoho Books (${fmt(invT)})`, "good")
+      }
+      else {
+        await go(eEx, "gold", 600);
+        await runV("alert", { params: { Queue: "Finance approvals", Notify: "finance-lead@company.com" }, lines: ["Add the invoice to the approval queue", `Reason: <em class="w">${dup ? "duplicate" : "variance " + vr.toFixed(1) + "%"}</em>`, "Send the notification email"], out: mailCard(v.v, num, reason, invT) }, "gold");
+        queued(v.v, num, reason); log(`${num} held: ${reason}`, "bad")
+      }
+      kpis({ inv: "+" + S.session + " this session", po: bad ? "1 sent to Finance" : "no manual entry", flag: bad }); chart();
+      await sleep(1500); reset(); running = false; if (pending.length) cycle(pending.shift())
+    }
+    kpis({ inv: "", po: "no manual entry" }); chart();
+    log("Ready. Press Process new invoice to watch the flow");
+    $("det").onclick = e => { detail = !detail; e.target.textContent = "Node details: " + (detail ? "On" : "Off") };
+    $("inv").onclick = () => cycle(""); $("exc").onclick = () => cycle("exc"); $("dup").onclick = () => cycle("dup");
+    $("play").onclick = e => { playing = !playing; e.target.textContent = playing ? "Pause" : "Resume auto-refresh" };
+    (async () => { await sleep(1200); while (true) { if (playing && !running) await cycle(""); await sleep(4000) } })();
+  </script>
+</body>
+
+</html>

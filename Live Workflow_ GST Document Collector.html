@@ -138,12 +138,12 @@
     <h1>GST Document Collector</h1>
     <span class="live"><i></i>LIVE SIMULATION</span>
   </div>
-  <p class="sub">Autonomous tax compliance pipeline in n8n. Scans pending filing statuses on the 4th and 18th of the month, dispatches secure WhatsApp upload links, and auto-logs submission timestamps.</p>
+  <p class="sub">Automated GST document retrieval and follow-up engine in n8n. Scans active client filing deadlines, dispatches WhatsApp template links with secure upload tokens, and auto-logs submission milestones.</p>
   
   <div class="bar">
-    <button class="p" id="cron">+ Run 4th of Month Scan</button>
-    <button class="" id="upload">Simulate Client Upload</button>
-    <button class="" id="remind">Trigger Urgent WhatsApp Nudge</button>
+    <button class="p" id="cron">+ Trigger 7-Day Pre-Filing Scan</button>
+    <button class="" id="wa">Simulate WhatsApp Document Upload</button>
+    <button class="" id="audit">Simulate Status Update & Audit Log</button>
     <button id="toggle">Pause</button>
   </div>
 
@@ -153,10 +153,10 @@
   </div>
 
   <div class="kpis">
-    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">542</div><div class="d">Documents Collected</div></div>
-    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">99.4%</div><div class="d">On-Time Filing Rate</div></div>
-    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">0</div><div class="d">Manual Follow-up Calls</div></div>
-    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">100%</div><div class="d">Audit Logged</div></div>
+    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">348</div><div class="d">Clients Followed Up</div></div>
+    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">94.2%</div><div class="d">On-Time Filing Rate</div></div>
+    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">3 min</div><div class="d">Batch Cycle Time</div></div>
+    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">100%</div><div class="d">Audit Log Trail</div></div>
   </div>
 
   <div class="two">
@@ -190,9 +190,9 @@ const gE = el("g", {}, svg);
 const gN = el("g", {}, svg);
 const gP = el("g", {}, svg);
 
-const RAW_NODES = [["cron","Cron Trigger","4th & 18th 9:00 AM",40,180,"<circle cx=\"12\" cy=\"12\" r=\"9\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"12,6 12,12 16,14\" stroke=\"#6366f1\" stroke-width=\"2\"/>"],["fetch","Google Sheets API","Fetch Client Register",210,180,"<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"3\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><line x1=\"3\" y1=\"9\" x2=\"21\" y2=\"9\" stroke=\"#059669\" stroke-width=\"1.5\"/><line x1=\"9\" y1=\"9\" x2=\"9\" y2=\"21\" stroke=\"#059669\" stroke-width=\"1.5\"/>"],["filter","Filter Status","Status != Received",390,180,"<polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"],["wa","WhatsApp Cloud API","1-Tap Upload Link",580,180,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"],["lognode","Update Sheets","Timestamp & Count++",760,180,"<path d=\"M9 11l3 3L22 4\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><path d=\"M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"]];
-const RAW_EDGES = [["cron","fetch","scheduled run"],["fetch","filter","128 active clients"],["filter","wa","34 pending filings"],["wa","lognode","links delivered"]];
-const RAW_LOGS = ["Cron fired: Initiating GST GSTR-1 preparation cycle for 128 clients.","Filter node: Identified 34 accounts with Filing Status != 'Received'.","Dispatched branded WhatsApp utility message with dynamic secure upload link.","Google Sheets updated: Logged timestamp and incremented follow-up counter."];
+const RAW_NODES = [["cron","Cron (4th & 18th)","Filing Date Trigger",40,180,"<circle cx=\"12\" cy=\"12\" r=\"9\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"12,6 12,12 16,14\" stroke=\"#6366f1\" stroke-width=\"2\"/>"],["fetch","Sheets / Airtable","Fetch Active Clients",210,180,"<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><line x1=\"3\" y1=\"9\" x2=\"21\" y2=\"9\" stroke=\"#059669\" stroke-width=\"1.5\"/><line x1=\"3\" y1=\"15\" x2=\"21\" y2=\"15\" stroke=\"#059669\" stroke-width=\"1.5\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"21\" stroke=\"#059669\" stroke-width=\"1.5\"/>"],["filter","Filter Node","Status != \"Received\"",390,180,"<polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"],["wa","WhatsApp Cloud API","Utility Template Link",580,180,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"],["lognode","Google Sheets","Update Follow-Up Count",760,180,"<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><line x1=\"3\" y1=\"9\" x2=\"21\" y2=\"9\" stroke=\"#059669\" stroke-width=\"1.5\"/><line x1=\"3\" y1=\"15\" x2=\"21\" y2=\"15\" stroke=\"#059669\" stroke-width=\"1.5\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"21\" stroke=\"#059669\" stroke-width=\"1.5\"/>"]];
+const RAW_EDGES = [["cron","fetch","trigger cron scan"],["fetch","filter","348 client records"],["filter","wa","42 pending GST docs"],["wa","lognode","uploaded & verified"]];
+const RAW_LOGS = ["Cron trigger fired: 7 days before GST filing deadline (18th of month).","Queried Google Sheets client database: 348 active businesses loaded.","Filter identified 42 clients with Filing Status != 'Received'.","Dispatched WhatsApp utility templates containing authenticated upload links."];
 
 const D = {};
 function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
@@ -216,7 +216,7 @@ const EDG = [];
 RAW_EDGES.forEach(([fromId, toId, lab]) => {
   const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(30, (x2 - x1) / 2);
   const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: (x1 + x2)/2, y: Math.min(y1, y2) - 8, class: "il" }, gE) : null;
+  const t = lab ? el("text", { x: (x1 + x2)/2, y: (y1 + y2)/2 - 8, class: "il" }, gE) : null;
   if(t) t.textContent = lab;
   EDG.push({ p, t, from: fromId, to: toId });
 });
@@ -312,8 +312,8 @@ chart();
 log("GST Document Collector pipeline online. Ready for execution.", "good");
 
 if($("cron")) $("cron").onclick = () => cycle(0);
-if($("upload")) $("upload").onclick = () => cycle(1);
-if($("remind")) $("remind").onclick = () => cycle(2);
+if($("wa")) $("wa").onclick = () => cycle(1);
+if($("audit")) $("audit").onclick = () => cycle(2);
 $("toggle").onclick = function() {
   paused = !paused;
   this.textContent = paused ? "Resume" : "Pause";

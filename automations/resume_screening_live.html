@@ -149,7 +149,7 @@
 
   <div class="cv">
     <div class="chip">Resume Screening and Interview Scheduler Auto-Flow <b>● Active</b></div>
-    <svg id="w" viewBox="0 0 960 400" role="img" aria-label="Resume Screening and Interview Scheduler workflow"></svg>
+    <svg id="w" viewBox="0 0 960 480" role="img" aria-label="Resume Screening and Interview Scheduler workflow"></svg>
   </div>
 
   <div class="kpis">
@@ -190,7 +190,7 @@ const gE = el("g", {}, svg);
 const gN = el("g", {}, svg);
 const gP = el("g", {}, svg);
 
-const RAW_NODES = [["app","Webhook / Email Ingest","Candidate Resume Upload",40,180,"<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/>"],["parse","Read Binary Files","Extract PDF / DOCX Text",210,180,"<path d=\"M4 6h16M4 12h16M4 18h10\" stroke=\"#059669\" stroke-width=\"2\"/>"],["ai","OpenAI Evaluator","Match vs JD (1-100 Score)",390,180,"<path d=\"M12 2a10 10 0 1 0 10 10H12V2z\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/>"],["filter","If Score >= 75","Screening Threshold Gate",560,180,"<polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"],["cal","Cal.com / Calendly","Dynamic Booking Link",740,100,"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\" stroke=\"#059669\" stroke-width=\"1.5\"/>"],["reject","Polite Email Nudge","Retain in Talent Pool",740,260,"<path d=\"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\" stroke=\"#94a3c4\" stroke-width=\"2\" fill=\"none\"/>"]];
+const RAW_NODES = [["app","Webhook / Email Ingest","Candidate Resume Upload",40,200,"<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"14 2 14 8 20 8\" stroke=\"#6366f1\" stroke-width=\"1.5\"/>"],["parse","Read Binary Files","Extract PDF / DOCX Text",210,200,"<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"14 2 14 8 20 8\" stroke=\"#6366f1\" stroke-width=\"1.5\"/>"],["ai","OpenAI Evaluator","Match vs JD (1-100 Score)",390,200,"<path d=\"M12 2a10 10 0 1 0 10 10H12V2z\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/>"],["filter","If Score >= 75","Screening Threshold Gate",560,200,"<polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"],["cal","Cal.com / Calendly","Dynamic Booking Link",740,85,"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\" stroke=\"#059669\" stroke-width=\"2\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\" stroke=\"#059669\" stroke-width=\"2\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\" stroke=\"#059669\" stroke-width=\"1.5\"/>"],["reject","Polite Email Nudge","Retain in Talent Pool",740,315,"<path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"]];
 const RAW_EDGES = [["app","parse","cv_rahul_sharma.pdf"],["parse","ai","parsed 4 pages of text"],["ai","filter","Score: 88/100 (High Fit)"],["filter","cal","score >= 75: send invite"],["filter","reject","score < 75: polite retain"]];
 const RAW_LOGS = ["Inbound job application received: Full Stack Lead from Rahul Sharma.","Binary file reader extracted 12 technical competencies, 7 yrs experience, React/Node/AWS.","OpenAI scoring rubric returned Score: 88/100 (Strong cultural & technical alignment).","Automated calendar invitation emailed with dynamic Cal.com booking link."];
 
@@ -216,7 +216,7 @@ const EDG = [];
 RAW_EDGES.forEach(([fromId, toId, lab]) => {
   const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(30, (x2 - x1) / 2);
   const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: (x1 + x2)/2, y: Math.min(y1, y2) - 8, class: "il" }, gE) : null;
+  const t = lab ? el("text", { x: (x1 + x2)/2, y: (y1 + y2)/2 - 8, class: "il" }, gE) : null;
   if(t) t.textContent = lab;
   EDG.push({ p, t, from: fromId, to: toId });
 });

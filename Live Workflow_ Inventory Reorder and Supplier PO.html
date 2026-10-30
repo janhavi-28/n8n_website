@@ -138,12 +138,12 @@
     <h1>Inventory Reorder and Supplier PO</h1>
     <span class="live"><i></i>LIVE SIMULATION</span>
   </div>
-  <p class="sub">Automated supply chain replenishment pipeline in n8n. Continuously scans warehouse inventory against safety buffers, generates pre-filled purchase orders, and empowers managers with 1-click approvals.</p>
+  <p class="sub">Autonomous replenishment engine in n8n. Audits warehouse inventory nightly, compares stock against safety thresholds, drafts pre-filled supplier POs, and alerts managers for 1-click approvals.</p>
   
   <div class="bar">
-    <button class="p" id="cron">+ Run Midnight Stock Audit</button>
-    <button class="" id="low">Simulate Low Stock Alert</button>
-    <button class="" id="po">Simulate PO Dispatch to Supplier</button>
+    <button class="p" id="cron">+ Run Midnight Warehouse Audit</button>
+    <button class="" id="doc">Simulate PO Draft Generation</button>
+    <button class="" id="slack">Simulate Procurement Manager Approval</button>
     <button id="toggle">Pause</button>
   </div>
 
@@ -153,10 +153,10 @@
   </div>
 
   <div class="kpis">
-    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">318</div><div class="d">POs Generated</div></div>
-    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">₹18.4L</div><div class="d">Stockouts Prevented</div></div>
-    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">0</div><div class="d">Stock Emergencies</div></div>
-    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">100%</div><div class="d">Supplier Audit Trail</div></div>
+    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">340</div><div class="d">POs Drafted & Sent</div></div>
+    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">0</div><div class="d">Stockout Incidents</div></div>
+    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">8 hrs</div><div class="d">Procurement Cycle Saved</div></div>
+    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">100%</div><div class="d">Supplier Parity</div></div>
   </div>
 
   <div class="two">
@@ -190,7 +190,7 @@ const gE = el("g", {}, svg);
 const gN = el("g", {}, svg);
 const gP = el("g", {}, svg);
 
-const RAW_NODES = [["cron","Midnight Cron","Daily 12:00 AM Audit",40,180,"<circle cx=\"12\" cy=\"12\" r=\"9\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"12,6 12,12 16,14\" stroke=\"#6366f1\" stroke-width=\"2\"/>"],["erp","Tally / ERP API","Fetch Warehouse Stock",210,180,"<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><path d=\"M7 7h10M7 12h10M7 17h6\" stroke=\"#059669\" stroke-width=\"1.5\"/>"],["filter","Code Node (JS)","Current <= Reorder Level",390,180,"<polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"],["doc","Google Docs Node","Draft PO Template",570,180,"<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"14 2 14 8 20 8\" stroke=\"#8b5cf6\" stroke-width=\"2\"/>"],["slack","Slack / Form Gate","Human-in-the-Loop Signoff",750,180,"<path d=\"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\" stroke=\"#ef4444\" stroke-width=\"2\" fill=\"none\"/>"],["send","Supplier Email Node","Dispatch Purchase Order",910,180,"<path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"]];
+const RAW_NODES = [["cron","Midnight Cron","Daily Inventory Audit",40,180,"<circle cx=\"12\" cy=\"12\" r=\"9\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"12,6 12,12 16,14\" stroke=\"#6366f1\" stroke-width=\"2\"/>"],["erp","Tally / ERP Bridge","Fetch Current Stock Levels",210,180,"<polyline points=\"20 6 9 17 4 12\" stroke=\"#059669\" stroke-width=\"2\"/>"],["filter","Code Node (JS)","Stock <= Reorder Level",390,180,"<polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"],["doc","Google Docs / PDF","Populate Supplier PO",570,180,"<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"14 2 14 8 20 8\" stroke=\"#6366f1\" stroke-width=\"1.5\"/>"],["slack","Slack Interactive","Procurement Sign-off",750,180,"<path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\" fill=\"#ef4444\"/>"],["send","Supplier Dispatch","Email PO to Vendor",910,180,"<path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"]];
 const RAW_EDGES = [["cron","erp","start stock scan"],["erp","filter","1,240 SKU records"],["filter","doc","3 SKUs below reorder"],["doc","slack","PO #PO-8812 drafted"],["slack","send","manager clicked Approve"]];
 const RAW_LOGS = ["Midnight stock audit executed across Bangalore central distribution warehouse.","Identified 3 items dipping below threshold (SKU-RAW-STEEL-10: 14 units left, Min: 50).","Drafted standard Supplier Purchase Order PO-8812 with preferred vendor Apex Steel Ltd.","Procurement Manager approved PO via Slack interactive button. PO dispatched automatically."];
 
@@ -216,7 +216,7 @@ const EDG = [];
 RAW_EDGES.forEach(([fromId, toId, lab]) => {
   const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(30, (x2 - x1) / 2);
   const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: (x1 + x2)/2, y: Math.min(y1, y2) - 8, class: "il" }, gE) : null;
+  const t = lab ? el("text", { x: (x1 + x2)/2, y: (y1 + y2)/2 - 8, class: "il" }, gE) : null;
   if(t) t.textContent = lab;
   EDG.push({ p, t, from: fromId, to: toId });
 });
@@ -312,8 +312,8 @@ chart();
 log("Inventory Reorder and Supplier PO pipeline online. Ready for execution.", "good");
 
 if($("cron")) $("cron").onclick = () => cycle(0);
-if($("low")) $("low").onclick = () => cycle(1);
-if($("po")) $("po").onclick = () => cycle(2);
+if($("doc")) $("doc").onclick = () => cycle(1);
+if($("slack")) $("slack").onclick = () => cycle(2);
 $("toggle").onclick = function() {
   paused = !paused;
   this.textContent = paused ? "Resume" : "Pause";

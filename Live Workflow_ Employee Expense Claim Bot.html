@@ -138,25 +138,25 @@
     <h1>Employee Expense Claim Bot</h1>
     <span class="live"><i></i>LIVE SIMULATION</span>
   </div>
-  <p class="sub">AI-driven corporate expense processing pipeline in n8n. Ingests receipt photos from employees over WhatsApp, parses line items via Vision LLM, verifies policy thresholds, and triggers automated approvals.</p>
+  <p class="sub">AI receipt ingestion and policy audit pipeline in n8n. Converts mobile WhatsApp receipt snapshots into structured accounting entries with instant corporate limit verification.</p>
   
   <div class="bar">
-    <button class="p" id="lunch">+ Ingest Lunch Bill (₹350)</button>
-    <button class="" id="hotel">Ingest Client Dinner (₹3,200)</button>
-    <button class="" id="approve">Simulate Manager 1-Tap Signoff</button>
+    <button class="p" id="wa">+ Upload Dinner Receipt (₹450 - Under Limit)</button>
+    <button class="" id="over">Upload Travel Hotel (₹4,200 - Exceeds Limit)</button>
+    <button class="" id="mgr">Simulate Manager 1-Click WhatsApp Signoff</button>
     <button id="toggle">Pause</button>
   </div>
 
   <div class="cv">
     <div class="chip">Employee Expense Claim Bot Auto-Flow <b>● Active</b></div>
-    <svg id="w" viewBox="0 0 960 400" role="img" aria-label="Employee Expense Claim Bot workflow"></svg>
+    <svg id="w" viewBox="0 0 960 480" role="img" aria-label="Employee Expense Claim Bot workflow"></svg>
   </div>
 
   <div class="kpis">
-    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">892</div><div class="d">Processed Claims</div></div>
-    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">₹4.8L</div><div class="d">Reimbursed Seamlessly</div></div>
-    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">12 sec</div><div class="d">Approval Turnaround</div></div>
-    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">100%</div><div class="d">Policy Enforced</div></div>
+    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">842</div><div class="d">Receipts Audited</div></div>
+    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">₹4.8L</div><div class="d">Claims Approved</div></div>
+    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">45 sec</div><div class="d">Submission to Log</div></div>
+    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">100%</div><div class="d">Policy Compliance</div></div>
   </div>
 
   <div class="two">
@@ -190,9 +190,9 @@ const gE = el("g", {}, svg);
 const gN = el("g", {}, svg);
 const gP = el("g", {}, svg);
 
-const RAW_NODES = [["wa","WhatsApp Webhook","Receipt Photo Inbound",40,180,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"],["media","HTTP Media Download","Fetch Binary Image",210,180,"<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"7 10 12 15 17 10\" stroke=\"#6366f1\" stroke-width=\"2\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\" stroke=\"#6366f1\" stroke-width=\"2\"/>"],["ai","Vision LLM OCR","Vendor, Total, Date & Tax",390,180,"<path d=\"M12 2a10 10 0 1 0 10 10H12V2z\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/><path d=\"M12 12L2.5 7.5\" stroke=\"#8b5cf6\" stroke-width=\"1.5\"/>"],["policy","Policy Filter","Food Limit: ₹500",560,180,"<polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"],["sheets","Zoho Expense / Sheets","Auto-Approve & Log",740,100,"<path d=\"M9 11l3 3L22 4\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" stroke=\"#059669\" stroke-width=\"1.5\" fill=\"none\"/>"],["mgr","Manager Approval","WhatsApp Interactive Card",740,260,"<path d=\"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2\" stroke=\"#ef4444\" stroke-width=\"2\" fill=\"none\"/><circle cx=\"9\" cy=\"7\" r=\"4\" stroke=\"#ef4444\" stroke-width=\"2\"/>"]];
-const RAW_EDGES = [["wa","media","receipt_photo.jpg"],["media","ai","binary to vision model"],["ai","policy","extracted vendor & total"],["policy","sheets","within policy (₹350)"],["policy","mgr","exceeds policy (₹3,200)"]];
-const RAW_LOGS = ["Inbound WhatsApp receipt image from sales exec (+91-9876543210).","Vision OCR extracted: Vendor 'Haldirams', Total ₹350.00, Date 28-Oct.","Policy verification: Food expense ₹350 is within ₹500/day policy limit.","Auto-approved and appended voucher #EXP-4012 directly to Zoho Expense."];
+const RAW_NODES = [["wa","WhatsApp Cloud API","Inbound Receipt Photo",40,200,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"],["media","HTTP Media Download","Fetch Binary Image",210,200,"<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"14 2 14 8 20 8\" stroke=\"#6366f1\" stroke-width=\"1.5\"/>"],["ai","Vision OCR (OpenAI)","Extract Vendor, Date & Total",390,200,"<path d=\"M12 2a10 10 0 1 0 10 10H12V2z\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/>"],["policy","Policy Check (JS)","Verify Limit Matrix",560,200,"<polyline points=\"16 18 22 12 16 6\" stroke=\"#059669\" stroke-width=\"2\"/><polyline points=\"8 6 2 12 8 18\" stroke=\"#059669\" stroke-width=\"2\"/>"],["sheets","Sheets / Zoho Expense","Within Limit -> Auto-Log",740,85,"<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><line x1=\"3\" y1=\"9\" x2=\"21\" y2=\"9\" stroke=\"#059669\" stroke-width=\"1.5\"/><line x1=\"3\" y1=\"15\" x2=\"21\" y2=\"15\" stroke=\"#059669\" stroke-width=\"1.5\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"21\" stroke=\"#059669\" stroke-width=\"1.5\"/>"],["mgr","Manager WhatsApp / Slack","Exceeds Limit -> Approval",740,315,"<path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\" fill=\"#ef4444\"/>"]];
+const RAW_EDGES = [["wa","media","receipt_scan.jpg"],["media","ai","binary downloaded"],["ai","policy","Vendor: Subway | Total: ₹450"],["policy","sheets","under ₹500 food limit"],["policy","mgr","hotel ₹4,200 > limit"]];
+const RAW_LOGS = ["Inbound media message received on WhatsApp from Sales Exec Rohit.","Binary image retrieved from Meta Cloud API securely.","OpenAI Vision extracted: 'Subway Connaught Place, ₹450.00, 28-Oct-2026'.","Policy matrix verified: ₹450 <= ₹500 food limit. Voucher logged in Zoho Expense automatically."];
 
 const D = {};
 function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
@@ -216,7 +216,7 @@ const EDG = [];
 RAW_EDGES.forEach(([fromId, toId, lab]) => {
   const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(30, (x2 - x1) / 2);
   const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: (x1 + x2)/2, y: Math.min(y1, y2) - 8, class: "il" }, gE) : null;
+  const t = lab ? el("text", { x: (x1 + x2)/2, y: (y1 + y2)/2 - 8, class: "il" }, gE) : null;
   if(t) t.textContent = lab;
   EDG.push({ p, t, from: fromId, to: toId });
 });
@@ -311,9 +311,9 @@ async function cycle(scenario = 0) {
 chart();
 log("Employee Expense Claim Bot pipeline online. Ready for execution.", "good");
 
-if($("lunch")) $("lunch").onclick = () => cycle(0);
-if($("hotel")) $("hotel").onclick = () => cycle(1);
-if($("approve")) $("approve").onclick = () => cycle(2);
+if($("wa")) $("wa").onclick = () => cycle(0);
+if($("over")) $("over").onclick = () => cycle(1);
+if($("mgr")) $("mgr").onclick = () => cycle(2);
 $("toggle").onclick = function() {
   paused = !paused;
   this.textContent = paused ? "Resume" : "Pause";

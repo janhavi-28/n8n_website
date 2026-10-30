@@ -138,12 +138,12 @@
     <h1>WhatsApp Order Capture for Dealers</h1>
     <span class="live"><i></i>LIVE SIMULATION</span>
   </div>
-  <p class="sub">Conversational dealer ordering pipeline in n8n. Decodes dealer voice notes & shorthand texts, runs semantic catalog matching, confirms order totals, and auto-generates ERP sales vouchers.</p>
+  <p class="sub">Conversational dealer B2B commerce engine in n8n. Transcribes dealer voice notes, vector-matches regional slang to official product SKUs, and injects confirmed orders into ERP systems.</p>
   
   <div class="bar">
-    <button class="p" id="voice">+ Ingest Dealer Voice Note</button>
-    <button class="" id="text">Ingest Shorthand Text Order</button>
-    <button class="" id="tally">Simulate ERP Injection</button>
+    <button class="p" id="voice">+ Inbound Dealer Voice Note (.ogg)</button>
+    <button class="" id="agent">Simulate SKU Semantic Matching</button>
+    <button class="" id="tally">Simulate Dealer 'CONFIRM' & ERP Save</button>
     <button id="toggle">Pause</button>
   </div>
 
@@ -153,10 +153,10 @@
   </div>
 
   <div class="kpis">
-    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">₹24.5L</div><div class="d">Orders Captured</div></div>
-    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">99.1%</div><div class="d">Catalog Match Accuracy</div></div>
-    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">45 sec</div><div class="d">End-to-End Cycle</div></div>
-    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">0</div><div class="d">Manual Order Entry</div></div>
+    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">1,120</div><div class="d">Dealer Orders Booked</div></div>
+    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">99.2%</div><div class="d">Voice-to-SKU Accuracy</div></div>
+    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">35 sec</div><div class="d">Average Order Flow</div></div>
+    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">₹1.8Cr</div><div class="d">GMV Processed</div></div>
   </div>
 
   <div class="two">
@@ -190,9 +190,9 @@ const gE = el("g", {}, svg);
 const gN = el("g", {}, svg);
 const gP = el("g", {}, svg);
 
-const RAW_NODES = [["wa","WhatsApp Webhook","Dealer Inbound Voice/Text",40,180,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"],["whisper","Whisper AI Engine","Voice to Hindi/Eng Text",210,180,"<path d=\"M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><path d=\"M19 10v2a7 7 0 0 1-14 0v-2\" stroke=\"#6366f1\" stroke-width=\"2\"/>"],["agent","Catalog LLM Matcher","Vector Store SKU Match",390,180,"<circle cx=\"12\" cy=\"12\" r=\"9\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\" stroke=\"#8b5cf6\" stroke-width=\"2\"/><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\" stroke=\"#8b5cf6\" stroke-width=\"2\"/>"],["confirm","WhatsApp Confirmation","Order Summary & Total",570,180,"<path d=\"M9 11l3 3L22 4\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><path d=\"M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/>"],["tally","Tally Prime / Zoho","Create Sales Order",750,180,"<rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/><line x1=\"2\" y1=\"10\" x2=\"22\" y2=\"10\" stroke=\"#d97706\" stroke-width=\"1.5\"/>"]];
-const RAW_EDGES = [["wa","whisper","audio_note.ogg"],["whisper","agent","Bhejo 50 peti Item A"],["agent","confirm","50x SKU-A @ ₹450"],["confirm","tally","dealer replied CONFIRM"]];
-const RAW_LOGS = ["Voice memo received from verified dealer: Metro Hardware (Ahmedabad).","Whisper converted audio: 'Bhaiya 50 box 10mm anchor bolt aur 20 box washer bhejo'.","Semantic Matcher mapped to SKU #ANC-10MM (50 qty) & #WSH-10MM (20 qty). Total: ₹48,200.","Dealer replied 'CONFIRM'. Official Sales Order #SO-9912 generated in Tally Prime."];
+const RAW_NODES = [["wa","WhatsApp Cloud API","Dealer Inbound Voice",40,180,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"],["whisper","Whisper AI STT","Voice-to-Text Transcription",210,180,"<path d=\"M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/><path d=\"M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8\" stroke=\"#8b5cf6\" stroke-width=\"2\"/>"],["agent","AI Catalog Agent","Match SKUs in Vector DB",390,180,"<path d=\"M12 2a10 10 0 1 0 10 10H12V2z\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/>"],["confirm","WhatsApp Confirmation","Send Summary -> \"CONFIRM\"",570,180,"<path d=\"M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z\" fill=\"#25d366\"/>"],["tally","Tally / Zoho Books","Sales Order Created",750,180,"<polyline points=\"20 6 9 17 4 12\" stroke=\"#059669\" stroke-width=\"2\"/>"]];
+const RAW_EDGES = [["wa","whisper","dealer_audio.ogg"],["whisper","agent","\"50 bori cement and 20 sariya\""],["agent","confirm","SKU-CEM-50KG x 50, SKU-STEEL-TMT x 20"],["confirm","tally","Dealer replied: \"CONFIRM\""]];
+const RAW_LOGS = ["Inbound WhatsApp voice note received from verified dealer Mahaveer Traders.","Whisper converted audio: 'Bhai 50 bori UltraTech cement aur 20 piece 12mm sariya bhejna.'","Semantic LLM agent matched items to SKU-CEM-ULTRA and SKU-TMT-12MM with current price ₹38,400.","Dealer replied 'CONFIRM'. Official Sales Order #SO-4412 created in Tally Prime bridge."];
 
 const D = {};
 function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
@@ -216,7 +216,7 @@ const EDG = [];
 RAW_EDGES.forEach(([fromId, toId, lab]) => {
   const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(30, (x2 - x1) / 2);
   const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: (x1 + x2)/2, y: Math.min(y1, y2) - 8, class: "il" }, gE) : null;
+  const t = lab ? el("text", { x: (x1 + x2)/2, y: (y1 + y2)/2 - 8, class: "il" }, gE) : null;
   if(t) t.textContent = lab;
   EDG.push({ p, t, from: fromId, to: toId });
 });
@@ -312,7 +312,7 @@ chart();
 log("WhatsApp Order Capture for Dealers pipeline online. Ready for execution.", "good");
 
 if($("voice")) $("voice").onclick = () => cycle(0);
-if($("text")) $("text").onclick = () => cycle(1);
+if($("agent")) $("agent").onclick = () => cycle(1);
 if($("tally")) $("tally").onclick = () => cycle(2);
 $("toggle").onclick = function() {
   paused = !paused;

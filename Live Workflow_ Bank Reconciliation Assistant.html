@@ -138,25 +138,25 @@
     <h1>Bank Reconciliation Assistant</h1>
     <span class="live"><i></i>LIVE SIMULATION</span>
   </div>
-  <p class="sub">Automated accounting reconciliation pipeline in n8n. Ingests bank statement files, runs automated ledger matching algorithms, and auto-marks invoices as paid while isolating discrepancies.</p>
+  <p class="sub">Autonomous bank statement matching pipeline in n8n. Parses transactional CSV records, auto-reconciles against open ERP invoices, and routes discrepancies to accounting teams with 1-click approvals.</p>
   
   <div class="bar">
-    <button class="p" id="stmt">+ Ingest Bank Statement CSV</button>
-    <button class="" id="match">Simulate Exact Match</button>
-    <button class="" id="slack">Simulate Discrepancy Escalation</button>
+    <button class="p" id="batch">+ Ingest HDFC Bank Statement CSV</button>
+    <button class="" id="match">Simulate Auto-Match to ERP</button>
+    <button class="" id="slack">Simulate Accountant Slack Review</button>
     <button id="toggle">Pause</button>
   </div>
 
   <div class="cv">
     <div class="chip">Bank Reconciliation Assistant Auto-Flow <b>● Active</b></div>
-    <svg id="w" viewBox="0 0 960 400" role="img" aria-label="Bank Reconciliation Assistant workflow"></svg>
+    <svg id="w" viewBox="0 0 960 480" role="img" aria-label="Bank Reconciliation Assistant workflow"></svg>
   </div>
 
   <div class="kpis">
-    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">1,840</div><div class="d">Reconciled Transactions</div></div>
-    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">98.7%</div><div class="d">Auto-Match Accuracy</div></div>
-    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">3 min</div><div class="d">Statement Audit Time</div></div>
-    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">100%</div><div class="d">Books Balanced</div></div>
+    <div class="card k"><div class="l">Total Processed</div><div class="v" id="k-1">1,840</div><div class="d">Lines Reconciled</div></div>
+    <div class="card k"><div class="l">Automation Rate</div><div class="v" id="k-2">95.6%</div><div class="d">Auto-Match Accuracy</div></div>
+    <div class="card k"><div class="l">Speed / Cycle</div><div class="v" id="k-3">4 min</div><div class="d">Daily Reconciliation</div></div>
+    <div class="card k"><div class="l">Reliability</div><div class="v" id="k-4">₹0</div><div class="d">Unmatched Variance</div></div>
   </div>
 
   <div class="two">
@@ -190,7 +190,7 @@ const gE = el("g", {}, svg);
 const gN = el("g", {}, svg);
 const gP = el("g", {}, svg);
 
-const RAW_NODES = [["trig","Webhook / Drive Watcher","Bank Statement Inbound",40,180,"<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"14 2 14 8 20 8\" stroke=\"#6366f1\" stroke-width=\"2\"/>"],["parse","Code Node (JS)","Parse Statement JSON",210,180,"<polyline points=\"16 18 22 12 16 6\" stroke=\"#d97706\" stroke-width=\"2\"/><polyline points=\"8 6 2 12 8 18\" stroke=\"#d97706\" stroke-width=\"2\"/>"],["match","ERP Ledger Engine","Match Unpaid Invoices",390,180,"<circle cx=\"11\" cy=\"11\" r=\"8\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\" stroke=\"#059669\" stroke-width=\"2\"/>"],["switch","Switch Node","Match Found vs No Match",560,180,"<path d=\"M4 12h6M10 12l6-6M10 12l6 6\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/>"],["erp","ERP Auto-Reconcile","Mark Paid in Books",740,100,"<path d=\"M9 11l3 3L22 4\" stroke=\"#059669\" stroke-width=\"2\" fill=\"none\"/><rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" stroke=\"#059669\" stroke-width=\"1.5\" fill=\"none\"/>"],["slack","Slack Notification","Tag Accountant for Review",740,260,"<path d=\"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\" stroke=\"#ef4444\" stroke-width=\"2\" fill=\"none\"/>"]];
+const RAW_NODES = [["trig","Drive / Email Watch","Statement CSV Ingest",40,200,"<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/><polyline points=\"14 2 14 8 20 8\" stroke=\"#6366f1\" stroke-width=\"1.5\"/>"],["parse","Code Node (JS)","Parse CSV to Unified JSON",210,200,"<polyline points=\"16 18 22 12 16 6\" stroke=\"#059669\" stroke-width=\"2\"/><polyline points=\"8 6 2 12 8 18\" stroke=\"#059669\" stroke-width=\"2\"/>"],["match","ERP Ledger Engine","Match Unpaid Invoices",390,200,"<ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\" stroke=\"#8b5cf6\" stroke-width=\"2\" fill=\"none\"/><path d=\"M21 12c0 1.66-4 3-9 3s-9-1.34-9-3\" stroke=\"#8b5cf6\" stroke-width=\"2\"/><path d=\"M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5\" stroke=\"#8b5cf6\" stroke-width=\"2\"/>"],["switch","Switch Node","Match Found vs No Match",560,200,"<path d=\"M4 12h6M10 12l6-6M10 12l6 6\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"],["erp","ERP Auto-Reconcile","Mark Invoice Paid",740,85,"<polyline points=\"20 6 9 17 4 12\" stroke=\"#059669\" stroke-width=\"2\"/>"],["slack","Slack / Teams Alert","Tag Accountant for Review",740,315,"<path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\" fill=\"#ef4444\"/>"]];
 const RAW_EDGES = [["trig","parse","HDFC_Dec2026.csv"],["parse","match","45 transactions parsed"],["match","switch","evaluate matches"],["switch","erp","exact match: ₹48,500"],["switch","slack","unmatched ₹3,200 tag"]];
 const RAW_LOGS = ["Bank statement HDFC_Dec.csv ingested via Drive watcher.","Code node parsed 45 transaction rows into clean JSON schema.","Exact match: UTR #99824 matched Invoice #INV-8821 (₹48,500). Auto-marked 'PAID'.","Switch node routed unmatched bank charge ₹3,200 to #finance-alerts on Slack."];
 
@@ -216,7 +216,7 @@ const EDG = [];
 RAW_EDGES.forEach(([fromId, toId, lab]) => {
   const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(30, (x2 - x1) / 2);
   const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: (x1 + x2)/2, y: Math.min(y1, y2) - 8, class: "il" }, gE) : null;
+  const t = lab ? el("text", { x: (x1 + x2)/2, y: (y1 + y2)/2 - 8, class: "il" }, gE) : null;
   if(t) t.textContent = lab;
   EDG.push({ p, t, from: fromId, to: toId });
 });
@@ -311,7 +311,7 @@ async function cycle(scenario = 0) {
 chart();
 log("Bank Reconciliation Assistant pipeline online. Ready for execution.", "good");
 
-if($("stmt")) $("stmt").onclick = () => cycle(0);
+if($("batch")) $("batch").onclick = () => cycle(0);
 if($("match")) $("match").onclick = () => cycle(1);
 if($("slack")) $("slack").onclick = () => cycle(2);
 $("toggle").onclick = function() {
