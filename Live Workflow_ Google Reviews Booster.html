@@ -193,13 +193,13 @@ const IC_AI = '<circle cx="12" cy="12" r="9" '+st("#0284c7",1.8)+'/><path d="M9 
 const IC_DASH = '<rect x="3" y="3" width="18" height="18" rx="3" fill="#059669"/><text x="12" y="16" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">GMB</text>';
 
 const NODES = [
-  ["crm", "Service Completed", "CRM Webhook", 30, 180, IC_CAL, 1],
+  ["crm", "Service Completed", "CRM Webhook", 30, 180, IC_CHECK, 1],
   ["wait", "Wait 2 Hours", "Wait", 180, 180, IC_WAIT],
-  ["survey", "Feedback Poll", "WhatsApp Cloud API", 340, 180, IC_WA],
-  ["google", "Google Review Link", "Google Business Profile", 500, 90, IC_STAR],
+  ["survey", "Feedback Poll", "WhatsApp Cloud API", 340, 180, IC_SURVEY],
+  ["google", "Google Review Link", "Google Business Profile", 500, 90, IC_GOOGLE],
   ["alert", "Alert Desk", "Slack / WhatsApp", 500, 270, IC_ALERT],
-  ["ai", "Generate Response", "Claude LLM", 680, 90, IC_ROBOT],
-  ["dash", "Sync Feedback", "Google Sheets", 840, 180, IC_SYNC]
+  ["ai", "Generate Response", "Claude LLM", 680, 90, IC_AI],
+  ["dash", "Sync Feedback", "Google Sheets", 840, 180, IC_DASH]
 ];
 
 const D = {};

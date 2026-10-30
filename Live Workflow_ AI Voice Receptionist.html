@@ -194,12 +194,12 @@ const IC_POST = '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0
 
 const NODES = [
   ["sip", "Incoming Call", "Twilio SIP Trigger", 30, 180, IC_PHONE, 1],
-  ["stt", "Stream Audio STT", "OpenAI Whisper", 180, 180, IC_EAR],
+  ["stt", "Stream Audio STT", "OpenAI Whisper", 180, 180, IC_MIC],
   ["llm", "Dialogue Agent", "Claude 3.5 Sonnet", 340, 180, IC_BRAIN],
   ["cal", "Book Slot", "Google Calendar", 500, 90, IC_CAL],
-  ["trans", "Warm Transfer", "Twilio Voice", 500, 270, IC_HEAD],
-  ["tts", "Neural Voice TTS", "ElevenLabs", 680, 180, IC_SPEECH],
-  ["post", "Log Interaction", "HubSpot CRM", 840, 180, IC_SYNC]
+  ["trans", "Warm Transfer", "Twilio Voice", 500, 270, IC_AGENT],
+  ["tts", "Neural Voice TTS", "ElevenLabs", 680, 180, IC_SPEAKER],
+  ["post", "Log Interaction", "HubSpot CRM", 840, 180, IC_POST]
 ];
 
 const D = {};

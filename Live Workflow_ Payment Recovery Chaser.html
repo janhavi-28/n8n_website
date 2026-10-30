@@ -196,11 +196,11 @@ const IC_REC = '<path d="M9 11l3 3L22 4" '+st("#059669",2)+'/><path d="M21 12v7a
 const NODES = [
   ["cron", "Daily 9:00 AM", "Schedule Trigger", 30, 180, IC_CLOCK, 1],
   ["erp", "Overdue Invoices", "Zoho / Tally", 180, 180, IC_ERP],
-  ["tier", "Aging Tier Filter", "Switch", 340, 180, IC_FILTER],
+  ["tier", "Aging Tier Filter", "Switch", 340, 180, IC_TIER],
   ["soft", "UPI WhatsApp Nudge", "WhatsApp Cloud API", 500, 90, IC_WA],
-  ["firm", "Escalation Notice", "Send Email", 500, 270, IC_MAIL],
-  ["pay", "Payment Webhook", "Webhook Trigger", 680, 180, IC_HOOK],
-  ["rec", "Reconcile Invoice", "ERP Ledger", 840, 180, IC_CHECK]
+  ["firm", "Escalation Notice", "Send Email", 500, 270, IC_NOTICE],
+  ["pay", "Payment Webhook", "Webhook Trigger", 680, 180, IC_PAY],
+  ["rec", "Reconcile Invoice", "ERP Ledger", 840, 180, IC_REC]
 ];
 
 const D = {};
