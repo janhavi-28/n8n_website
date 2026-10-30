@@ -135,7 +135,8 @@
       background: rgba(255, 109, 90, .06); border-radius: 0 8px 8px 0;
     }
     .ln em { font-style: normal; font-weight: 700; color: #ee513d; }
-  </style>
+    .ndv { display: none !important; }
+</style>
 </head>
 <body>
 <main>
@@ -150,8 +151,7 @@
     <button id="ndr">Simulate Courier NDR (Failed Delivery)</button>
     <button id="pin">Simulate WhatsApp GPS Pin Verification</button>
     <button id="toggle">Pause</button>
-    <button id="det">Node details: Off</button>
-  </div>
+    </div>
 
   <div class="cvw">
     <div class="cv">
@@ -306,19 +306,7 @@ function log(m, c){
 let paused = false, running = false, detail = true;
 
 const ndv = $("ndv");
-async function view(title, sub, params, lines){
-  if(!detail) return;
-  ndv.innerHTML = `
-    <div class="nh"><svg viewBox="0 0 24 24">${IC_TRUCK}</svg><div><b>${title}</b><small>${sub}</small></div><span class="pill ok">NDR Engine</span></div>
-    <div class="nb">
-      <div><h4>Parameters</h4><div class="pm">${Object.entries(params).map(([k,v])=>`<span><b>${k}</b>${v}</span>`).join("")}</div></div>
-      <div><h4>Logistics Recovery Flow</h4><div id="vlines">${lines.map(l=>`<div class="ln">${l}</div>`).join("")}</div></div>
-    </div>`;
-  ndv.classList.add("open");
-  await sleep(1400);
-  ndv.classList.remove("open");
-  await sleep(250);
-}
+async function view(){ return; }
 
 async function cycle(type = "order"){
   if(running || paused) return;

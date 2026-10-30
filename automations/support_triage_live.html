@@ -43,10 +43,11 @@ ul{list-style:none;margin:0;padding:0;font-size:13px}li{padding:6px 0;border-bot
 .pill{margin-left:auto;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--coral);color:var(--coral)}.pill.ok{border-color:var(--ok);color:var(--ok)}
 .nb{padding:12px 16px;display:grid;gap:10px;max-height:360px;overflow-y:auto;font-size:12.5px}
 .ln{font:12px/1.5 ui-monospace,monospace;padding:6px 10px;border-left:3px solid var(--coral);background:rgba(255,109,90,.06);border-radius:0 8px 8px 0}
+  .ndv { display: none !important; }
 </style></head><body><main>
 <div class="top"><h1>Customer Support Triage</h1><span class="live"><i></i>LIVE SIMULATION</span></div>
 <p class="sub">AI ticket categorization, sentiment scoring, and automated knowledge-base replies inside n8n. Resolves FAQs instantly and routes high-priority escalations straight to engineering on Slack.</p>
-<div class="bar"><button class="p" id="tkt">+ Ingest normal ticket</button><button id="urgent">Simulate P1 outage ticket</button><button id="play">Pause</button><button id="det">Node details: Off</button></div>
+<div class="bar"><button class="p" id="tkt">+ Ingest normal ticket</button><button id="urgent">Simulate P1 outage ticket</button><button id="play">Pause</button></div>
 <div class="cv"><div class="chip">AI Support Router <b>● Active</b></div><svg id="w" viewBox="0 0 960 480" role="img" aria-label="customer support triage workflow"></svg></div>
 <div class="ndv" id="ndv"></div>
 <div class="kpis" id="kpis">
@@ -152,13 +153,7 @@ function logItem(txt,badge="INFO"){
   if(ul.children.length>7)ul.removeChild(ul.lastChild);
 }
 
-function showNodeDetail(title,lines){
-  if(!showDetails)return;
-  const v=$("ndv");
-  v.innerHTML=`<div class="nh"><b>${title}</b><span class="pill ok">AI Evaluating</span></div><div class="nb">${lines.map(l=>`<div class="ln">${l}</div>`).join("")}</div>`;
-  v.classList.add("open");
-  setTimeout(()=>v.classList.remove("open"),2300);
-}
+function showNodeDetail(){ return; }
 
 async function cycle(isUrgent=false){
   if(paused)return;

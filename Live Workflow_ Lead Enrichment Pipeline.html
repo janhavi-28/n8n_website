@@ -43,10 +43,11 @@ ul{list-style:none;margin:0;padding:0;font-size:13px}li{padding:6px 0;border-bot
 .pill{margin-left:auto;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--coral);color:var(--coral)}.pill.ok{border-color:var(--ok);color:var(--ok)}
 .nb{padding:12px 16px;display:grid;gap:10px;max-height:360px;overflow-y:auto;font-size:12.5px}
 .ln{font:12px/1.5 ui-monospace,monospace;padding:6px 10px;border-left:3px solid var(--coral);background:rgba(255,109,90,.06);border-radius:0 8px 8px 0}
+  .ndv { display: none !important; }
 </style></head><body><main>
 <div class="top"><h1>Lead Enrichment Pipeline</h1><span class="live"><i></i>LIVE SIMULATION</span></div>
 <p class="sub">Demo of automated inbound lead enrichment inside n8n. Ingests raw leads, pulls technographics and decision-maker profiles, scores buying intent, and notifies sales in real time.</p>
-<div class="bar"><button class="p" id="lead">+ Ingest new lead</button><button id="vip">Simulate VIP Enterprise lead</button><button id="play">Pause</button><button id="det">Node details: On</button></div>
+<div class="bar"><button class="p" id="lead">+ Ingest new lead</button><button id="vip">Simulate VIP Enterprise lead</button><button id="play">Pause</button></div>
 <div class="cv"><div class="chip">Lead Enrichment & Scoring <b>● Active</b></div><svg id="w" viewBox="0 0 960 480" role="img" aria-label="lead enrichment workflow"></svg></div>
 <div class="ndv" id="ndv"></div>
 <div class="kpis" id="kpis">
@@ -130,7 +131,7 @@ function fly(i,cls,ms){
 async function go(i,cls,ms=500){await fly(i,cls,ms);EDG[i].p.classList.add("ok");EDG[i].t&&EDG[i].t.classList.add("show")}
 async function run(id,ms){const c=D[id].g.classList;c.add("run");await sleep(ms);c.remove("run");c.add("ok")}
 
-let leadsCount=1480,matchRate=96.8,vipCount=86,paused=false,showDetails=true;
+let leadsCount=1480,matchRate=96.8,vipCount=86,paused=false,showDetails = false;
 const shown={};
 function setK(id,val,f){
   const c=$(id),from=shown[id]??val,t0=performance.now();
@@ -151,13 +152,7 @@ function logItem(txt,badge="INFO"){
   if(ul.children.length>7)ul.removeChild(ul.lastChild);
 }
 
-function showNodeDetail(title,lines){
-  if(!showDetails)return;
-  const v=$("ndv");
-  v.innerHTML=`<div class="nh"><b>${title}</b><span class="pill ok">Processing</span></div><div class="nb">${lines.map(l=>`<div class="ln">${l}</div>`).join("")}</div>`;
-  v.classList.add("open");
-  setTimeout(()=>v.classList.remove("open"),2300);
-}
+function showNodeDetail(){ return; }
 
 async function cycle(isVIP=false){
   if(paused)return;

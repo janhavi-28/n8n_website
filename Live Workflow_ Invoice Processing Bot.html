@@ -43,10 +43,11 @@ ul{list-style:none;margin:0;padding:0;font-size:13px}li{padding:6px 0;border-bot
 .pill{margin-left:auto;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--coral);color:var(--coral)}.pill.ok{border-color:var(--ok);color:var(--ok)}
 .nb{padding:12px 16px;display:grid;gap:10px;max-height:360px;overflow-y:auto;font-size:12.5px}
 .ln{font:12px/1.5 ui-monospace,monospace;padding:6px 10px;border-left:3px solid var(--coral);background:rgba(255,109,90,.06);border-radius:0 8px 8px 0}
+  .ndv { display: none !important; }
 </style></head><body><main>
 <div class="top"><h1>Invoice Processing Bot</h1><span class="live"><i></i>LIVE SIMULATION</span></div>
 <p class="sub">Demo of automated PDF invoice parsing inside n8n. Ingests billing attachments, extracts line items via Vision OCR, runs 3-way PO matching, and syncs to ERP.</p>
-<div class="bar"><button class="p" id="inv">+ Process new invoice PDF</button><button id="mismatch">Simulate PO exception</button><button id="play">Pause</button><button id="det">Node details: On</button></div>
+<div class="bar"><button class="p" id="inv">+ Process new invoice PDF</button><button id="mismatch">Simulate PO exception</button><button id="play">Pause</button></div>
 <div class="cv"><div class="chip">Invoice 3-Way Match & ERP <b>● Active</b></div><svg id="w" viewBox="0 0 960 480" role="img" aria-label="invoice processing workflow"></svg></div>
 <div class="ndv" id="ndv"></div>
 <div class="kpis" id="kpis">
@@ -129,7 +130,7 @@ function fly(i,cls,ms){
 async function go(i,cls,ms=500){await fly(i,cls,ms);EDG[i].p.classList.add("ok");EDG[i].t&&EDG[i].t.classList.add("show")}
 async function run(id,ms){const c=D[id].g.classList;c.add("run");await sleep(ms);c.remove("run");c.add("ok")}
 
-let invCount=428,poMatched=92.6,accVal=99.4,procTime=3.8,paused=false,showDetails=true;
+let invCount=428,poMatched=92.6,accVal=99.4,procTime=3.8,paused=false,showDetails = false;
 const shown={};
 function setK(id,val,f,delta){
   const c=$(id),from=shown[id]??val,t0=performance.now();
@@ -150,13 +151,7 @@ function logItem(txt,badge="INFO"){
   if(ul.children.length>7)ul.removeChild(ul.lastChild);
 }
 
-function showNodeDetail(title,lines){
-  if(!showDetails)return;
-  const v=$("ndv");
-  v.innerHTML=`<div class="nh"><b>${title}</b><span class="pill ok">Validating</span></div><div class="nb">${lines.map(l=>`<div class="ln">${l}</div>`).join("")}</div>`;
-  v.classList.add("open");
-  setTimeout(()=>v.classList.remove("open"),2300);
-}
+function showNodeDetail(){ return; }
 
 async function cycle(simulateMismatch=false){
   if(paused)return;
