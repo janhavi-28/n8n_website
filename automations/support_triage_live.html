@@ -46,7 +46,7 @@ ul{list-style:none;margin:0;padding:0;font-size:13px}li{padding:6px 0;border-bot
 </style></head><body><main>
 <div class="top"><h1>Customer Support Triage</h1><span class="live"><i></i>LIVE SIMULATION</span></div>
 <p class="sub">AI ticket categorization, sentiment scoring, and automated knowledge-base replies inside n8n. Resolves FAQs instantly and routes high-priority escalations straight to engineering on Slack.</p>
-<div class="bar"><button class="p" id="tkt">+ Ingest normal ticket</button><button id="urgent">Simulate P1 outage ticket</button><button id="play">Pause</button><button id="det">Node details: On</button></div>
+<div class="bar"><button class="p" id="tkt">+ Ingest normal ticket</button><button id="urgent">Simulate P1 outage ticket</button><button id="play">Pause</button><button id="det">Node details: Off</button></div>
 <div class="cv"><div class="chip">AI Support Router <b>● Active</b></div><svg id="w" viewBox="0 0 960 480" role="img" aria-label="customer support triage workflow"></svg></div>
 <div class="ndv" id="ndv"></div>
 <div class="kpis" id="kpis">
@@ -123,13 +123,15 @@ const e6=edge(out("route"),inn("alert"),"P1 Urgent / Angry");
 function fly(i,cls,ms){
   return new Promise(res=>{
     const p=EDG[i].p,L=p.getTotalLength(),c=el("circle",{r:6,class:"pk "+(cls||"")},gP),t0=performance.now();
-    (function f(t){const k=Math.min(1,(t-t0)/ms),q=p.getPointAtLength(L*k);c.setAttribute("cx",q.x);c.setAttribute("cy",q.y);k<1?requestAnimationFrame(f):(c.remove(),res())})(t0);
+    (function f(t){const k = Math.min(1, (t - t0) / ms);
+      const ease = k < 0.5 ? 2 * k * k : -1 + (4 - 2 * k) * k;
+      const q = p.getPointAtLength(L * ease);c.setAttribute("cx",q.x);c.setAttribute("cy",q.y);k<1?requestAnimationFrame(f):(c.remove(),res())})(t0);
   });
 }
 async function go(i,cls,ms=500){await fly(i,cls,ms);EDG[i].p.classList.add("ok");EDG[i].t&&EDG[i].t.classList.add("show")}
 async function run(id,ms){const c=D[id].g.classList;c.add("run");await sleep(ms);c.remove("run");c.add("ok")}
 
-let tktCount=1482,defRate=68.4,paused=false,showDetails=true;
+let tktCount=1482,defRate=68.4,paused=false,showDetails = false;
 const shown={};
 function setK(id,val,f){
   const c=$(id),from=shown[id]??val,t0=performance.now();

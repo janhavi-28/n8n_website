@@ -150,7 +150,7 @@
     <button id="ndr">Simulate Courier NDR (Failed Delivery)</button>
     <button id="pin">Simulate WhatsApp GPS Pin Verification</button>
     <button id="toggle">Pause</button>
-    <button id="det">Node details: On</button>
+    <button id="det">Node details: Off</button>
   </div>
 
   <div class="cvw">
@@ -242,7 +242,9 @@ function fly(i, cls, ms){
   return new Promise(res => {
     const p = EDG[i].p, L = p.getTotalLength(), c = el("circle", { r: 6, class: "pk " + (cls || "") }, gP), t0 = performance.now();
     (function f(t){
-      const k = Math.min(1, (t - t0) / ms), q = p.getPointAtLength(L * k);
+      const k = Math.min(1, (t - t0) / ms);
+      const ease = k < 0.5 ? 2 * k * k : -1 + (4 - 2 * k) * k;
+      const q = p.getPointAtLength(L * ease);
       c.setAttribute("cx", q.x);
       c.setAttribute("cy", q.y);
       k < 1 ? requestAnimationFrame(f) : (c.remove(), res());

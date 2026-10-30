@@ -7,30 +7,30 @@
   <style>
     :root {
       --bg: #f3f5fb; --card: rgba(255, 255, 255, .82); --text: #0f172a; --mut: #64748b; --line: #dde3f0;
-      --accent: #059669; --accent-dark: #047857; --good: #059669; --bad: #e11d48; --gold: #d97706;
+      --accent: #4f46e5; --good: #059669; --bad: #e11d48; --badbg: #ffe9ee; --gold: #d97706;
       --canvas: #f7f8fb; --dot: #d3d8e4; --nb: #fff; --nl: #c5cad8; --edge: #9aa1b5;
-      --ok: #059669; color-scheme: light; box-sizing: border-box;
+      --coral: #ff6d5a; --ok: #2fae6b; color-scheme: light; box-sizing: border-box;
       padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
     }
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
         --bg: #070b16; --card: rgba(20, 28, 50, .72); --text: #eef2ff; --mut: #94a3c4; --line: rgba(148, 163, 210, .22);
-        --accent: #34d399; --good: #34d399; --bad: #fb7185; --gold: #fbbf24;
+        --accent: #818cf8; --good: #34d399; --bad: #fb7185; --badbg: rgba(244, 63, 94, .14); --gold: #fbbf24;
         --canvas: #14161f; --dot: #2c3040; --nb: #262938; --nl: #454a5e; --edge: #6b7390; color-scheme: dark;
       }
     }
     * { box-sizing: border-box; }
     body {
-      margin: 0; color: var(--text); font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: radial-gradient(900px 480px at 12% -8%, rgba(5, 150, 105, .18), transparent),
-                  radial-gradient(700px 420px at 100% 0, rgba(217, 119, 6, .12), transparent), var(--bg);
+      margin: 0; color: var(--text); font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: radial-gradient(900px 480px at 12% -8%, color-mix(in srgb, var(--accent) 24%, transparent), transparent),
+                  radial-gradient(700px 420px at 100% 0, rgba(236, 72, 153, .13), transparent), var(--bg);
       background-attachment: fixed; min-height: 100vh;
     }
     main { max-width: 1040px; margin: 0 auto; padding: 26px 14px 30px; }
     .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     h1 {
-      font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -.035em;
-      background: linear-gradient(90deg, var(--text) 30%, #059669, #d97706);
+      font-size: 28px; margin: 0; font-weight: 800; letter-spacing: -.035em;
+      background: linear-gradient(90deg, var(--text) 30%, var(--accent));
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
     .live {
@@ -48,8 +48,8 @@
     }
     button:active { transform: scale(.96); }
     button.p {
-      background: linear-gradient(135deg, #059669, #047857); border: 0; color: #fff;
-      box-shadow: 0 10px 24px -10px #059669;
+      background: linear-gradient(135deg, #ff6d5a, #ff8a5a); border: 0; color: #fff;
+      box-shadow: 0 10px 24px -10px #ff6d5a;
     }
     .card {
       background: var(--card); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
@@ -58,61 +58,91 @@
     }
     .cvw { position: relative; }
     .cv {
-      border: 1px solid var(--line); border-radius: 16px; overflow: hidden; position: relative;
+      border: 1px solid var(--line); border-radius: 20px; overflow-x: auto; position: relative;
       background-color: var(--canvas);
       background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
-      background-size: 20px 20px;
+      background-size: 22px 22px;
     }
     .chip {
-      position: absolute; left: 14px; top: 14px; z-index: 2; display: inline-flex; align-items: center; gap: 8px;
-      padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 999px;
-      background: rgba(15, 23, 42, .75); color: #fff; border: 1px solid rgba(255, 255, 255, .15);
+      position: sticky; left: 12px; top: 12px; display: inline-flex; gap: 10px; align-items: center;
+      margin: 12px; padding: 6px 12px; border-radius: 10px; background: var(--nb); border: 1px solid var(--nl);
+      font-size: 12px; font-weight: 600; z-index: 2;
     }
-    .chip b { color: #34d399; font-weight: 700; }
-    svg#w { width: 100%; height: auto; display: block; }
+    .chip b { color: var(--ok); font-weight: 600; }
+    svg#w { width: 100%; min-width: 860px; height: auto; display: block; }
+    
+    /* Nodes */
     .nd { cursor: pointer; }
     .nd .b {
-      fill: var(--nb); stroke: var(--nl); stroke-width: 1.5;
-      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .08)); transition: stroke .2s;
+      fill: var(--nb); stroke: var(--nl); stroke-width: 1.5; transition: stroke .25s;
     }
-    .nd:hover .b { stroke: var(--accent); }
-    .nd text { font-size: 11.5px; font-weight: 700; fill: var(--text); text-anchor: middle; font-family: inherit; }
-    .nd text.s { font-size: 9.5px; font-weight: 500; fill: var(--mut); }
+    .nd text { font-size: 12px; font-weight: 600; fill: var(--text); text-anchor: middle; }
+    .nd .s { font-size: 10px; font-weight: 400; fill: var(--mut); }
+    
+    .nd.run .b {
+      stroke: var(--coral); stroke-width: 2; stroke-dasharray: 6 4;
+      animation: d .6s linear infinite; filter: drop-shadow(0 0 6px var(--coral));
+    }
+    .nd.ok .b { stroke: var(--ok); stroke-width: 2; }
+    .nd.gold .b { stroke: var(--gold); stroke-width: 2; filter: drop-shadow(0 0 6px var(--gold)); }
+    
+    .bg { display: none; }
+    .nd.ok .bg { display: block; }
     .bg circle { fill: var(--ok); }
-    .bg { opacity: 0; transition: opacity .2s; }
-    .nd.done .bg { opacity: 1; }
-    .ed { fill: none; stroke: var(--edge); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 6 5; animation: dash 18s linear infinite; }
-    @keyframes dash { to { stroke-dashoffset: -1000; } }
-    .il { fill: var(--mut); font-size: 9.5px; font-weight: 600; text-anchor: middle; }
-    .pk { fill: #059669; filter: drop-shadow(0 0 7px #059669); }
-    .pk.gold { fill: #d97706; filter: drop-shadow(0 0 7px #d97706); }
+    
+    @keyframes d { to { stroke-dashoffset: -10; } }
+    
+    /* Edges */
+    .ed { fill: none; stroke: var(--edge); stroke-width: 1.8; transition: stroke .3s; }
+    .ed.ok { stroke: var(--ok); }
+    
+    .mk { fill: var(--edge); }
+    .pt { fill: var(--nb); stroke: var(--edge); stroke-width: 1.5; }
+    
+    .il { fill: var(--ok); font-size: 10px; font-weight: 600; opacity: 0; transition: .3s; text-anchor: middle; }
+    .il.show { opacity: 1; }
+    
+    /* Flowing Packets */
+    .pk { fill: var(--coral); filter: drop-shadow(0 0 7px var(--coral)); will-change: cx, cy; }
+    .pk.gold { fill: var(--gold); filter: drop-shadow(0 0 8px var(--gold)); }
+    
+    /* Metrics & Dashboard Grid */
     .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
     @media (max-width: 720px) { .grid { grid-template-columns: repeat(2, 1fr); } }
     .box {
       border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; background: var(--card);
+      position: relative; overflow: hidden;
+    }
+    .box::before {
+      content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), #ec4899);
     }
     .box span { display: block; font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--mut); }
-    .box b { display: block; font-size: 20px; font-weight: 800; margin: 4px 0 2px; }
-    .box small { color: var(--good); font-size: 11px; font-weight: 600; }
+    .box b { display: block; font-size: 24px; font-weight: 800; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+    .box small { color: var(--good); font-size: 11.5px; font-weight: 600; }
+    
     .split { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-top: 14px; }
     @media (max-width: 780px) { .split { grid-template-columns: 1fr; } }
     .sec { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--card); }
     h2 { font-size: 11.5px; margin: 0 0 8px; color: var(--mut); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
     ul { list-style: none; margin: 0; padding: 0; font-size: 13px; }
-    li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+    li { padding: 5px 0; border-bottom: 1px solid var(--line); }
     li:last-child { border: 0; }
     li b { color: var(--mut); font-weight: 500; margin-right: 6px; }
     li.good { color: var(--good); }
     li.gold { color: var(--gold); }
-    .bars rect { fill: #059669; opacity: .5; transform-box: fill-box; transform-origin: bottom; }
-    .bars rect.new { opacity: 1; animation: g .6s ease-out; filter: drop-shadow(0 0 6px #059669); }
+    
+    .bars rect { fill: var(--accent); opacity: .5; transform-box: fill-box; transform-origin: bottom; }
+    .bars rect.new { opacity: 1; animation: g .6s ease-out; filter: drop-shadow(0 0 6px var(--accent)); }
     @keyframes g { from { transform: scaleY(0); } }
     .bars text { fill: var(--mut); font-size: 10px; text-anchor: middle; }
+    
+    /* Inspector Modal */
     .ndv {
-      position: absolute; left: 50%; top: 50%; width: min(600px, 94%); max-height: 96%; overflow: hidden;
+      position: absolute; left: 50%; top: 50%; width: min(580px, 94%); max-height: 94%; overflow: hidden;
       transform: translate(-50%, -46%) scale(.94); opacity: 0; pointer-events: none;
-      transition: opacity .25s, transform .25s; background: var(--nb); border: 1px solid var(--nl);
-      border-radius: 16px; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .5); z-index: 5;
+      transition: opacity .25s ease-out, transform .25s ease-out; background: var(--nb); border: 1px solid var(--nl);
+      border-radius: 16px; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .5); z-index: 10;
     }
     .ndv.open { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
     .nh { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--nl); }
@@ -126,11 +156,11 @@
     .nb { padding: 12px 16px; display: grid; gap: 10px; max-height: 360px; overflow-y: auto; font-size: 12.5px; }
     .nb h4 { margin: 0 0 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--mut); }
     .pm { display: flex; flex-wrap: wrap; gap: 6px; }
-    .pm span { font-size: 11.5px; padding: 3px 9px; border-radius: 8px; background: rgba(5, 150, 105, .12); }
+    .pm span { font-size: 11.5px; padding: 3px 9px; border-radius: 8px; background: color-mix(in srgb, var(--accent) 12%, transparent); }
     .pm span b { color: var(--mut); font-weight: 600; margin-right: 5px; }
     .ln {
-      font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace; padding: 6px 10px; border-left: 3px solid #059669;
-      background: rgba(5, 150, 105, .06); border-radius: 0 8px 8px 0;
+      font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace; padding: 6px 10px; border-left: 3px solid var(--coral);
+      background: color-mix(in srgb, var(--text) 5%, transparent); border-radius: 0 8px 8px 0;
     }
   </style>
 </head>
@@ -147,7 +177,7 @@
     <button class="" id="split">Simulate Parallel Broadcast</button>
     <button class="" id="verify">Verify Amazon & Woo Parity</button>
     <button id="toggle">Pause</button>
-    <button id="det">Node details: On</button>
+    <button id="det">Node details: Off</button>
   </div>
 
   <div class="cvw">
@@ -167,29 +197,30 @@
 
   <div class="split">
     <div class="sec">
-      <h2>Live Execution Log</h2>
+      <h2>Activity Log</h2>
       <ul id="log"></ul>
     </div>
     <div class="sec">
-      <h2>Hourly Activity</h2>
+      <h2>Execution Volume</h2>
       <svg class="bars" viewBox="0 0 260 90" id="ch"></svg>
     </div>
   </div>
 </main>
 
 <script>
+const NS = "http://www.w3.org/2000/svg";
 const $ = id => document.getElementById(id);
 const svg = $("w");
 const el = (n, a = {}, p = null) => {
-  const e = document.createElementNS("http://www.w3.org/2000/svg", n);
+  const e = document.createElementNS(NS, n);
   for (const k in a) e.setAttribute(k, a[k]);
   if (p) p.appendChild(e);
   return e;
 };
 
 const defs = el("defs", {}, svg);
-const m = el("marker", { id: "ar", viewBox: "0 0 10 10", refX: "6", refY: "5", markerWidth: "6", markerHeight: "6", orient: "auto-start-reverse" }, defs);
-el("path", { d: "M 0 1 L 8 5 L 0 9 z", fill: "var(--edge)" }, m);
+const m = el("marker", { id: "ar", markerWidth: "8", markerHeight: "8", refX: "7", refY: "4", orient: "auto" }, defs);
+el("path", { d: "M 0 0 L 8 4 L 0 8 z", class: "mk" }, m);
 
 const gE = el("g", { id: "edges" }, svg);
 const gP = el("g", { id: "packets" }, svg);
@@ -207,8 +238,8 @@ RAW_NODES.forEach(([id, name, sub, x, y, ic]) => {
   el("path", { class: "b", d: `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
   el("g", { transform: `translate(${x+16},${y+16}) scale(1.33)` }, g).innerHTML = ic;
   const L = wrap(name);
-  L.forEach((t, i) => el("text", { x: x+32, y: y+78+i*13 }, g).textContent = t);
-  el("text", { x: x+32, y: y+78+L.length*13, class: "s" }, g).textContent = sub;
+  L.forEach((t, i) => el("text", { x: x+32, y: y+80+i*13 }, g).textContent = t);
+  el("text", { x: x+32, y: y+80+L.length*13, class: "s" }, g).textContent = sub;
   const b = el("g", { class: "bg" }, g);
   el("circle", { cx: x+64, cy: y+4, r: 9 }, b);
   el("path", { d: `M${x+59.5} ${y+4}l3.2 3.2 6-6.2`, fill: "none", stroke: "#fff", "stroke-width": 2, "stroke-linecap": "round" }, b);
@@ -219,19 +250,22 @@ const out = id => [D[id].x + 64, D[id].y + 32], inn = id => [D[id].x, D[id].y + 
 const EDG = [];
 
 RAW_EDGES.forEach(([fromId, toId, lab]) => {
-  const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(35, (x2 - x1) / 2);
+  const [x1, y1] = out(fromId), [x2, y2] = inn(toId), dx = Math.max(30, (x2 - x1) / 2);
   const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: (x1 + x2)/2, y: ((y1 + y2)/2) - 8, class: "il" }, gE) : null;
+  const t = lab ? el("text", { x: (x1 + x2)/2, y: Math.min(y1, y2) - 8, class: "il" }, gE) : null;
   if(t) t.textContent = lab;
   EDG.push({ p, t, from: fromId, to: toId });
 });
 
-function fly(idx, cls, ms = 700){
+function fly(idx, cls, ms = 480){
   return new Promise(res => {
     if(!EDG[idx]) return res();
     const p = EDG[idx].p, L = p.getTotalLength(), c = el("circle", { r: 6, class: "pk " + (cls || "") }, gP), t0 = performance.now();
     (function f(t){
-      const k = Math.min(1, (t - t0) / ms), q = p.getPointAtLength(L * k);
+      const k = Math.min(1, (t - t0) / ms);
+      // smooth cubic easeInOut matching sim-dashboard.html
+      const ease = k < 0.5 ? 2 * k * k : -1 + (4 - 2 * k) * k;
+      const q = p.getPointAtLength(L * ease);
       c.setAttribute("cx", q.x);
       c.setAttribute("cy", q.y);
       k < 1 ? requestAnimationFrame(f) : (c.remove(), res());
@@ -241,44 +275,56 @@ function fly(idx, cls, ms = 700){
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function run(id, ms = 450, cls = ""){
-  const g = D[id].g;
-  g.classList.add("active");
-  if(cls) g.classList.add(cls);
+async function go(idx, cls = "", ms = 480){
+  await fly(idx, cls, ms);
+  if(EDG[idx]){
+    EDG[idx].p.classList.add("ok");
+    EDG[idx].t && EDG[idx].t.classList.add("show");
+  }
+}
+
+async function run(id, ms = 380, cls = ""){
+  if(!D[id]) return;
+  const c = D[id].g.classList;
+  c.add("run");
+  if(cls) c.add(cls);
   await sleep(ms);
-  g.classList.remove("active");
-  g.classList.add("done");
+  c.remove("run");
+  c.add("ok");
 }
 
 function reset(){
-  RAW_NODES.forEach(([id]) => D[id].g.classList.remove("active", "done", "gold"));
+  Object.values(D).forEach(n => n.g.setAttribute("class", "nd"));
+  EDG.forEach(e => {
+    e.p.classList.remove("ok");
+    e.t && e.t.classList.remove("show");
+  });
 }
 
-const H = [12, 18, 25, 34, 48, 62, 54, 78, 92];
+const H = [14, 22, 28, 36, 45, 68, 58, 84, 96];
 function chart(){
   const s = $("ch"); s.innerHTML = "";
   const max = Math.max(...H);
   H.forEach((v, i) => {
-    const h = (v / max) * 60, x = 15 + i * 27, y = 75 - h;
+    const h = (v / max) * 60, x = 12 + i * 27, y = 74 - h;
     el("rect", { x, y, width: 14, height: h, rx: 3, class: i === H.length - 1 ? "new" : "" }, s);
-    el("text", { x: x + 7, y: 88 }, s).textContent = (9 + i) + "h";
+    el("text", { x: x + 7, y: 86 }, s).textContent = (9 + i) + "h";
   });
 }
 
 function log(msg, cls="good"){
   const li = document.createElement("li");
-  li.className = cls;
-  const time = new Date().toTimeString().slice(0, 8);
-  li.innerHTML = "<b>[" + time + "]</b> " + msg;
+  if(cls) li.className = cls;
+  const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  li.innerHTML = "<b>" + time + "</b> " + msg;
   const u = $("log"); u.prepend(li);
   while(u.children.length > 8) u.lastChild.remove();
 }
 
-let paused = false, running = false, detail = true;
+let paused = false, running = false, detail = false;
 const ndv = $("ndv");
 
 async function view(title, sub, params, lines){
-  if(!detail) return;
   ndv.innerHTML = `
     <div class="nh"><div><b>${title}</b><small>${sub}</small></div><span class="pill ok">Active Engine</span></div>
     <div class="nb">
@@ -286,53 +332,65 @@ async function view(title, sub, params, lines){
       <div><h4>Execution Steps</h4><div>${lines.map(l=>`<div class="ln">${l}</div>`).join("")}</div></div>
     </div>`;
   ndv.classList.add("open");
-  await sleep(1300);
+  await sleep(1400);
   ndv.classList.remove("open");
   await sleep(200);
 }
 
-async function cycle(scenario = 0){
+async function cycle(scenario = 0, isManual = false){
   if(running || paused) return;
   running = true;
   reset();
 
-  log(RAW_LOGS[0] || "Pipeline triggered. Processing data payload...", "good");
-  
-  for(let i = 0; i < RAW_NODES.length; i++){
-    const nodeId = RAW_NODES[i][0];
-    await run(nodeId, 450);
-    if(i < EDG.length) {
-      await fly(i, "good", 650);
-    }
-    if(i === 1 && detail){
-      await view(RAW_NODES[i][1], RAW_NODES[i][2], { Status: "Operational", Speed: "Sub-second", Mode: "Autonomous" }, [
-        RAW_LOGS[1] || "Payload schema validated successfully",
-        RAW_LOGS[2] || "Triggered secondary event handler",
-        "Pipeline state preserved across nodes"
-      ]);
-    }
+  const isAlt = scenario > 0;
+  log(RAW_LOGS[scenario] || RAW_LOGS[0], isAlt ? "gold" : "good");
+
+  // Step 1: Trigger first node
+  await run(RAW_NODES[0][0], 360, isAlt ? "gold" : "");
+
+  // Step 2: Flow across edges and trigger subsequent nodes smoothly
+  for(let i = 0; i < EDG.length; i++){
+    await go(i, isAlt ? "gold" : "", 460);
+    const targetNode = EDG[i].to;
+    await run(targetNode, 380, isAlt ? "gold" : "");
   }
 
-  log(RAW_LOGS[RAW_LOGS.length - 1] || "Execution completed. Audit records updated.", "good");
+  // Show inspector if user enabled node details or triggered manually
+  if(detail || isManual){
+    const inspectNode = RAW_NODES[Math.min(1, RAW_NODES.length - 1)];
+    await view(inspectNode[1], inspectNode[2], { Status: "Operational", Engine: "n8n Self-Hosted", Speed: "Sub-second" }, [
+      RAW_LOGS[1] || "Payload processed and verified",
+      RAW_LOGS[2] || "Dispatched downstream events",
+      "Status recorded with zero anomalies"
+    ]);
+  }
+
+  log(RAW_LOGS[RAW_LOGS.length - 1] || "Pipeline cycle completed successfully.", "good");
 
   H[H.length - 1] += 1;
   chart();
 
-  await sleep(1400);
+  await sleep(1200);
   reset();
   running = false;
 }
 
 chart();
-log("Multi-Channel Stock and Price Sync pipeline online. Ready for automated execution.", "good");
+log("Multi-Channel Stock and Price Sync pipeline online. Ready for execution.", "good");
 
-if($("sale")) $("sale").onclick = () => cycle(0);
-if($("split")) $("split").onclick = () => cycle(1);
-if($("verify")) $("verify").onclick = () => cycle(2);
+if($("sale")) $("sale").onclick = () => cycle(0, true);
+if($("split")) $("split").onclick = () => cycle(1, true);
+if($("verify")) $("verify").onclick = () => cycle(2, true);
 $("toggle").onclick = function(){ paused = !paused; this.textContent = paused ? "Resume" : "Pause"; };
 $("det").onclick = function(){ detail = !detail; this.textContent = "Node details: " + (detail ? "On" : "Off"); };
 
-setInterval(() => { if(!paused && !running) cycle(0); }, 10500);
+(async () => {
+  await sleep(1000);
+  while(true){
+    if(!paused && !running) await cycle(0, false);
+    await sleep(3500);
+  }
+})();
 </script>
 </body>
 </html>
