@@ -436,9 +436,6 @@ body {
         <div class="success-icon">✓</div>
         <h3 class="success-title">Request Received!</h3>
         <p class="success-desc">Thank you! Our automation team will reach out to you within one business day.</p>
-        <a id="btn-wa-success" href="#" target="_blank" rel="noopener noreferrer" class="info-wa-btn">
-          Chat on WhatsApp
-        </a>
       </div>
     </section>
 
@@ -521,11 +518,6 @@ function handleFormSubmit(e) {
     `Hi Aivatika Team,\n\nI am interested in "${auto}".\n\nContact Details:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n- Automation: ${auto}\n\nPlease contact me for next steps!\n\nThanks,\n${name}`
   );
 
-  const waText = encodeURIComponent(
-    `Hi Aivatika Team, I want to get the *${auto}* for *${biz}*.\nName: ${name}\nPhone: ${phone}`
-  );
-
-  document.getElementById('btn-wa-success').href = `https://wa.me/918050473346?text=${waText}`;
   document.getElementById('contact-form').style.display = 'none';
   document.getElementById('success-card').style.display = 'block';
 
