@@ -193,21 +193,21 @@ const IC_AI = '<circle cx="12" cy="12" r="9" '+st("#0284c7",1.8)+'/><path d="M9 
 const IC_DASH = '<rect x="3" y="3" width="18" height="18" rx="3" fill="#059669"/><text x="12" y="16" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">GMB</text>';
 
 const NODES = [
-  ["crm", "Appointment Done", "CRM Webhook Trigger", 30, 180, IC_CHECK],
-  ["wait", "Wait 2 Hours", "Optimal Feedback Delay", 180, 180, IC_WAIT],
-  ["survey", "WhatsApp Star Poll", "1 to 5 Star Selector", 340, 180, IC_SURVEY],
-  ["google", "1-Tap Google Reviews", "Maps Link + AI Prompt", 500, 90, IC_GOOGLE],
-  ["alert", "Private Alert to Lead", "Slack / WhatsApp Desk", 500, 270, IC_ALERT],
-  ["ai", "AI Review Reply", "SEO Keywords & Courtesy", 680, 90, IC_AI],
-  ["dash", "Sync Google Profile", "Reputation Dashboard", 840, 180, IC_DASH]
+  ["crm", "Service Completed", "CRM Webhook", 30, 180, IC_CAL, 1],
+  ["wait", "Wait 2 Hours", "Wait", 180, 180, IC_WAIT],
+  ["survey", "Feedback Poll", "WhatsApp Cloud API", 340, 180, IC_WA],
+  ["google", "Google Review Link", "Google Business Profile", 500, 90, IC_STAR],
+  ["alert", "Alert Desk", "Slack / WhatsApp", 500, 270, IC_ALERT],
+  ["ai", "Generate Response", "Claude LLM", 680, 90, IC_ROBOT],
+  ["dash", "Sync Feedback", "Google Sheets", 840, 180, IC_SYNC]
 ];
 
 const D = {};
 function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
 
-NODES.forEach(([id, name, sub, x, y, ic]) => {
+NODES.forEach(([id, name, sub, x, y, ic, tr]) => {
   const g = el("g", { class: "nd" }, gN);
-  el("path", { class: "b", d: `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
+  el("path", { class: "b", d: tr ? `M${x+32} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+32}a32 32 0 0 1 0-64z` : `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
   el("g", { transform: `translate(${x+16},${y+16}) scale(1.33)` }, g).innerHTML = ic;
   const L = wrap(name);
   L.forEach((t, i) => el("text", { x: x+32, y: y+80+i*13 }, g).textContent = t);

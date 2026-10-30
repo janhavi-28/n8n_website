@@ -193,21 +193,21 @@ const IC_DISPATCH = '<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" fill="#05966
 const IC_NOTION = '<rect x="3" y="3" width="18" height="18" rx="3" fill="#374151"/><text x="12" y="16" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">N</text>';
 
 const NODES = [
-  ["video", "Video Ingest", "Google Drive / Loom", 30, 180, IC_VIDEO],
-  ["stt", "Whisper Audio STT", "Speaker Transcription", 180, 180, IC_MIC],
-  ["ai", "Insight Distiller", "Claude 3.5 Sonnet", 340, 180, IC_AI],
-  ["li", "LinkedIn Post AI", "Thought Leadership", 500, 90, IC_LI],
-  ["x", "Twitter / X Thread", "10-Tweet Hook Sequence", 500, 270, IC_X],
-  ["sched", "Buffer / Postiz", "Multi-Platform Dispatch", 680, 180, IC_DISPATCH],
-  ["notion", "Notion Content Sync", "Editorial Calendar", 840, 180, IC_NOTION]
+  ["video", "Video Ingest", "Google Drive Watch", 30, 180, IC_DRIVE, 1],
+  ["stt", "Transcribe Audio", "OpenAI Whisper", 180, 180, IC_MIC],
+  ["ai", "Extract Insights", "Claude 3.5 Sonnet", 340, 180, IC_AI],
+  ["li", "Draft LinkedIn Post", "Basic LLM Chain", 500, 90, IC_LI],
+  ["x", "Draft X Thread", "Basic LLM Chain", 500, 270, IC_TW],
+  ["sched", "Schedule Post", "Buffer / Postiz", 680, 180, IC_BUF],
+  ["notion", "Editorial Calendar", "Notion API", 840, 180, IC_NOT]
 ];
 
 const D = {};
 function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
 
-NODES.forEach(([id, name, sub, x, y, ic]) => {
+NODES.forEach(([id, name, sub, x, y, ic, tr]) => {
   const g = el("g", { class: "nd" }, gN);
-  el("path", { class: "b", d: `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
+  el("path", { class: "b", d: tr ? `M${x+32} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+32}a32 32 0 0 1 0-64z` : `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
   el("g", { transform: `translate(${x+16},${y+16}) scale(1.33)` }, g).innerHTML = ic;
   const L = wrap(name);
   L.forEach((t, i) => el("text", { x: x+32, y: y+80+i*13 }, g).textContent = t);

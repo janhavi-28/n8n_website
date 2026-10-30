@@ -190,16 +190,16 @@ const gE = el("g", {}, svg);
 const gN = el("g", {}, svg);
 const gP = el("g", {}, svg);
 
-const RAW_NODES = [["inv","Inventory Webhook","Shopify Stock Trigger",40,200,"<circle cx=\"9\" cy=\"21\" r=\"1\"/><circle cx=\"20\" cy=\"21\" r=\"1\"/><path d=\"M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/>"],["code","Code Node (JS)","Standardize SKU & Quantity",210,200,"<polyline points=\"16 18 22 12 16 6\" stroke=\"#059669\" stroke-width=\"2\"/><polyline points=\"8 6 2 12 8 18\" stroke=\"#059669\" stroke-width=\"2\"/>"],["split","Parallel Broadcast","Split Batch to Channels",390,200,"<path d=\"M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5\" stroke=\"#8b5cf6\" stroke-width=\"2\"/>"],["woo","WooCommerce API","Update Store Stock",620,85,"<polyline points=\"20 6 9 17 4 12\" stroke=\"#059669\" stroke-width=\"2\"/>"],["mkt","Amazon & Flipkart","Merchant PUT Batch API",620,315,"<path d=\"M3 3h18v18H3z\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"]];
-const RAW_EDGES = [["inv","code","SKU-RUN-SHOE-9: stock=12"],["code","split","payload formatted to unified JSON"],["split","woo","PUT /wp-json/wc/v3/products"],["split","mkt","PUT Amazon SP-API & Flipkart"]];
+const RAW_NODES = [["inv","Master Stock Change","Shopify Webhook",40,200,"<circle cx=\"9\" cy=\"21\" r=\"1\"/><circle cx=\"20\" cy=\"21\" r=\"1\"/><path d=\"M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6\" stroke=\"#6366f1\" stroke-width=\"2\" fill=\"none\"/>",1],["code","Standardize SKU","Code",210,200,"<polyline points=\"16 18 22 12 16 6\" stroke=\"#059669\" stroke-width=\"2\"/><polyline points=\"8 6 2 12 8 18\" stroke=\"#059669\" stroke-width=\"2\"/>"],["split","Broadcast Parallel","Split In Batches",390,200,"<path d=\"M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5\" stroke=\"#8b5cf6\" stroke-width=\"2\"/>"],["woo","Update Storefront","WooCommerce API",620,85,"<polyline points=\"20 6 9 17 4 12\" stroke=\"#059669\" stroke-width=\"2\"/>"],["mkt","Update Marketplaces","Amazon & Flipkart",620,315,"<path d=\"M3 3h18v18H3z\" stroke=\"#d97706\" stroke-width=\"2\" fill=\"none\"/>"]];
+const RAW_EDGES = [["inv","code","SKU-RUN-SHOE-9: stock=12"],["code","split","payload standardized"],["split","woo","PUT WooCommerce API"],["split","mkt","PUT Amazon & Flipkart"]];
 const RAW_LOGS = ["Inventory update event received from master Shopify store: SKU-RUN-SHOE-9 stock changed to 12.","JS Code node mapped SKU and stock count into standardized marketplace payload.","Broadcasted parallel API sync: WooCommerce store updated in 1.1 seconds.","Amazon SP-API and Flipkart Merchant APIs updated simultaneously. Full parity maintained."];
 
 const D = {};
 function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
 
-RAW_NODES.forEach(([id, name, sub, x, y, ic]) => {
+RAW_NODES.forEach(([id, name, sub, x, y, ic, tr]) => {
   const g = el("g", { class: "nd", id: "nd-" + id }, gN);
-  el("path", { class: "b", d: `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
+  el("path", { class: "b", d: tr ? `M${x+32} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+32}a32 32 0 0 1 0-64z` : `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
   el("g", { transform: `translate(${x+16},${y+16}) scale(1.33)` }, g).innerHTML = ic;
   const L = wrap(name);
   L.forEach((t, i) => el("text", { x: x+32, y: y+80+i*13 }, g).textContent = t);

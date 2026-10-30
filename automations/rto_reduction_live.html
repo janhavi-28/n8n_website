@@ -194,21 +194,21 @@ const IC_RESTOCK = '<path d="M23 4v6h-6M1 20v-6h6" '+st("#059669",2)+'/><path d=
 const IC_SYNC = '<rect x="3" y="3" width="18" height="18" rx="3" fill="#10b981"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" fill="none"/>';
 
 const NODES = [
-  ["order", "Shopify Order", "New Webhook", 30, 180, IC_CART],
-  ["vfy", "AI Address Sanitizer", "Google Maps + Pin", 180, 180, IC_MAP],
-  ["wa", "WhatsApp Verification", "Confirm COD Order", 340, 180, IC_WA],
-  ["ndr", "Shiprocket NDR Webhook", "Delivery Failed", 500, 90, IC_TRUCK],
-  ["voice", "AI Voice Re-Attempt", "Call Customer Instantly", 680, 90, IC_VOICE],
-  ["restock", "RTO Restock & Return", "Inventory Control", 500, 270, IC_RESTOCK],
-  ["sync", "Shopify & ERP Sync", "Update Order Status", 840, 180, IC_SYNC]
+  ["order", "Shopify Order", "Webhook Trigger", 30, 180, IC_CART, 1],
+  ["vfy", "Verify Address", "Google Maps API", 180, 180, IC_PIN],
+  ["wa", "COD Confirmation", "WhatsApp Cloud API", 340, 180, IC_WA],
+  ["ndr", "NDR Alert", "Shiprocket Webhook", 500, 90, IC_SHIP],
+  ["voice", "Voice Re-Attempt", "AI Voice Agent", 680, 90, IC_PHONE],
+  ["restock", "Restock Inventory", "ERP Inventory", 500, 270, IC_BOX],
+  ["sync", "Sync Order Status", "Shopify API", 840, 180, IC_SYNC]
 ];
 
 const D = {};
 function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
 
-NODES.forEach(([id, name, sub, x, y, ic]) => {
+NODES.forEach(([id, name, sub, x, y, ic, tr]) => {
   const g = el("g", { class: "nd" }, gN);
-  el("path", { class: "b", d: `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
+  el("path", { class: "b", d: tr ? `M${x+32} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+32}a32 32 0 0 1 0-64z` : `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
   el("g", { transform: `translate(${x+16},${y+16}) scale(1.33)` }, g).innerHTML = ic;
   const L = wrap(name);
   L.forEach((t, i) => el("text", { x: x+32, y: y+80+i*13 }, g).textContent = t);
