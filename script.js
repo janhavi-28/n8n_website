@@ -3,42 +3,40 @@
    ========================================= */
 
 const CONFIG = {
-  domain: 'n8n_aivatika.com',
-  siteName: 'n8n_aivatika.com',
-  heroTitle: 'n8n Automations made by our team',
-  heroSubtitle: 'Ready-to-use workflows that save hours of manual work. Watch each one run live.',
-  contactEmail: 'hello@n8n_aivatika.com',
-  whatsappNumber: '91XXXXXXXXXX'
+  domain: 'aivatika.com',
+  siteName: 'AIVATIKA - Enterprise AI Automation',
+  heroTitle: 'AIVATIKA AI Automation Suite',
+  heroSubtitle: 'Enterprise-grade autonomous AI workflows that save hundreds of manual hours every month.',
+  contactEmail: 'contact@aivatika.com',
+  whatsappNumber: '918050473346'
 };
 
 const AUTOMATIONS = [
   {
-    id: 'daily-dashboard',
+    id: 'dashboard',
     name: 'Daily Business Dashboard',
-    tagline: 'Pulls sales, expenses, inventory and ads into one live dashboard with automatic anomaly alerts.',
+    tagline: 'Pulls sales, expenses, inventory and ads into one live executive dashboard with automatic anomaly alerts.',
     embed: 'automations/dashboard_workflow_live.html',
     live: true,
     pricing: {
-      price: 'Setup Rs 15,000 + Rs 2,000/month',
+      price: 'Setup ₹49,000 (One-time) + Monthly Maintenance ₹9,900',
       setupRequired: [
-        'n8n instance (Cloud or self-hosted)',
         'Data source credentials (Sheets, CRM, Ads, Accounting)',
-        'SMTP / Email account for anomaly alerts',
+        'Email / Slack account for alerts',
         'Defined KPI calculation metrics & schedule'
       ]
     }
   },
   {
-    id: 'tender-hunter',
+    id: 'tender',
     name: 'Tender / Opportunity Hunter',
     tagline: 'Scans government and listing sites daily and shows only the relevant tenders with deadlines and countdown alerts.',
     embed: 'automations/tender_workflow_live.html',
     live: true,
     pricing: {
-      price: 'Setup Rs 18,000 + Rs 2,500/month',
+      price: 'Setup ₹39,000 (One-time) + Monthly Maintenance ₹7,500',
       setupRequired: [
-        'n8n instance (Cloud or self-hosted)',
-        'Target portal keywords & category filters (GeM, CPPP)',
+        'Target portal keywords & category filters (GeM)',
         'Google Sheets or database for lead logging',
         'Slack, Telegram, or Email for real-time alerts',
         'Filter rules for budget ranges & locations'
@@ -46,16 +44,15 @@ const AUTOMATIONS = [
     }
   },
   {
-    id: 'email-automation',
+    id: 'email',
     name: 'Email Campaign Automator',
     tagline: 'Automates personalised email sequences with dynamic content, A/B testing and delivery analytics.',
     embed: 'automations/email_workflow_live.html',
     live: true,
     pricing: {
-      price: 'Setup Rs 12,000 + Rs 1,500/month',
+      price: 'Setup ₹39,000 (One-time) + Monthly Maintenance ₹8,500',
       setupRequired: [
-        'n8n instance (Cloud or self-hosted)',
-        'Email service provider (SES, SendGrid, Mailgun, or SMTP)',
+        'Email service provider (SES, Mailgun, Brevo, or SMTP)',
         'Verified sending domain (SPF, DKIM & DMARC)',
         'Audience contact list or CRM connection',
         'Email sequence copy templates & triggers'
@@ -63,16 +60,15 @@ const AUTOMATIONS = [
     }
   },
   {
-    id: 'lead-enrichment',
+    id: 'lead',
     name: 'Lead Enrichment Pipeline',
     tagline: 'Enriches raw leads with company data, tech stack, funding info and decision-maker contacts.',
     embed: 'automations/lead_enrichment_live.html',
     live: true,
     pricing: {
-      price: 'Setup Rs 14,000 + Rs 2,000/month',
+      price: 'Setup ₹59,000 (One-time) + Monthly Maintenance ₹9,500',
       setupRequired: [
-        'n8n instance (Cloud or self-hosted)',
-        'Enrichment API key (Apollo, Hunter, Clearbit)',
+        'Enrichment API key (Apollo, Hunter)',
         'Inbound lead intake (Web forms, webhook, or Sheet)',
         'Destination CRM or database for enriched contacts',
         'Field mapping requirements (revenue, team size)'
@@ -80,36 +76,81 @@ const AUTOMATIONS = [
     }
   },
   {
-    id: 'invoice-bot',
+    id: 'invoice',
     name: 'Invoice Processing Bot',
-    tagline: 'Extracts, validates and routes invoices from email / PDF to your accounting system with 99% accuracy.',
+    tagline: 'Extracts, validates and routes invoices from email / PDF to your accounting system with human review queue.',
     embed: 'automations/invoice_bot_live.html',
     live: true,
     pricing: {
-      price: 'Setup Rs 20,000 + Rs 3,000/month',
+      price: 'Setup ₹79,000 (One-time) + Monthly Maintenance ₹12,500',
       setupRequired: [
-        'n8n instance (Cloud or self-hosted)',
         'Dedicated invoice inbox (IMAP/Gmail) or Google Drive',
         'Document OCR / Vision API key',
-        'Accounting software access (Zoho, Tally, QuickBooks)',
+        'Accounting software access (Zoho, QuickBooks, Tally bridge)',
         'PO & vendor matching validation rules'
       ]
     }
   },
   {
-    id: 'support-triage',
-    name: 'Customer Support Triage',
+    id: 'support',
+    name: 'Customer Support AI',
     tagline: 'Auto-categorises, prioritises and routes tickets with suggested replies from your knowledge base.',
     embed: 'automations/support_triage_live.html',
     live: true,
     pricing: {
-      price: 'Setup Rs 16,000 + Rs 2,200/month',
+      price: 'Setup ₹69,000 (One-time) + Monthly Maintenance ₹12,500',
       setupRequired: [
-        'n8n instance (Cloud or self-hosted)',
         'Helpdesk API access (Zendesk, Intercom, Freshdesk)',
         'Company knowledge base / FAQ documentation',
         'AI model API key for answer generation',
         'Ticket escalation rules & routing tags'
+      ]
+    }
+  },
+  {
+    id: 'whatsapp',
+    name: 'WhatsApp Automation',
+    tagline: 'Conversational AI booking, support, and sales follow-up directly on WhatsApp with official Cloud API.',
+    embed: 'automations/whatsapp_workflow_live.html',
+    live: true,
+    pricing: {
+      price: 'Setup ₹59,000 (One-time) + Monthly Maintenance ₹9,500',
+      setupRequired: [
+        'Meta Business Manager account',
+        'Dedicated phone number for WhatsApp Cloud API',
+        'Booking calendar or product catalog data',
+        'CRM webhook endpoint'
+      ]
+    }
+  },
+  {
+    id: 'voice',
+    name: 'AI Voice Receptionist',
+    tagline: 'Human-like conversational voice AI that answers inbound phone calls 24/7, qualifies callers, and books meetings.',
+    embed: 'automations/voice_workflow_live.html',
+    live: true,
+    pricing: {
+      price: 'Setup ₹1,49,000 (One-time) + Monthly Maintenance ₹24,900',
+      setupRequired: [
+        'Dedicated business phone number / SIP trunk / Twilio',
+        'Receptionist call script & brand voice guidelines',
+        'Calendar booking integration access'
+      ]
+    }
+  },
+  {
+    id: 'sales',
+    name: 'AI Sales Agent',
+    tagline: 'Autonomous outbound & inbound AI sales pipeline: identifies target prospects, drafts bespoke outreach, and schedules demos.',
+    embed: 'automations/sales_workflow_live.html',
+    live: true,
+    pricing: {
+      price: 'Setup ₹1,99,000 (One-time) + Monthly Maintenance ₹29,900',
+      setupRequired: [
+        'ICP (Ideal Customer Profile) definition',
+        'Sales playbooks and collateral',
+        'Sales rep calendar links',
+        'Outbound email/LinkedIn sending accounts'
       ]
     }
   }

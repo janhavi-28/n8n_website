@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Live Workflow: AI Sales Agent</title>
+  <style>
+    :root {
+      --bg: #f3f5fb; --card: rgba(255, 255, 255, .85); --text: #0f172a; --mut: #64748b; --line: #dde3f0;
+      --accent: #f59e0b; --accent-dark: #d97706; --good: #059669; --bad: #e11d48; --gold: #d97706;
+      --canvas: #f7f8fb; --dot: #d3d8e4; --nb: #fff; --nl: #c5cad8; --edge: #9aa1b5; --coral: #ff6d5a;
+      --ok: #f59e0b; color-scheme: light; box-sizing: border-box;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #070b16; --card: rgba(20, 28, 50, .75); --text: #eef2ff; --mut: #94a3c4; --line: rgba(148, 163, 210, .22);
+        --accent: #fbbf24; --good: #34d399; --bad: #fb7185; --gold: #fbbf24; --canvas: #14161f; --dot: #2c3040;
+        --nb: #262938; --nl: #454a5e; --edge: #6b7390; color-scheme: dark;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; color: var(--text); font: 15px/1.4 system-ui, -apple-system, sans-serif;
+      background: radial-gradient(900px 480px at 12% -8%, rgba(245, 158, 11, .15), transparent),
+                  radial-gradient(700px 420px at 100% 0, rgba(255, 109, 90, .1), transparent), var(--bg);
+      background-attachment: fixed; min-height: 100vh;
+    }
+    main { max-width: 1080px; margin: 0 auto; padding: 24px 16px 32px; }
+    .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+    h1 {
+      font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -.03em;
+      background: linear-gradient(90deg, var(--text) 30%, #f59e0b, #ff6d5a);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .live {
+      font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #d97706;
+      background: rgba(245, 158, 11, .12); border: 1px solid rgba(245, 158, 11, .3);
+      padding: 4px 12px; border-radius: 999px; display: inline-flex; gap: 7px; align-items: center;
+    }
+    .live i { width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; animation: pu 1.4s infinite; }
+    @keyframes pu { 50% { opacity: .25; transform: scale(1.6); } }
+    p.sub { margin: 6px 0 16px; color: var(--mut); font-size: 13.5px; line-height: 1.5; }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    button {
+      font: inherit; font-weight: 600; padding: 9px 16px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--card); color: var(--text);
+      cursor: pointer; transition: transform .15s, background .15s;
+    }
+    button:active { transform: scale(.96); }
+    button.p {
+      background: linear-gradient(135deg, #f59e0b, #d97706); border: 0; color: #fff;
+      box-shadow: 0 8px 20px -6px rgba(245, 158, 11, .4);
+    }
+    .card {
+      background: var(--card); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--line); border-radius: 20px; padding: 18px;
+      box-shadow: 0 18px 40px -20px rgba(15, 23, 42, .15);
+    }
+    .cv {
+      position: relative; border-radius: 20px; border: 1px solid var(--line); overflow-x: auto;
+      background-color: var(--canvas); background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
+      background-size: 22px 22px; margin-bottom: 14px;
+    }
+    .cv svg { min-width: 900px; width: 100%; display: block; }
+    .chip {
+      position: sticky; left: 12px; top: 12px; display: inline-flex; gap: 10px; align-items: center;
+      margin: 12px; padding: 6px 12px; border-radius: 10px; background: var(--nb);
+      border: 1px solid var(--nl); font-size: 12px; font-weight: 600; z-index: 2;
+    }
+    .chip b { color: #f59e0b; }
+    .nd .b { fill: var(--nb); stroke: var(--nl); stroke-width: 1.5; transition: stroke .25s; }
+    .nd text { fill: var(--text); font-size: 11.5px; font-weight: 600; text-anchor: middle; }
+    .nd .s { fill: var(--mut); font-size: 9.5px; font-weight: 400; }
+    .nd.run .b { stroke: #f59e0b; stroke-width: 2; stroke-dasharray: 6 4; animation: d .6s linear infinite; }
+    .nd.ok .b { stroke: #f59e0b; stroke-width: 2; }
+    @keyframes d { to { stroke-dashoffset: -10; } }
+    .ed { fill: none; stroke: var(--edge); stroke-width: 1.8; transition: stroke .3s; }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .k { position: relative; overflow: hidden; }
+    .k::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, #f59e0b, #ff6d5a); }
+    .k .l { color: var(--mut); text-transform: uppercase; letter-spacing: .07em; font-size: 11px; font-weight: 600; }
+    .k .v { font-size: 26px; font-weight: 800; margin: 4px 0; }
+    .k .d { font-size: 12px; color: var(--good); }
+    .log-box { max-height: 180px; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 12px; }
+    .log-entry { padding: 4px 0; border-bottom: 1px solid var(--line); color: var(--mut); }
+    .log-entry b { color: var(--text); }
+  </style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <h1>Live Workflow: AI Sales Agent</h1>
+    <span class="live"><i></i>LIVE SIMULATION</span>
+  </div>
+  <p class="sub">Autonomous enterprise sales outreach and objection handling pipeline. Mines decision-makers matching ICP, generates bespoke value propositions, negotiates objections, and books executive demos directly on your calendar.</p>
+  
+  <div class="bar">
+    <button class="p" id="btn-prospect">+ Ingest Target Account</button>
+    <button id="btn-reply">Simulate Inbound Objection</button>
+    <button id="btn-toggle">Pause Auto-Stream</button>
+  </div>
+
+  <div class="cv">
+    <div class="chip">Autonomous SDR Pipeline <b>● Hunting</b></div>
+    <svg id="w" viewBox="0 0 940 320">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 1 L 8 5 L 0 9 z" fill="#9aa1b5" />
+        </marker>
+      </defs>
+      <path class="ed" id="e1" d="M 120 160 L 220 160" marker-end="url(#arr)" />
+      <path class="ed" id="e2" d="M 330 160 L 430 160" marker-end="url(#arr)" />
+      <path class="ed" id="e3" d="M 540 160 L 640 110" marker-end="url(#arr)" />
+      <path class="ed" id="e4" d="M 540 160 L 640 210" marker-end="url(#arr)" />
+      <path class="ed" id="e5" d="M 750 110 L 840 140" marker-end="url(#arr)" />
+      <path class="ed" id="e6" d="M 750 210 L 840 180" marker-end="url(#arr)" />
+
+      <g class="nd" id="n1" transform="translate(40, 125)">
+        <rect class="b" width="80" height="70" rx="14" />
+        <text x="40" y="32">ICP Radar</text>
+        <text class="s" x="40" y="50">Apollo / Sales Nav</text>
+      </g>
+      <g class="nd" id="n2" transform="translate(220, 125)">
+        <rect class="b" width="110" height="70" rx="14" />
+        <text x="55" y="32">Research AI</text>
+        <text class="s" x="55" y="50">10-K & LinkedIn</text>
+      </g>
+      <g class="nd" id="n3" transform="translate(430, 125)">
+        <rect class="b" width="110" height="70" rx="14" />
+        <text x="55" y="32">Copy Generator</text>
+        <text class="s" x="55" y="50">Personalized Hook</text>
+      </g>
+      <g class="nd" id="n4" transform="translate(640, 75)">
+        <rect class="b" width="110" height="70" rx="14" />
+        <text x="55" y="32">Demo Booker</text>
+        <text class="s" x="55" y="50">ChiliPiper/Cal</text>
+      </g>
+      <g class="nd" id="n5" transform="translate(640, 175)">
+        <rect class="b" width="110" height="70" rx="14" />
+        <text x="55" y="32">Objection AI</text>
+        <text class="s" x="55" y="50">Case Study Matrix</text>
+      </g>
+      <g class="nd" id="n6" transform="translate(840, 125)">
+        <rect class="b" width="80" height="70" rx="14" />
+        <text x="40" y="32">Salesforce</text>
+        <text class="s" x="40" y="50">Pipeline Sync</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="kpis">
+    <div class="card k">
+      <div class="l">Prospects Contacted</div>
+      <div class="v" id="k-pros">3,420</div>
+      <div class="d">100% personalized</div>
+    </div>
+    <div class="card k">
+      <div class="l">Positive Reply Rate</div>
+      <div class="v">14.8%</div>
+      <div class="d">3.2x industry avg</div>
+    </div>
+    <div class="card k">
+      <div class="l">Demos Booked</div>
+      <div class="v" id="k-demo">128</div>
+      <div class="d">₹34.5L pipeline</div>
+    </div>
+    <div class="card k">
+      <div class="l">Objection Win Rate</div>
+      <div class="v">62.5%</div>
+      <div class="d">Converted to call</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin: 0 0 10px; font-size: 13px; text-transform: uppercase; color: var(--mut);">Autonomous Outreach & Objection Stream</h3>
+    <div class="log-box" id="log">
+      <div class="log-entry"><b>[System]</b> AI Sales Agent hunting pipeline active. ICP: VP Engineering, CTO, COO at Series A-C SaaS.</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  let prosCount = 3420, demoCount = 128, auto = true;
+  const logEl = document.getElementById('log');
+  function addLog(txt) {
+    const time = new Date().toLocaleTimeString();
+    const div = document.createElement('div');
+    div.className = 'log-entry';
+    div.innerHTML = `<b>[${time}]</b> ${txt}`;
+    logEl.prepend(div);
+  }
+
+  async function pulseNode(id, time = 400) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('run');
+    await new Promise(r => setTimeout(r, time));
+    el.classList.remove('run');
+    el.classList.add('ok');
+    setTimeout(() => el.classList.remove('ok'), 800);
+  }
+
+  async function triggerSales(isReply = false) {
+    if (!isReply) {
+      prosCount++;
+      document.getElementById('k-pros').textContent = prosCount.toLocaleString();
+      addLog(`Target identified: Rajesh M., VP Operations at TechFlow (Bengaluru)`);
+      await pulseNode('n1');
+      addLog(`Deep research completed: Recent funding, expanding warehouse, hiring operations staff.`);
+      await pulseNode('n2');
+      await pulseNode('n3');
+      addLog(`Bespoke outreach email queued: "How TechFlow can cut 35 hours weekly on manual order sync..."`);
+      await pulseNode('n6');
+      addLog(`Salesforce opportunity created with engagement tracker.`);
+    } else {
+      addLog(`Prospect replied: "We already have an internal tool, why would we switch?"`);
+      await pulseNode('n5');
+      addLog(`Objection AI drafted response citing ROI metrics and comparative case study.`);
+      demoCount++;
+      document.getElementById('k-demo').textContent = demoCount.toLocaleString();
+      await pulseNode('n4');
+      addLog(`Rajesh accepted demo invitation! Executive call booked on calendar for Thursday 2 PM.`);
+    }
+  }
+
+  document.getElementById('btn-prospect').onclick = () => triggerSales(false);
+  document.getElementById('btn-reply').onclick = () => triggerSales(true);
+  document.getElementById('btn-toggle').onclick = (e) => {
+    auto = !auto;
+    e.target.textContent = auto ? 'Pause Auto-Stream' : 'Resume Auto-Stream';
+  };
+
+  setInterval(() => {
+    if (auto) triggerSales(Math.random() > 0.6);
+  }, 11000);
+</script>
+</body>
+</html>
+

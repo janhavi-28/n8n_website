@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact Us | Aivatika - AI Automations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff;
+  --bg-subtle: #f8fafc;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --subtle: #64748b;
+  --line: #e2e8f0;
+  --accent: #f2563f;
+  --green: #059669;
+  --green-bright: #10b981;
+  --green-bg: #e6f7f0;
+  --input-bg: #ffffff;
+  --input-border: #e2e8f0;
+  --card-shadow: 0 20px 48px -12px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #090d16;
+    --bg-subtle: #0f1422;
+    --surface: #101626;
+    --text: #f8fafc;
+    --muted: #cbd5e1;
+    --subtle: #94a3b8;
+    --line: rgba(255, 255, 255, 0.09);
+    --accent: #ff6d5a;
+    --green: #34d399;
+    --green-bright: #34d399;
+    --green-bg: rgba(52, 211, 153, 0.12);
+    --input-bg: #172036;
+    --input-border: rgba(255, 255, 255, 0.14);
+    --card-shadow: 0 24px 56px -12px rgba(0, 0, 0, 0.5);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background Constellation Canvas */
+#canvas-network {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+/* Top Navbar */
+.navbar {
+  position: relative;
+  z-index: 20;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+}
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--green-bright), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--text);
+}
+.btn-nav {
+  padding: 9px 20px;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+}
+.btn-nav:hover {
+  background: var(--accent);
+}
+
+/* Main Container */
+.main-wrap {
+  position: relative;
+  z-index: 10;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.contact-card-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--card-shadow);
+  display: grid;
+  grid-template-columns: 1fr;
+  overflow: hidden;
+}
+@media (min-width: 860px) {
+  .contact-card-box {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+}
+
+/* Left Side: Simple Form */
+.form-side {
+  padding: 44px 38px;
+}
+@media (max-width: 600px) {
+  .form-side { padding: 32px 22px; }
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.form-title {
+  font-size: clamp(1.8rem, 3vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.form-sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 28px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+.form-label {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  margin-bottom: 8px;
+}
+.form-input, .form-select {
+  width: 100%;
+  padding: 13px 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  background: var(--input-bg);
+  color: var(--text);
+  outline: none;
+  transition: all 0.15s;
+}
+.form-input:focus, .form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(242, 86, 63, 0.12);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 14px 22px;
+  border-radius: 999px;
+  border: none;
+  background: #0f172a;
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  margin-top: 24px;
+}
+.btn-submit:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -4px rgba(242, 86, 63, 0.35);
+}
+
+/* Right Side: Only Address, Number & Location */
+.info-side {
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--line);
+  padding: 44px 38px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+@media (min-width: 860px) {
+  .info-side {
+    border-top: none;
+    border-left: 1px solid var(--line);
+  }
+}
+@media (max-width: 600px) {
+  .info-side { padding: 32px 22px; }
+}
+
+.info-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 28px;
+  letter-spacing: -0.02em;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  margin-bottom: 34px;
+}
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.info-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+.info-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  margin-bottom: 3px;
+}
+.info-val {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.info-val:hover {
+  color: var(--accent);
+}
+
+.info-wa-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 999px;
+  background: #25d366;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.94rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.28);
+}
+.info-wa-btn:hover {
+  background: #1eb956;
+  transform: translateY(-1px);
+}
+
+/* Success Card */
+.success-card {
+  text-align: center;
+  padding: 40px 10px;
+}
+.success-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 28px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+.success-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+.success-desc { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+
+<!-- Constellation Network Canvas -->
+<canvas id="canvas-network"></canvas>
+
+<!-- Top Navbar -->
+<header class="navbar">
+  <a href="index.html" class="brand">
+    <span class="brand-icon">Ai</span>
+    <span>Aivatika</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="index.html">Automations</a></li>
+  </ul>
+
+  <a href="#contact-card" class="btn-nav">Contact</a>
+</header>
+
+<main class="main-wrap">
+  <div class="contact-card-box">
+    
+    <!-- LEFT SIDE: Simple Form (Name, Company Name, Automation Type, Phone Number) -->
+    <section class="form-side">
+      <h1 class="form-title">Get in touch.</h1>
+      <p class="form-sub">Tell us a little about your business and we'll reply within one business day.</p>
+
+      <form id="contact-form" onsubmit="handleFormSubmit(event)">
+        <!-- 1. Name -->
+        <div class="form-group">
+          <label for="c-name" class="form-label">YOUR NAME *</label>
+          <input type="text" id="c-name" class="form-input" placeholder="Priya Sharma" required>
+        </div>
+
+        <!-- 2. Company Name -->
+        <div class="form-group">
+          <label for="c-biz" class="form-label">COMPANY NAME *</label>
+          <input type="text" id="c-biz" class="form-input" placeholder="Sunrise Diagnostics" required>
+        </div>
+
+        <!-- 3. Automation Type -->
+        <div class="form-group">
+          <label for="c-auto" class="form-label">AUTOMATION TYPE</label>
+          <select id="c-auto" class="form-select">
+            <option value="WhatsApp Automation" selected>WhatsApp Automation (₹59,000 setup)</option>
+            <option value="Daily Business Dashboard">Daily Business Dashboard (₹49,000 setup)</option>
+            <option value="Tender / Opportunity Hunter">Tender / Opportunity Hunter (₹39,000 setup)</option>
+            <option value="Email Campaign Automator">Email Campaign Automator (₹39,000 setup)</option>
+            <option value="Lead Enrichment Pipeline">Lead Enrichment Pipeline (₹59,000 setup)</option>
+            <option value="Invoice Processing Bot">Invoice Processing Bot (₹79,000 setup)</option>
+            <option value="Customer Support AI">Customer Support AI (₹69,000 setup)</option>
+            <option value="AI Voice Receptionist">AI Voice Receptionist (₹1,49,000 setup)</option>
+            <option value="AI Sales Agent">AI Sales Agent (₹1,99,000 setup)</option>
+            <option value="Custom AI Automation">Custom AI Automation / Bespoke System</option>
+          </select>
+        </div>
+
+        <!-- 4. Phone Number -->
+        <div class="form-group">
+          <label for="c-phone" class="form-label">PHONE NUMBER *</label>
+          <input type="tel" id="c-phone" class="form-input" placeholder="+91 80504 73346" required>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-submit">
+          <span>Submit Request</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </form>
+
+      <!-- Success Confirmation -->
+      <div id="success-card" class="success-card" style="display:none;">
+        <div class="success-icon">✓</div>
+        <h3 class="success-title">Request Received!</h3>
+        <p class="success-desc">Thank you! Our automation team will reach out to you within one business day.</p>
+        <a id="btn-wa-success" href="#" target="_blank" rel="noopener noreferrer" class="info-wa-btn">
+          Chat on WhatsApp
+        </a>
+      </div>
+    </section>
+
+    <!-- RIGHT SIDE: Only Address, Number & Location -->
+    <section class="info-side">
+      <h2 class="info-title">Contact Information</h2>
+
+      <div class="info-list">
+        <!-- Number -->
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="info-label">PHONE NUMBER</div>
+            <a href="tel:+918050473346" class="info-val">+91-8050473346</a>
+          </div>
+        </div>
+
+        <!-- Address / Location -->
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div>
+            <div class="info-label">LOCATION &amp; ADDRESS</div>
+            <div class="info-val">Bengaluru, Karnataka, India</div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <div>
+            <div class="info-label">EMAIL</div>
+            <a href="mailto:contact@aivatika.com" class="info-val">contact@aivatika.com</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick WhatsApp CTA -->
+      <a href="https://wa.me/918050473346" target="_blank" rel="noopener noreferrer" class="info-wa-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+        <span>Message on WhatsApp</span>
+      </a>
+    </section>
+
+  </div>
+</main>
+
+<script>
+// Check query param (e.g. ?auto=whatsapp or ?auto=invoice)
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const autoParam = params.get('auto');
+  if (autoParam) {
+    const sel = document.getElementById('c-auto');
+    for (let opt of sel.options) {
+      if (opt.value.toLowerCase().includes(autoParam.toLowerCase())) {
+        opt.selected = true;
+        break;
+      }
+    }
+  }
+});
+
+function handleFormSubmit(e) {
+  e.preventDefault();
+  const name = document.getElementById('c-name').value.trim();
+  const biz = document.getElementById('c-biz').value.trim();
+  const auto = document.getElementById('c-auto').value;
+  const phone = document.getElementById('c-phone').value.trim();
+
+  const subject = encodeURIComponent(`Automation Inquiry: ${auto} - ${biz}`);
+  const mailBody = encodeURIComponent(
+    `Hi Aivatika Team,\n\nI am interested in "${auto}".\n\nContact Details:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n- Automation: ${auto}\n\nPlease contact me for next steps!\n\nThanks,\n${name}`
+  );
+
+  const waText = encodeURIComponent(
+    `Hi Aivatika Team, I want to get the *${auto}* for *${biz}*.\nName: ${name}\nPhone: ${phone}`
+  );
+
+  document.getElementById('btn-wa-success').href = `https://wa.me/918050473346?text=${waText}`;
+  document.getElementById('contact-form').style.display = 'none';
+  document.getElementById('success-card').style.display = 'block';
+
+  window.open(`mailto:contact@aivatika.com?subject=${subject}&body=${mailBody}`, '_self');
+}
+
+/* Background Constellation Canvas */
+(function() {
+  const canvas = document.getElementById('canvas-network');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const count = Math.min(Math.floor(window.innerWidth / 24), 50);
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      radius: Math.random() * 2 + 1.2
+    });
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, w, h);
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = w;
+      if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h;
+      if (p.y > h) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#059669';
+      ctx.globalAlpha = 0.4;
+      ctx.fill();
+
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dx = p.x - p2.x;
+        const dy = p.y - p2.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = '#059669';
+          ctx.globalAlpha = (1 - dist / 120) * 0.16;
+          ctx.lineWidth = 0.75;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
