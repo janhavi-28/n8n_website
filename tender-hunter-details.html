@@ -1,692 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Tender / Opportunity Hunter — Aivatika</title>
-  <meta name="description" content="Production-grade Tender & Opportunity Hunter in n8n: Scrapes GeM and e-procurement portals daily, filters opportunities using AI keyword matching, and delivers instant alerts.">
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --surface-secondary: #f1f5f9;
-      --text: #0f172a;
-      --muted: #475569;
-      --line: #e2e8f0;
-      --coral: #ff6d5a;
-      --coral-hover: #e85d4b;
-      --coral-soft: rgba(255, 109, 90, 0.08);
-      --green: #059669;
-      --green-soft: rgba(5, 150, 105, 0.1);
-      --blue: #2563eb;
-      --blue-soft: rgba(37, 99, 235, 0.08);
-      --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
-      --card-shadow-hover: 0 12px 32px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
-      color-scheme: light;
-      box-sizing: border-box;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #090d16;
-        --surface: #131b2e;
-        --surface-secondary: #1a243b;
-        --text: #f8fafc;
-        --muted: #94a3b8;
-        --line: #243049;
-        --coral: #ff7d6b;
-        --coral-hover: #ff6d5a;
-        --coral-soft: rgba(255, 125, 107, 0.14);
-        --green: #10b981;
-        --green-soft: rgba(16, 185, 129, 0.15);
-        --blue: #3b82f6;
-        --blue-soft: rgba(59, 130, 246, 0.15);
-        --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
-        --card-shadow-hover: 0 12px 32px -4px rgba(0, 0, 0, 0.6);
-        color-scheme: dark;
-      }
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Sticky Header */
-    .top-nav {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      background: var(--surface);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .top-nav-inner {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      transition: color 0.15s;
-    }
-    .back-link:hover {
-      color: var(--text);
-    }
-    .nav-brand {
-      font-weight: 700;
-      font-size: 15px;
-      letter-spacing: -0.02em;
-      color: var(--text);
-    }
-
-    /* Main Container */
-    .main-wrap {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 32px 20px 80px;
-    }
-
-    /* 1. Hero Section */
-    .hero-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 44px 36px;
-      box-shadow: var(--card-shadow);
-      margin-bottom: 40px;
-      text-align: center;
-    }
-    .badge-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--coral);
-      background: var(--coral-soft);
-      padding: 6px 14px;
-      border-radius: 999px;
-      margin-bottom: 20px;
-    }
-    .hero-headline {
-      font-size: clamp(26px, 4vw, 38px);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.2;
-      color: var(--text);
-      max-width: 860px;
-      margin: 0 auto 16px;
-    }
-    .hero-subheading {
-      font-size: 17px;
-      color: var(--muted);
-      max-width: 720px;
-      margin: 0 auto 28px;
-    }
-    .hero-buttons {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 32px;
-    }
-    .btn-coral {
-      background: var(--coral);
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 15px;
-      padding: 12px 26px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 20px -6px rgba(255, 109, 90, 0.4);
-      transition: background 0.15s, transform 0.15s;
-    }
-    .btn-coral:hover {
-      background: var(--coral-hover);
-      transform: translateY(-1px);
-    }
-    .btn-secondary {
-      background: var(--surface-secondary);
-      color: var(--text);
-      font-weight: 600;
-      font-size: 15px;
-      padding: 12px 24px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: background 0.15s;
-    }
-    .btn-secondary:hover {
-      background: var(--line);
-    }
-    .hero-stats {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 28px;
-      flex-wrap: wrap;
-      padding-top: 24px;
-      border-top: 1px solid var(--line);
-    }
-    .proof-stat {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-    }
-    .proof-stat-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--coral);
-    }
-
-    /* Section Headings */
-    .section-title-wrap {
-      margin-bottom: 24px;
-    }
-    .section-title {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text);
-    }
-    .section-sub {
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    /* 2. Pipeline Grid */
-    .pipeline-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 16px;
-      margin-bottom: 48px;
-      position: relative;
-    }
-    .pipeline-step {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: var(--card-shadow);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-    }
-    .step-num {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--coral);
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .step-time {
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 500;
-    }
-    .step-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 6px;
-      line-height: 1.3;
-    }
-    .step-desc {
-      font-size: 12.5px;
-      color: var(--muted);
-      line-height: 1.45;
-      margin-bottom: 12px;
-    }
-    .step-node-tag {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--blue);
-      background: var(--blue-soft);
-      padding: 4px 8px;
-      border-radius: 6px;
-      display: inline-block;
-      width: fit-content;
-    }
-    .step-arrow-badge {
-      position: absolute;
-      right: -12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 24px;
-      height: 24px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      color: var(--coral);
-      font-weight: bold;
-      z-index: 2;
-    }
-    @media (max-width: 900px) {
-      .step-arrow-badge { display: none; }
-    }
-
-    /* 3. Sample Output Section */
-    .sample-section {
-      margin-bottom: 48px;
-    }
-    .sample-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: var(--card-shadow);
-    }
-    .sample-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--line);
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .sample-badge {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: var(--coral);
-      background: var(--coral-soft);
-      padding: 4px 10px;
-      border-radius: 6px;
-      text-transform: uppercase;
-    }
-    .sample-meta {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .sample-grid {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 24px;
-    }
-    @media (max-width: 768px) {
-      .sample-grid { grid-template-columns: 1fr; }
-    }
-    .lead-info-col {
-      background: var(--surface-secondary);
-      border-radius: 14px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .lead-info-name {
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--text);
-    }
-    .lead-info-sub {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .lead-prop {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12.5px;
-      border-bottom: 1px dashed var(--line);
-      padding-bottom: 6px;
-    }
-    .lead-prop-label { color: var(--muted); }
-    .lead-prop-val { font-weight: 600; color: var(--text); }
-    .score-pill {
-      margin-top: 8px;
-      background: var(--green-soft);
-      color: var(--green);
-      font-weight: 800;
-      font-size: 13px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .brief-col {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .brief-title {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .brief-points {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      font-size: 13.5px;
-      line-height: 1.5;
-    }
-    .brief-points li {
-      position: relative;
-      padding-left: 18px;
-      color: var(--text);
-    }
-    .brief-points li::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 8px;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--coral);
-    }
-    .brief-footer {
-      margin-top: 18px;
-      padding-top: 12px;
-      border-top: 1px solid var(--line);
-      font-size: 11.5px;
-      color: var(--muted);
-    }
-
-    /* 4. Tables Section */
-    .tables-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-bottom: 48px;
-    }
-    @media (max-width: 860px) {
-      .tables-section { grid-template-columns: 1fr; }
-    }
-    .table-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: var(--card-shadow);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .table-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-    .table-sub {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .data-table th {
-      text-align: left;
-      padding: 10px 12px;
-      color: var(--muted);
-      font-weight: 700;
-      border-bottom: 1px solid var(--line);
-      font-size: 11.5px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .data-table td {
-      padding: 12px;
-      border-bottom: 1px solid var(--line);
-      color: var(--text);
-    }
-    .data-table tr:last-child td { border-bottom: none; }
-    .data-table .row-title { font-weight: 600; display: block; }
-    .data-table .row-note { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
-    .data-table .price-val { font-weight: 700; white-space: nowrap; text-align: right; }
-    .table-footer-note {
-      margin-top: 16px;
-      padding-top: 12px;
-      border-top: 1px solid var(--line);
-      font-size: 11.5px;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    /* 5. Final CTA Section */
-    .cta-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 44px 32px;
-      text-align: center;
-      box-shadow: var(--card-shadow);
-      margin-bottom: 40px;
-    }
-    .cta-title {
-      font-size: clamp(22px, 3.5vw, 30px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-      color: var(--text);
-    }
-    .cta-sub {
-      font-size: 15px;
-      color: var(--muted);
-      max-width: 580px;
-      margin: 0 auto 28px;
-    }
-    .cta-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    /* Simulation Modal */
-    .sim-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .sim-modal.is-open { display: flex; }
-    .sim-modal-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-    }
-    .sim-modal-dialog {
-      position: relative;
-      width: 100%;
-      max-width: 1160px;
-      height: 90vh;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      z-index: 2;
-    }
-    .sim-modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--line);
-      background: var(--surface);
-    }
-    .sim-modal-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .sim-modal-close {
-      background: none;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 6px 12px;
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--muted);
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-    }
-    .sim-modal-close:hover {
-      background: var(--surface-secondary);
-      color: var(--text);
-    }
-    .sim-modal-body {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      background: var(--bg);
-      position: relative;
-    }
-    .sim-modal-body iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
-
-    /* Contact Form Modal */
-    .contact-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 110;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .contact-modal.is-open { display: flex; }
-    .contact-modal-dialog {
-      position: relative;
-      width: 100%;
-      max-width: 480px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 32px 28px;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4);
-      z-index: 2;
-    }
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-label {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 10px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      background: var(--surface-secondary);
-      color: var(--text);
-      font-size: 14px;
-      font-family: inherit;
-    }
-    .form-input:focus {
-      outline: 2px solid var(--coral);
-      border-color: transparent;
-    }
-  </style>
+  <title>Tender &amp; Opportunity Hunter - Architecture &amp; Pricing | Aivatika</title>
+  <meta name="description"
+    content="Production-grade Tender &amp; Opportunity Hunter in n8n. Scrapes GeM and e-procurement portals daily, evaluates eligibility with AI, and delivers priority bid room alerts.">
+  <style>:root{--bg:#f8fafc;--surface:#ffffff;--surface-secondary:#f1f5f9;--text:#0f172a;--muted:#475569;--subtle:#64748b;--line:#e2e8f0;--accent:#f2563f;--accent-hover:#dc3e26;--accent-soft:#fff0ed;--accent-border:#fecdd3;--live:#059669;--live-bg:#e6f7f0;--warning-bg:#fffbeb;--warning-border:#fef3c7;--warning-text:#b45309;--card-shadow:0 4px 20px -2px rgba(15,23,42,.06),0 2px 6px -1px rgba(15,23,42,.04);--font:'Plus Jakarta Sans',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}@media (prefers-color-scheme:dark){:root{--bg:#0b0f17;--surface:#131b2b;--surface-secondary:#1a2438;--text:#f1f5f9;--muted:#94a3b8;--subtle:#64748b;--line:#1e293b;--accent-soft:rgba(242,86,63,0.16);--accent-border:rgba(242,86,63,0.35);--live-bg:rgba(5,150,105,0.2);--live:#34d399;--warning-bg:rgba(180,83,9,0.15);--warning-border:rgba(180,83,9,0.3);--warning-text:#fbbf24;--card-shadow:0 4px 24px -2px rgba(0,0,0,.45)}}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font);background-color:var(--bg);color:var(--text);line-height:1.55;padding-bottom:60px;-webkit-font-smoothing:antialiased}a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}header{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}.nav-inner{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:800;font-size:1.15rem;letter-spacing:-.02em}.brand-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff7a63);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}.nav-actions{display:flex;align-items:center;gap:12px}.btn-nav-back{font-family:inherit;display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s ease}.btn-nav-back:hover{background:var(--surface-secondary);color:var(--text);border-color:var(--subtle)}.container{max-width:1180px;margin:0 auto;padding:0 20px}.hero-section{padding:48px 0 36px;text-align:center;max-width:860px;margin:0 auto}.hero-headline{font-size:clamp(2rem,4vw,2.85rem);font-weight:800;letter-spacing:-.03em;line-height:1.18;color:var(--text);margin-bottom:16px}.hero-subheading{font-size:1.1rem;color:var(--muted);line-height:1.6;margin-bottom:28px}.hero-buttons{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:32px}.btn-primary{font-family:inherit;display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-weight:700;font-size:.95rem;padding:13px 26px;border-radius:999px;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(242,86,63,.35);transition:all .15s ease;text-decoration:none}.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 6px 18px rgba(242,86,63,.45)}.btn-outline{font-family:inherit;display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text);font-weight:700;font-size:.95rem;padding:13px 24px;border-radius:999px;border:1px solid var(--line);cursor:pointer;transition:all .15s ease;text-decoration:none}.btn-outline:hover{background:var(--surface-secondary);border-color:var(--subtle)}.hero-stats{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--line)}.proof-stat{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted)}.proof-stat-dot{width:7px;height:7px;border-radius:50%;background:var(--live)}.section-title-wrap{margin:44px 0 20px}.section-title{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;color:var(--text)}.section-sub{font-size:.92rem;color:var(--muted);margin-top:4px}.pipeline-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch}@media (max-width:900px){.pipeline-grid{grid-template-columns:1fr}}.pipeline-step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 16px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;justify-content:space-between;position:relative}.step-num{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.step-num span:first-child{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.06em;text-transform:uppercase}.step-time{font-size:11px;font-weight:600;color:var(--subtle);background:var(--surface-secondary);padding:2px 7px;border-radius:999px}.step-title{font-size:.96rem;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}.step-desc{font-size:12.5px;color:var(--muted);line-height:1.45;margin-bottom:12px}.step-node-tag{font-size:11px;font-weight:700;color:var(--muted);background:var(--surface-secondary);border-radius:6px;padding:5px 8px;display:inline-flex;align-items:center;gap:5px;width:fit-content}.step-arrow-badge{display:flex;align-items:center;justify-content:center;margin-top:10px;color:var(--accent);font-weight:700}.table-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow-x:auto;box-shadow:var(--card-shadow);margin-bottom:24px}.data-table{width:100%;border-collapse:collapse;text-align:left;font-size:13.5px;min-width:680px}.data-table thead th{background:var(--surface-secondary);padding:14px 18px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--subtle);border-bottom:1px solid var(--line)}.data-table tbody td{padding:16px 18px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--text)}.data-table tbody tr:last-child td{border-bottom:none}.row-title{font-weight:700;display:block;color:var(--text)}.row-sub{font-size:12px;color:var(--muted);display:block;margin-top:3px}.cost-highlight{font-weight:800;color:var(--accent);font-size:14.5px}.cost-badge-optional{display:inline-block;font-size:11px;font-weight:700;color:var(--subtle);background:var(--surface-secondary);padding:2px 7px;border-radius:999px;margin-top:3px}.final-cta-section{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:40px 24px;text-align:center;margin-top:48px;box-shadow:var(--card-shadow)}.final-cta-section h2{font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;color:var(--text)}.final-cta-section p{color:var(--muted);font-size:1rem;max-width:620px;margin:0 auto 24px}.final-cta-actions{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}.sim-modal,.contact-modal{display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;padding:16px}.sim-modal.is-open,.contact-modal.is-open{display:flex}.sim-modal-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.65);backdrop-filter:blur(4px)}.sim-modal-dialog{position:relative;background:var(--surface);border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,.35);width:100%;max-width:1100px;height:90vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line)}.sim-modal-header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}.sim-modal-title{font-weight:700;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px}.sim-modal-actions{display:flex;align-items:center;gap:10px}.sim-modal-btn{font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line);background:transparent;padding:5px 10px;border-radius:6px;text-decoration:none;cursor:pointer}.sim-modal-btn:hover{background:var(--surface-secondary);color:var(--text)}.sim-modal-close{background:transparent;border:none;cursor:pointer;color:var(--subtle);display:flex;align-items:center;justify-content:center;padding:4px;border-radius:6px}.sim-modal-close:hover{color:var(--text);background:var(--surface-secondary)}.sim-modal-body{flex:1;background:#0b0f17;position:relative}.sim-modal-body iframe{width:100%;height:100%;border:none;display:block}.contact-dialog{position:relative;background:var(--surface);border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,.35);width:100%;max-width:440px;padding:28px 24px;border:1px solid var(--line)}.contact-dialog h3{font-size:1.25rem;font-weight:800;margin-bottom:6px;color:var(--text)}.contact-dialog p{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.45}.form-group{margin-bottom:14px}.form-group label{display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px}.form-group input{width:100%;padding:10px 12px;font-size:13.5px;border:1px solid var(--line);border-radius:8px;font-family:inherit;background:var(--surface);color:var(--text)}.btn-submit{width:100%;padding:12px;background:var(--accent);color:#fff;font-weight:700;font-size:.95rem;border:none;border-radius:8px;cursor:pointer;margin-top:8px}.btn-submit:hover{background:var(--accent-hover)}</style>
 </head>
+
 <body>
 
-  <!-- Sticky Back Header -->
-  <header class="top-nav">
-    <div class="top-nav-inner">
-      <a href="index.html" class="back-link">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        <span>Back to Automations</span>
+  <!-- Sticky Header -->
+  <header>
+    <div class="nav-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-logo">Ai</span>
+        <span>Aivatika</span>
       </a>
-      <div class="nav-brand">Aivatika</div>
+      <div class="nav-actions">
+        <a href="index.html" class="btn-nav-back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Automations
+        </a>
+      </div>
     </div>
   </header>
 
-  <main class="main-wrap">
+  <main class="container">
 
     <!-- 1. Hero Section -->
-    <section class="hero-card">
-      <div class="badge-tag">Procurement Intelligence</div>
-      <h1 class="hero-headline">Every government & enterprise tender discovered, qualified, and alerted daily.</h1>
-      <p class="hero-subheading">Scans GeM and procurement portals daily, filters high-probability tenders with Claude AI keyword matching, and delivers instant alerts with direct bid links.</p>
+    <section class="hero-section">
+      <h1 class="hero-headline">Autonomous Government &amp; Enterprise Tender Discovery on Auto-Pilot.</h1>
       <div class="hero-buttons">
-        <button type="button" class="btn-coral" onclick="openSimModal()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <button class="btn-primary" type="button" onclick="openSimulation()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
           </svg>
-          <span>Watch Live Simulation</span>
+          Watch Live Simulation
         </button>
-        <button type="button" class="btn-secondary" onclick="openContactModal()">
-          <span>Contact Us</span>
+        <button class="btn-outline" type="button" onclick="openContactModal()">
+          Contact Us
         </button>
       </div>
       <div class="hero-stats">
@@ -696,19 +55,19 @@
         </div>
         <div class="proof-stat">
           <span class="proof-stat-dot"></span>
-          <span>Daily 8 AM portal scans</span>
+          <span>24/7 monitoring</span>
         </div>
         <div class="proof-stat">
           <span class="proof-stat-dot"></span>
-          <span>Works with GeM, CPPP, Slack, Telegram</span>
+          <span>Works with GeM, CPPP &amp; State Portals</span>
         </div>
       </div>
     </section>
 
     <!-- 2. Architecture Section -->
     <div class="section-title-wrap">
-      <h2 class="section-title">Automated Tender Hunter Architecture</h2>
-      <p class="section-sub">Step-by-step logic executed inside n8n for automated procurement discovery.</p>
+      <h2 class="section-title">Automated Pipeline Architecture</h2>
+      <p class="section-sub">Step-by-step logic executed inside n8n for every published procurement notice.</p>
     </div>
 
     <!-- Step Cards -->
@@ -718,12 +77,12 @@
         <div>
           <div class="step-num">
             <span>Step 01</span>
-            <span class="step-time">typical 0.2s</span>
+            <span class="step-time">typical 1.5s</span>
           </div>
-          <div class="step-title">Procurement Portal Scraper</div>
-          <div class="step-desc">Scheduled morning runner scrapes GeM portal, central CPPP, state tenders, and private bidding registries.</div>
+          <div class="step-title">Daily Portal Scraping &amp; NIT Ingestion</div>
+          <div class="step-desc">Scrapes GeM, CPPP, and state e-procurement portals daily for newly published RFPs, notices, and corrigenda.</div>
         </div>
-        <div class="step-node-tag">Cron + Portal Scraper</div>
+        <div class="step-node-tag">Cron / Webhook</div>
         <div class="step-arrow-badge">→</div>
       </div>
 
@@ -732,12 +91,12 @@
         <div>
           <div class="step-num">
             <span>Step 02</span>
-            <span class="step-time">typical 1.1s</span>
+            <span class="step-time">typical 0.4s</span>
           </div>
-          <div class="step-title">RFP Document & NIT Extraction</div>
-          <div class="step-desc">Downloads Notice Inviting Tender (NIT) PDFs, parses eligibility criteria, EMD amounts, and pre-bid deadlines.</div>
+          <div class="step-title">Metadata Extraction &amp; PDF Download</div>
+          <div class="step-desc">Extracts tender authority, tender ID, estimated contract value, submission deadline, and downloads RFP/NIT PDFs.</div>
         </div>
-        <div class="step-node-tag">PDF Binary Parser</div>
+        <div class="step-node-tag">HTTP Request</div>
         <div class="step-arrow-badge">→</div>
       </div>
 
@@ -746,10 +105,10 @@
         <div>
           <div class="step-num">
             <span>Step 03</span>
-            <span class="step-time">typical 1.4s</span>
+            <span class="step-time">typical 2.1s</span>
           </div>
-          <div class="step-title">Claude AI RFP Fit & Match Scoring</div>
-          <div class="step-desc">Matches tender scope against company capabilities, turnover thresholds, and technical certifications (1-100 score).</div>
+          <div class="step-title">AI Scope &amp; Eligibility Matching</div>
+          <div class="step-desc">Claude analyzes qualification criteria, turnover rules, past experience clauses, and calculates bid fit score.</div>
         </div>
         <div class="step-node-tag">Claude (latest Sonnet)</div>
         <div class="step-arrow-badge">→</div>
@@ -760,12 +119,12 @@
         <div>
           <div class="step-num">
             <span>Step 04</span>
-            <span class="step-time">typical 0.3s</span>
+            <span class="step-time">typical 0.6s</span>
           </div>
-          <div class="step-title">Priority & Deadline Routing</div>
-          <div class="step-desc">Filters high-win probability opportunities (score >= 80) and calculates submission timeline countdowns.</div>
+          <div class="step-title">Multi-Factor Triage &amp; Scoring</div>
+          <div class="step-desc">Scores tender against company capabilities; filters out non-qualifying tenders and flags high-win bids.</div>
         </div>
-        <div class="step-node-tag">Switch Filter Node</div>
+        <div class="step-node-tag">Switch &amp; Code</div>
         <div class="step-arrow-badge">→</div>
       </div>
 
@@ -774,228 +133,200 @@
         <div>
           <div class="step-num">
             <span>Step 05</span>
-            <span class="step-time">typical 0.5s</span>
+            <span class="step-time">typical 0.3s</span>
           </div>
-          <div class="step-title">Instant Bid Alert & Lead Sync</div>
-          <div class="step-desc">Delivers structured bid briefs to Slack/Telegram with direct portal links and auto-populates your CRM bid tracking sheet.</div>
+          <div class="step-title">Bid Room Setup &amp; Priority Alerting</div>
+          <div class="step-desc">Creates bid Google Drive workspace, notifies procurement team on Slack/Telegram, and syncs to CRM.</div>
         </div>
-        <div class="step-node-tag">Slack / Telegram / Sheets</div>
+        <div class="step-node-tag">Slack / Google Drive</div>
       </div>
     </div>
 
-    <!-- 3. Sample Output Section -->
-    <div class="sample-section">
-      <div class="section-title-wrap">
-        <h2 class="section-title">Sample Output</h2>
-        <p class="section-sub">Standardized procurement brief delivered to your bidding desk automatically.</p>
-      </div>
-
-      <div class="sample-card">
-        <div class="sample-header">
-          <span class="sample-badge">Sample output</span>
-          <span class="sample-meta">Simulated GeM Procurement Match Alert</span>
-        </div>
-
-        <div class="sample-grid">
-          <div class="lead-info-col">
-            <div>
-              <div class="lead-info-name">Supply & Maintenance of Cloud IoT Gateways</div>
-              <div class="lead-info-sub">Ref: GEM/2026/B/8942110</div>
-            </div>
-            <div class="lead-prop">
-              <span class="lead-prop-label">Authority:</span>
-              <span class="lead-prop-val">Smart City Development Corp</span>
-            </div>
-            <div class="lead-prop">
-              <span class="lead-prop-label">Estimated Value:</span>
-              <span class="lead-prop-val">₹85,00,000</span>
-            </div>
-            <div class="lead-prop">
-              <span class="lead-prop-label">Submission Deadline:</span>
-              <span class="lead-prop-val">12 Days Remaining</span>
-            </div>
-            <div class="lead-prop">
-              <span class="lead-prop-label">EMD Required:</span>
-              <span class="lead-prop-val">Exempt (MSME Eligible)</span>
-            </div>
-            <div class="score-pill">
-              <span>Match Score</span>
-              <span>91 / 100 · High Win Probability</span>
-            </div>
-          </div>
-
-          <div class="brief-col">
-            <div>
-              <div class="brief-title">Claude AI Opportunity Intelligence Brief</div>
-              <ul class="brief-points">
-                <li><strong>Capability Alignment:</strong> Hardware specs and cloud gateway requirements match your existing OEM vendor partnerships. Past performance criteria (3 completed contracts) satisfied.</li>
-                <li><strong>Exemption Opportunity:</strong> EMD is fully exempted under Ministry of MSME guidelines; Solvency certificate from bank required before bid submission.</li>
-                <li><strong>Recommended Action:</strong> Pre-bid query submission closes this Thursday at 3 PM. RFP packet and draft query document have been auto-created in your Google Drive tender folder.</li>
-              </ul>
-            </div>
-            <div class="brief-footer">
-              Scraped from GeM Portal • Synced to Google Sheets Bid Tracker & Slack #procurement-alerts
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- 3. Cost and Pricing Sections -->
+    <div class="section-title-wrap">
+      <h2 class="section-title">Client Prerequisites &amp; Third-Party Operating Costs</h2>
+      <p class="section-sub">Required subscriptions and external accounts billed directly to your company at actual cost.</p>
     </div>
 
-    <!-- 4. Tables Section -->
-    <div class="tables-section">
-      <!-- Table 1: Operating Costs -->
-      <div class="table-card">
-        <div>
-          <h3 class="table-title">Client Prerequisites & Operating Costs</h3>
-          <p class="table-sub">Third-party infrastructure paid directly to vendors in INR (₹).</p>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Service</th>
-                <th style="text-align: right;">Estimated Cost</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <span class="row-title">Workflow Execution Host</span>
-                  <span class="row-note">Self-hosted n8n instance on Hetzner, AWS, or DigitalOcean</span>
-                </td>
-                <td class="price-val">₹500 – ₹1,500/mo</td>
-              </tr>
-              <tr>
-                <td>
-                  <span class="row-title">Portal Scraping & Proxy Rotator</span>
-                  <span class="row-note">Lightweight scraping proxy for uninterrupted GeM/CPPP querying</span>
-                </td>
-                <td class="price-val">₹1,000 – ₹2,500/mo</td>
-              </tr>
-              <tr>
-                <td>
-                  <span class="row-title">Claude AI Opportunity Filter Model</span>
-                  <span class="row-note">Claude (latest Sonnet) token usage per scraped RFP</span>
-                </td>
-                <td class="price-val">₹800 – ₹2,000/mo</td>
-              </tr>
-              <tr>
-                <td>
-                  <span class="row-title">Alert Dispatch & Database</span>
-                  <span class="row-note">Slack / Telegram Bot webhooks & Google Sheets</span>
-                </td>
-                <td class="price-val">Included in existing tools</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-footer-note">
-          Infrastructure runs in your own cloud. Data is sent only to the services you approve.
-        </div>
-      </div>
-
-      <!-- Table 2: Aivatika Pricing -->
-      <div class="table-card">
-        <div>
-          <h3 class="table-title">Aivatika Implementation Pricing</h3>
-          <p class="table-sub">One-time engineering implementation with ongoing monitoring.</p>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th style="text-align: right;">Fee (INR ₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <span class="row-title">One-Time Setup & Deployment</span>
-                  <span class="row-note">Custom portal scrapers, keyword & criteria configuration, Slack/Telegram channel alerts</span>
-                </td>
-                <td class="price-val">₹39,000</td>
-              </tr>
-              <tr>
-                <td>
-                  <span class="row-title">Monthly Maintenance & SLA</span>
-                  <span class="row-note">24/7 scraper uptime monitoring, selector updates for portal layout changes, daily scan health checks</span>
-                </td>
-                <td class="price-val">₹7,500/mo</td>
-              </tr>
-              <tr>
-                <td>
-                  <span class="row-title">Delivery Timeline</span>
-                  <span class="row-note">Production go-live within 5 business days</span>
-                </td>
-                <td class="price-val">5 Days</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-footer-note">
-          Timeline starts once target keywords and procurement categories are provided.
-        </div>
-      </div>
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 28%;">Component / Tool</th>
+            <th style="width: 28%;">What You Provide</th>
+            <th style="width: 22%;">Estimated Running Cost</th>
+            <th style="width: 22%;">Role in Pipeline</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <span class="row-title">Scraping &amp; Proxy Infrastructure</span>
+              <span class="row-sub">Residential / Datacenter Proxies</span>
+            </td>
+            <td>Rotating Indian IP proxy pool for reliable portal crawling.</td>
+            <td>
+              <span class="cost-highlight">~₹2,500 – ₹6,000/mo</span>
+              <span class="row-sub">Based on crawl frequency &amp; bandwidth</span>
+            </td>
+            <td>Prevents rate-limiting while fetching RFPs from government procurement portals.</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">AI Document Analysis</span>
+              <span class="row-sub">Anthropic Claude / OpenAI API</span>
+            </td>
+            <td>LLM API key for multi-page RFP PDF analysis and scoring.</td>
+            <td>
+              <span class="cost-highlight">~₹1,200 – ₹3,800/mo</span>
+              <span class="row-sub">Usage-based token billing</span>
+            </td>
+            <td>Parses technical specs, financial turnover, and eligibility requirements.</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Workspace &amp; Alerts</span>
+              <span class="row-sub">Google Drive / Slack / Telegram</span>
+            </td>
+            <td>Team channels and shared drive for bid room collaboration.</td>
+            <td>
+              <span class="cost-highlight">₹0 (Existing Plan)</span>
+              <span class="row-sub">Zero additional platform fees</span>
+            </td>
+            <td>Stores RFP documents, pre-bid checklists, and dispatches urgent deadline alerts.</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Workflow Execution Host</span>
+              <span class="row-sub">Self-Hosted or Cloud VPS</span>
+            </td>
+            <td>Cloud VPS server (AWS / Hetzner / DigitalOcean) or n8n Cloud.</td>
+            <td>
+              <span class="cost-highlight">~₹850 – ₹1,700/mo</span>
+              <span class="row-sub">Or client's existing private cloud server</span>
+            </td>
+            <td>Runs in your own cloud. Data is sent only to the services you approve.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- 5. Final CTA -->
-    <section class="cta-card">
-      <h2 class="cta-title">Ready to win more tenders without manual searching?</h2>
-      <p class="cta-sub">Never miss a high-margin procurement tender again. Put opportunity discovery on auto-pilot.</p>
-      <div class="cta-actions">
-        <button type="button" class="btn-coral" onclick="openContactModal()">
-          <span>Contact Us</span>
-        </button>
-        <button type="button" class="btn-secondary" onclick="openSimModal()">
-          <span>Watch Live Simulation</span>
+    <!-- Aivatika Implementation Pricing -->
+    <div class="section-title-wrap">
+      <h2 class="section-title">Aivatika Engineering &amp; Implementation Pricing</h2>
+      <p class="section-sub">Transparent, flat-rate pricing for production deployment, custom logic, and SLA support.</p>
+    </div>
+
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 30%;">Deliverable</th>
+            <th style="width: 36%;">Scope &amp; Specifications</th>
+            <th style="width: 18%;">Investment</th>
+            <th style="width: 16%;">Timeline &amp; SLA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <span class="row-title">One-Time Setup &amp; Architecture</span>
+              <span class="row-sub">Turnkey Tender &amp; Procurement Pipeline</span>
+            </td>
+            <td>
+              Custom portal scrapers (GeM/CPPP), AI eligibility criteria fine-tuning, automated bid room drive folders, and instant multi-channel Slack/Telegram alerts.
+            </td>
+            <td>
+              <span class="cost-highlight">₹1,59,000</span>
+              <span class="row-sub">One-time setup investment</span>
+            </td>
+            <td>
+              <strong>7 Business Days</strong>
+              <span class="row-sub">Timeline starts once API keys and workspace access are provided.</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Additional Monthly Maintenance &amp; Support</span>
+              <span class="row-sub">Optional Ongoing SLA</span>
+            </td>
+            <td>
+              Daily scraper health checks, portal DOM selector updates, AI prompt adjustments for new tender categories, and priority SLA (&lt; 4 hours).
+            </td>
+            <td>
+              <span class="cost-highlight">₹15,500/mo</span>
+              <span class="cost-badge-optional">Additional monthly fee</span>
+            </td>
+            <td>
+              <strong>Ongoing SLA</strong>
+              <span class="row-sub">Month-to-month, cancel anytime</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Final CTA Section -->
+    <section class="final-cta-section">
+      <h2>Ready to discover high-value tenders on auto-pilot?</h2>
+      <p>Have your bid desk receiving qualified tender opportunities and pre-bid alerts within 7 business days.</p>
+      <div class="final-cta-actions">
+        <button class="btn-primary" type="button" onclick="openContactModal()">
+          Contact Us
         </button>
       </div>
     </section>
 
   </main>
 
-  <!-- Simulation Modal -->
-  <div id="sim-modal" class="sim-modal" aria-hidden="true">
-    <div class="sim-modal-backdrop" onclick="closeSimModal()"></div>
+  <!-- Live Simulation Modal -->
+  <div id="sim-modal" class="sim-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="sim-modal-backdrop" onclick="closeSimulation()"></div>
     <div class="sim-modal-dialog">
       <div class="sim-modal-header">
-        <div class="sim-modal-title">Live Workflow Simulation: Tender / Opportunity Hunter</div>
-        <div style="display:flex; gap:10px;">
-          <a href="Live Workflow_ Tender _ Opportunity Hunter.html" target="_blank" rel="noopener noreferrer" class="sim-modal-close" style="text-decoration:none;">Open in New Tab ↗</a>
-          <button type="button" class="sim-modal-close" onclick="closeSimModal()">Close &times;</button>
+        <div class="sim-modal-title">
+          <span>Tender &amp; Opportunity Hunter</span>
+          <span style="background: var(--live-bg); color: var(--live); font-size: 11px; padding: 2px 8px; border-radius: 999px;">LIVE DEMO</span>
+        </div>
+        <div class="sim-modal-actions">
+          <a href="Live Workflow_ Tender _ Opportunity Hunter.html" target="_blank" rel="noopener noreferrer" class="sim-modal-btn">
+            Open in New Tab ↗
+          </a>
+          <button class="sim-modal-close" onclick="closeSimulation()" aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
       </div>
       <div class="sim-modal-body">
-        <iframe id="sim-iframe" src="" title="Tender Hunter Workflow Simulation"></iframe>
+        <iframe id="sim-iframe" src="" title="Live workflow simulation"></iframe>
       </div>
     </div>
   </div>
 
   <!-- Contact Modal -->
-  <div id="contact-modal" class="contact-modal" aria-hidden="true">
+  <div id="contact-modal" class="contact-modal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="sim-modal-backdrop" onclick="closeContactModal()"></div>
-    <div class="contact-modal-dialog">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-        <h3 style="font-size:18px; font-weight:800;">Contact Us</h3>
-        <button type="button" class="sim-modal-close" onclick="closeContactModal()">&times;</button>
-      </div>
-      <form onsubmit="handleFormSubmit(event)">
+    <div class="contact-dialog">
+      <h3>Contact Us</h3>
+      <p>Leave your details and an automation engineer will contact you within one business day.</p>
+      <form id="contact-form" onsubmit="submitForm(event)">
         <div class="form-group">
-          <label class="form-label">YOUR NAME *</label>
-          <input type="text" class="form-input" placeholder="Rohan Sharma" required>
+          <label for="c-name">Your Name</label>
+          <input type="text" id="c-name" placeholder="Rajesh Sharma" required>
         </div>
         <div class="form-group">
-          <label class="form-label">COMPANY NAME *</label>
-          <input type="text" class="form-input" placeholder="Apex Enterprise" required>
+          <label for="c-biz">Company / Enterprise</label>
+          <input type="text" id="c-biz" placeholder="Apex Infra Technologies" required>
         </div>
         <div class="form-group">
-          <label class="form-label">PHONE NUMBER *</label>
-          <input type="tel" class="form-input" placeholder="+91 98XXX XXXXX" required>
+          <label for="c-phone">Phone Number (WhatsApp)</label>
+          <input type="tel" id="c-phone" placeholder="+91 98765 43210" required>
         </div>
-        <div class="form-group">
-          <label class="form-label">EMAIL ADDRESS *</label>
-          <input type="email" class="form-input" placeholder="rohan@apex.com" required>
-        </div>
-        <button type="submit" class="btn-coral" style="width:100%; justify-content:center; margin-top:8px;">
-          <span>Submit Request</span>
-        </button>
+        <button type="submit" class="btn-submit">Submit Request →</button>
       </form>
     </div>
   </div>
@@ -1005,14 +336,14 @@
     const simIframe = document.getElementById('sim-iframe');
     const contactModal = document.getElementById('contact-modal');
 
-    function openSimModal() {
+    function openSimulation() {
       simIframe.src = 'Live Workflow_ Tender _ Opportunity Hunter.html';
       simModal.classList.add('is-open');
       simModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
 
-    function closeSimModal() {
+    function closeSimulation() {
       simModal.classList.remove('is-open');
       simModal.setAttribute('aria-hidden', 'true');
       simIframe.src = '';
@@ -1031,11 +362,28 @@
       document.body.style.overflow = '';
     }
 
-    function handleFormSubmit(e) {
+    function submitForm(e) {
       e.preventDefault();
-      alert('Thank you! Your request has been received. Our team will contact you within one business day.');
+      const name = document.getElementById('c-name').value.trim();
+      const biz = document.getElementById('c-biz').value.trim();
+      const phone = document.getElementById('c-phone').value.trim();
+
+      const subject = encodeURIComponent(`Tender & Opportunity Hunter Inquiry - ${biz}`);
+      const mailBody = encodeURIComponent(
+        `Hi Aivatika Team,\n\nI am interested in deploying the Tender & Opportunity Hunter pipeline.\n\nContact Details:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n\nPlease reach out for next steps!\n\nThanks,\n${name}`
+      );
+
+      window.open(`mailto:contact@aivatika.com?subject=${subject}&body=${mailBody}`, '_self');
       closeContactModal();
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeSimulation();
+        closeContactModal();
+      }
+    });
   </script>
 </body>
+
 </html>

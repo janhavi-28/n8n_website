@@ -1,1010 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Live Workflow: Tender Hunter</title>
-    <style>
-        :root {
-            --bg: #f3f5fb;
-            --card: rgba(255, 255, 255, .82);
-            --text: #0f172a;
-            --mut: #64748b;
-            --line: #dde3f0;
-            --accent: #4f46e5;
-            --good: #059669;
-            --bad: #e11d48;
-            --badbg: #ffe9ee;
-            --gold: #d97706;
-            --canvas: #f7f8fb;
-            --dot: #d3d8e4;
-            --nb: #fff;
-            --nl: #c5cad8;
-            --edge: #9aa1b5;
-            --coral: #ff6d5a;
-            --ok: #2fae6b;
-            color-scheme: light;
-            box-sizing: border-box;
-            padding-top: env(safe-area-inset-top, 0px);
-            padding-bottom: env(safe-area-inset-bottom, 0px)
-        }
-
-        @media (prefers-color-scheme:dark) {
-            :root:not([data-theme="light"]) {
-                --bg: #070b16;
-                --card: rgba(20, 28, 50, .72);
-                --text: #eef2ff;
-                --mut: #94a3c4;
-                --line: rgba(148, 163, 210, .22);
-                --accent: #818cf8;
-                --good: #34d399;
-                --bad: #fb7185;
-                --badbg: rgba(244, 63, 94, .14);
-                --gold: #fbbf24;
-                --canvas: #14161f;
-                --dot: #2c3040;
-                --nb: #262938;
-                --nl: #454a5e;
-                --edge: #6b7390;
-                color-scheme: dark
-            }
-        }
-
-        :root[data-theme="dark"] {
-            --bg: #070b16;
-            --card: rgba(20, 28, 50, .72);
-            --text: #eef2ff;
-            --mut: #94a3c4;
-            --line: rgba(148, 163, 210, .22);
-            --accent: #818cf8;
-            --good: #34d399;
-            --bad: #fb7185;
-            --badbg: rgba(244, 63, 94, .14);
-            --gold: #fbbf24;
-            --canvas: #14161f;
-            --dot: #2c3040;
-            --nb: #262938;
-            --nl: #454a5e;
-            --edge: #6b7390;
-            color-scheme: dark
-        }
-
-        html {
-            scroll-padding-top: env(safe-area-inset-top, 0px)
-        }
-
-        * {
-            box-sizing: border-box
-        }
-
-        body {
-            margin: 0;
-            color: var(--text);
-            font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-            background: radial-gradient(900px 480px at 12% -8%, color-mix(in srgb, var(--accent) 24%, transparent), transparent), radial-gradient(700px 420px at 100% 0, rgba(236, 72, 153, .13), transparent), var(--bg);
-            background-attachment: fixed;
-            min-height: 100vh
-        }
-
-        main {
-            max-width: 1040px;
-            margin: 0 auto;
-            padding: 26px 14px 30px
-        }
-
-        .top {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap
-        }
-
-        h1 {
-            font-size: 30px;
-            margin: 0;
-            font-weight: 800;
-            letter-spacing: -.035em;
-            background: linear-gradient(90deg, var(--text) 30%, var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent
-        }
-
-        .live {
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: .1em;
-            color: var(--good);
-            border: 1px solid var(--good);
-            padding: 4px 11px;
-            border-radius: 999px;
-            display: inline-flex;
-            gap: 7px;
-            align-items: center
-        }
-
-        .live i {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--good);
-            animation: pu 1.4s infinite
-        }
-
-        @keyframes pu {
-            50% {
-                opacity: .25;
-                transform: scale(1.6)
-            }
-        }
-
-        p.sub {
-            margin: 6px 0 16px;
-            color: var(--mut);
-            font-size: 14px
-        }
-
-        .bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px
-        }
-
-        button {
-            font: inherit;
-            font-weight: 600;
-            padding: 10px 20px;
-            border-radius: 999px;
-            border: 1px solid var(--line);
-            background: var(--card);
-            color: var(--text);
-            cursor: pointer;
-            transition: transform .15s
-        }
-
-        button:active {
-            transform: scale(.96)
-        }
-
-        button.p {
-            background: linear-gradient(135deg, #ff6d5a, #ff8a5a);
-            border: 0;
-            color: #fff;
-            box-shadow: 0 10px 24px -10px #ff6d5a
-        }
-
-        .card {
-            background: var(--card);
-            -webkit-backdrop-filter: blur(14px);
-            backdrop-filter: blur(14px);
-            border: 1px solid var(--line);
-            border-radius: 20px;
-            padding: 18px;
-            box-shadow: 0 18px 40px -20px rgba(15, 23, 42, .35)
-        }
-
-        .cv {
-            position: relative;
-            border-radius: 20px;
-            border: 1px solid var(--line);
-            overflow-x: auto;
-            background-color: var(--canvas);
-            background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
-            background-size: 22px 22px
-        }
-
-        .cv svg {
-            min-width: 900px;
-            width: 100%;
-            display: block
-        }
-
-        .chip {
-            position: sticky;
-            left: 12px;
-            top: 12px;
-            display: inline-flex;
-            gap: 10px;
-            align-items: center;
-            margin: 12px;
-            padding: 6px 12px;
-            border-radius: 10px;
-            background: var(--nb);
-            border: 1px solid var(--nl);
-            font-size: 12px;
-            font-weight: 600;
-            z-index: 2
-        }
-
-        .chip b {
-            color: var(--ok);
-            font-weight: 600
-        }
-
-        .nd .b {
-            fill: var(--nb);
-            stroke: var(--nl);
-            stroke-width: 1.5;
-            transition: stroke .25s
-        }
-
-        .nd text {
-            fill: var(--text);
-            font-size: 12px;
-            font-weight: 600;
-            text-anchor: middle
-        }
-
-        .nd .s {
-            fill: var(--mut);
-            font-size: 10px;
-            font-weight: 400
-        }
-
-        .nd.run .b {
-            stroke: var(--coral);
-            stroke-width: 2;
-            stroke-dasharray: 6 4;
-            animation: d .6s linear infinite;
-            filter: drop-shadow(0 0 6px var(--coral))
-        }
-
-        .nd.ok .b {
-            stroke: var(--ok);
-            stroke-width: 2
-        }
-
-        .nd.gold .b {
-            stroke: var(--gold);
-            stroke-width: 2;
-            filter: drop-shadow(0 0 6px var(--gold))
-        }
-
-        .bg {
-            display: none
-        }
-
-        .nd.ok .bg {
-            display: block
-        }
-
-        .bg circle {
-            fill: var(--ok)
-        }
-
-        .ed {
-            fill: none;
-            stroke: var(--edge);
-            stroke-width: 1.8;
-            transition: stroke .3s
-        }
-
-        .ed.ok {
-            stroke: var(--ok)
-        }
-
-        @keyframes d {
-            to {
-                stroke-dashoffset: -10
-            }
-        }
-
-        .mk {
-            fill: var(--edge)
-        }
-
-        .pt {
-            fill: var(--nb);
-            stroke: var(--edge);
-            stroke-width: 1.5
-        }
-
-        .il {
-            fill: var(--ok);
-            font-size: 10px;
-            font-weight: 600;
-            opacity: 0;
-            transition: .3s
-        }
-
-        .il.show {
-            opacity: 1
-        }
-
-        .pl {
-            fill: var(--mut);
-            font-size: 9.5px
-        }
-
-        .pk {
-            fill: var(--coral);
-            filter: drop-shadow(0 0 7px var(--coral))
-        }
-
-        .pk.gold {
-            fill: var(--gold);
-            filter: drop-shadow(0 0 8px var(--gold))
-        }
-
-        .kpis {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin: 12px 0
-        }
-
-        .k {
-            position: relative;
-            overflow: hidden
-        }
-
-        .k::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent), #ec4899)
-        }
-
-        .k .l {
-            color: var(--mut);
-            text-transform: uppercase;
-            letter-spacing: .07em;
-            font-size: 11px;
-            font-weight: 600
-        }
-
-        .k .v {
-            font-size: 29px;
-            font-weight: 800;
-            letter-spacing: -.035em;
-            margin: 4px 0;
-            font-variant-numeric: tabular-nums
-        }
-
-        .k .d {
-            font-size: 12px;
-            color: var(--good)
-        }
-
-        .k.flag {
-            border-color: var(--bad);
-            background: var(--badbg)
-        }
-
-        .k.flag::before {
-            background: var(--bad)
-        }
-
-        .k.flag .d {
-            color: var(--bad)
-        }
-
-        .two {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 10px
-        }
-
-        h2 {
-            font-size: 11.5px;
-            margin: 0 0 8px;
-            color: var(--mut);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .08em
-        }
-
-        ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            font-size: 13px
-        }
-
-        li {
-            padding: 5px 0;
-            border-bottom: 1px solid var(--line)
-        }
-
-        li:last-child {
-            border: 0
-        }
-
-        li b {
-            color: var(--mut);
-            font-weight: 500;
-            margin-right: 6px
-        }
-
-        li.gold {
-            color: var(--gold)
-        }
-
-        li.bad {
-            color: var(--bad)
-        }
-
-        li.good {
-            color: var(--good)
-        }
-
-        #banner {
-            display: none;
-            margin: 12px 0 0;
-            padding: 10px 12px;
-            border-radius: 14px;
-            background: var(--badbg);
-            border: 1px solid var(--bad);
-            color: var(--bad);
-            font-weight: 600
-        }
-
-        .bars rect {
-            fill: var(--accent);
-            opacity: .5;
-            transform-box: fill-box;
-            transform-origin: bottom
-        }
-
-        .bars rect.new {
-            opacity: 1;
-            animation: g .6s ease-out;
-            filter: drop-shadow(0 0 6px var(--accent))
-        }
-
-        @keyframes g {
-            from {
-                transform: scaleY(0)
-            }
-        }
-
-        .bars text {
-            fill: var(--mut);
-            font-size: 10px;
-            text-anchor: middle
-        }
-
-        .inp {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px
-        }
-
-        input {
-            flex: 1;
-            min-width: 200px;
-            font: inherit;
-            padding: 10px 16px;
-            border-radius: 999px;
-            border: 1px solid var(--line);
-            background: var(--card);
-            color: var(--text)
-        }
-
-        input:focus {
-            outline: 2px solid var(--accent);
-            outline-offset: 1px
-        }
-
-        .tw {
-            overflow-x: auto
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            min-width: 560px
-        }
-
-        th {
-            text-align: left;
-            color: var(--mut);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .07em;
-            padding: 6px 8px;
-            border-bottom: 1px solid var(--line)
-        }
-
-        td {
-            padding: 9px 8px;
-            border-bottom: 1px solid var(--line)
-        }
-
-        tr.in {
-            animation: g2 .5s ease-out
-        }
-
-        @keyframes g2 {
-            from {
-                opacity: 0;
-                transform: translateX(-12px)
-            }
-        }
-
-        .cd {
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-            border: 1px solid
-        }
-
-        .cd.r {
-            color: var(--bad);
-            background: var(--badbg);
-            border-color: var(--bad)
-        }
-
-        .cd.a {
-            color: var(--gold);
-            border-color: var(--gold)
-        }
-
-        .cd.g {
-            color: var(--good);
-            border-color: var(--good)
-        }
-
-        td.e0 {
-            color: var(--mut);
-            text-align: center;
-            padding: 20px
-        }
-
-        .cvw {
-            position: relative
-        }
-
-        .cv svg {
-            transition: opacity .25s
-        }
-
-        .cv.dim svg {
-            opacity: .25
-        }
-
-        .ndv {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: min(620px, 94%);
-            max-height: 96%;
-            overflow: hidden;
-            transform: translate(-50%, -46%) scale(.94);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .25s, transform .25s;
-            background: var(--nb);
-            border: 1px solid var(--nl);
-            border-radius: 16px;
-            box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .5);
-            z-index: 5
-        }
-
-        .ndv.open {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1)
-        }
-
-        .nh {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--nl)
-        }
-
-        .nh svg {
-            width: 32px;
-            height: 32px;
-            flex: none
-        }
-
-        .nh b {
-            display: block;
-            font-size: 15px
-        }
-
-        .nh small {
-            color: var(--mut);
-            font-size: 11px
-        }
-
-        .pill {
-            margin-left: auto;
-            padding: 3px 12px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid var(--coral);
-            color: var(--coral)
-        }
-
-        .pill.ok {
-            border-color: var(--ok);
-            color: var(--ok)
-        }
-
-        .nb {
-            padding: 12px 16px;
-            display: grid;
-            gap: 12px;
-            max-height: 380px;
-            overflow-y: auto
-        }
-
-        .nb h4 {
-            margin: 0 0 6px;
-            font-size: 10.5px;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            color: var(--mut)
-        }
-
-        .pm {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px
-        }
-
-        .pm span {
-            font-size: 11.5px;
-            padding: 3px 9px;
-            border-radius: 8px;
-            background: color-mix(in srgb, var(--accent) 12%, transparent)
-        }
-
-        .pm span b {
-            color: var(--mut);
-            font-weight: 600;
-            margin-right: 5px
-        }
-
-        .ln {
-            font: 12px/1.6 ui-monospace, Menlo, Consolas, monospace;
-            padding: 6px 10px;
-            border-left: 3px solid var(--coral);
-            margin-bottom: 4px;
-            opacity: 0;
-            transform: translateX(-8px);
-            animation: cr .35s forwards;
-            background: color-mix(in srgb, var(--text) 5%, transparent);
-            border-radius: 0 8px 8px 0
-        }
-
-        .ln em {
-            font-style: normal;
-            font-weight: 700;
-            color: var(--accent)
-        }
-
-        .ln em.w {
-            color: var(--bad)
-        }
-
-        .ln b {
-            color: var(--mut)
-        }
-
-        .ot table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11.5px
-        }
-
-        .ot th {
-            text-align: left;
-            color: var(--mut);
-            font-weight: 600;
-            padding: 3px 6px;
-            border-bottom: 1px solid var(--nl)
-        }
-
-        .ot td {
-            padding: 3px 6px
-        }
-
-        .ot p {
-            margin: 6px 0 0;
-            font-size: 11.5px;
-            color: var(--ok);
-            font-weight: 700
-        }
-
-        .em {
-            border: 1px solid var(--nl);
-            border-radius: 12px;
-            overflow: hidden;
-            font-size: 12px
-        }
-
-        .em .eh2 {
-            padding: 8px 12px;
-            background: color-mix(in srgb, var(--text) 5%, transparent);
-            line-height: 1.7
-        }
-
-        .em .eh2 b {
-            display: inline-block;
-            width: 56px;
-            color: var(--mut);
-            font-weight: 600
-        }
-
-        .em .eb {
-            padding: 10px 12px;
-            line-height: 1.6
-        }
-
-        .dl {
-            display: flex;
-            gap: 14px;
-            padding: 8px 12px;
-            border-top: 1px solid var(--nl);
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--ok)
-        }
-
-        .dl span {
-            opacity: 0;
-            animation: cr .4s forwards
-        }
-
-        .dl span:nth-child(2) {
-            animation-delay: .5s
-        }
-
-        .dl span:nth-child(3) {
-            animation-delay: 1s
-        }
-
-        .inb {
-            margin: 12px 0 0
-        }
-
-        .ib {
-            display: flex;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--line);
-            opacity: 0;
-            animation: cr .5s forwards
-        }
-
-        .ib:last-child {
-            border: 0
-        }
-
-        .ib i {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: var(--accent);
-            margin-top: 6px;
-            flex: none
-        }
-
-        .ib b {
-            display: block;
-            font-size: 13px
-        }
-
-        .ib small {
-            color: var(--mut);
-            font-size: 12px
-        }
-
-        .ib .t {
-            margin-left: auto;
-            font-size: 11px;
-            color: var(--mut);
-            white-space: nowrap
-        }
-
-        .cnt {
-            display: inline-block;
-            min-width: 20px;
-            text-align: center;
-            padding: 1px 7px;
-            border-radius: 999px;
-            background: var(--bad);
-            color: #fff;
-            font-size: 11px;
-            margin-left: 6px
-        }
-
-        @keyframes cr {
-            to {
-                opacity: 1;
-                transform: none
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <main>
-        <div class="top">
-            <h1>Tender / Opportunity Hunter</h1><span class="live"><i></i>LIVE SIMULATION</span>
-        </div>
-        <p class="sub">Demo of the automation as it looks inside n8n. Enter the client’s keywords and watch the sites
-            get scanned and only the relevant tenders come out.</p>
-        <div class="inp"><input id="kw" value="solar panels, Karnataka" aria-label="Client keywords"><button class="p"
-                id="go">Find tenders</button><button id="play">Pause auto-scan</button><button id="det">Node details:
-                On</button></div>
-        <div class="cvw">
-            <div class="cv">
-                <div class="chip">Tender Hunter: scan, filter, alert <b>● Active</b></div><svg id="w"
-                    viewBox="0 0 1070 500" role="img" aria-label="n8n style workflow"></svg>
-            </div>
-            <div class="ndv" id="ndv"></div>
-        </div>
-        <div id="banner"></div>
-        <div class="card inb" id="inbox" style="display:none">
-            <h2>Client’s inbox: client@yourcompany.com <span class="cnt" id="icnt">0</span></h2>
-            <div id="ibl"></div>
-        </div>
-        <div class="kpis" id="kpis"></div>
-        <div class="card">
-            <h2>Matching tenders</h2>
-            <div class="tw">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tender</th>
-                            <th>Source</th>
-                            <th>Location</th>
-                            <th>Budget</th>
-                            <th>Closes</th>
-                            <th>Countdown</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb">
-                        <tr>
-                            <td class="e0" colspan="6">Press Find tenders to run the scan</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card" style="margin-top:10px">
-            <h2>Activity log</h2>
-            <ul id="log"></ul>
-        </div>
-    </main>
-    <script>
-        const NS = "http://www.w3.org/2000/svg", $ = i => document.getElementById(i);
-        const el = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e };
-        const sleep = ms => new Promise(r => setTimeout(r, ms));
-        const st = (c, w = 2) => `stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
-        const SH = '<path d="M4 1h11l6 6v15a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="#0f9d58"/><path d="M15 1l6 6h-5a1 1 0 0 1-1-1z" fill="#087f45"/><rect x="6" y="11" width="12" height="8.5" rx="1" fill="#fff"/><path d="M6 14h12M6 16.8h12M11 11v8.5" stroke="#0f9d58" stroke-width="1.2"/>';
-        const GV = '<path d="M2 9l10-6 10 6z" fill="#1e40af"/><rect x="4" y="10" width="3" height="8" fill="#3b82f6"/><rect x="10.5" y="10" width="3" height="8" fill="#3b82f6"/><rect x="17" y="10" width="3" height="8" fill="#3b82f6"/><rect x="2" y="19" width="20" height="2.5" rx="1" fill="#1e40af"/>';
-        const GM = '<path d="M4.5 8h15l-1.2 13H5.7z" fill="#f59e0b"/><path d="M8.5 8V6.5a3.5 3.5 0 0 1 7 0V8" ' + st("#b45309", 1.8) + '/>';
-        const LS = '<rect x="3" y="3" width="18" height="18" rx="3" fill="#0ea5e9"/><path d="M7 9h10M7 13h10M7 17h6" ' + st("#fff", 1.8) + '/>';
-        const GL = `<circle cx="12" cy="12" r="9" ${st("#64748b")}/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" ${st("#64748b", 1.5)}/>`;
-        const KW = '<path d="M3 12V4h8l10 10-8 8z" fill="#14b8a6"/><circle cx="7.5" cy="8.5" r="1.6" fill="#fff"/>';
-        const MG = `<path d="M3 6h5c5 0 5 6 10 6M3 18h5c5 0 5-6 10-6M17 8l4 4-4 4" ${st("#8b5cf6")}/>`;
-        const DD = '<rect x="3" y="3" width="13" height="13" rx="2.5" ' + st("#0ea5e9") + '/><rect x="8" y="8" width="13" height="13" rx="2.5" fill="#0ea5e9" opacity=".85"/>';
-        const AI = '<path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z" fill="#8b5cf6"/><path d="M19 3v4M17 5h4" ' + st("#8b5cf6", 1.6) + '/>';
-        const CL = `<circle cx="12" cy="12" r="9" ${st("#6b7280")}/><path d="M12 7v5l3.5 2" ${st("#6b7280")}/>`;
-        const CD = `<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14" ${st("#ff6d5a")}/>`;
-        const EM = '<rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="#ea4335"/><path d="M3 7.5l9 6.5 9-6.5" ' + st("#fff", 1.8) + '/>';
-        const svg = $("w"), defs = el("defs", {}, svg);
-        el("path", { d: "M0 0L8 4L0 8z", class: "mk" }, el("marker", { id: "ar", markerWidth: 8, markerHeight: 8, refX: 7, refY: 4, orient: "auto" }, defs));
-        const gE = el("g", {}, svg), gN = el("g", {}, svg), gP = el("g", {}, svg);
-        const defN = [["trig", "Every 6 Hours", "Schedule Trigger", 10, 225, CL, 1], ["kw", "Client Keywords", "Set", 130, 225, KW], ["gov", "Govt Tender Portal", "HTTP Request", 250, 55, GV], ["gem", "GeM Bids", "HTTP Request", 250, 165, GM], ["lst", "Listing Sites", "HTTP Request", 250, 275, LS], ["oth", "Other Sites", "HTTP Request", 250, 385, GL], ["merge", "Collect Postings", "Merge", 380, 225, MG], ["dd", "Skip Already Seen", "Remove Duplicates", 510, 225, DD], ["ai", "AI Filter", "Basic LLM Chain", 630, 225, AI], ["save", "Save Matches", "Google Sheets", 750, 225, SH], ["cnt", "Deadline Countdown", "Code", 870, 225, CD], ["mail", "Send Alert", "Send Email", 990, 225, EM]];
-        const D = {};
-        function wrap(s) { if (s.length <= 16) return [s]; const w = s.split(" "), l = [""]; w.forEach(x => { const c = l[l.length - 1]; if ((c + " " + x).trim().length <= 16) l[l.length - 1] = (c + " " + x).trim(); else l.push(x) }); return l }
-        defN.forEach(([id, name, sub, x, y, ic, tr]) => {
-            const g = el("g", { class: "nd" }, gN);
-            el("path", { class: "b", d: tr ? `M${x + 32} ${y}H${x + 52}a12 12 0 0 1 12 12V${y + 52}a12 12 0 0 1-12 12H${x + 32}a32 32 0 0 1 0-64z` : `M${x + 12} ${y}H${x + 52}a12 12 0 0 1 12 12V${y + 52}a12 12 0 0 1-12 12H${x + 12}a12 12 0 0 1-12-12V${y + 12}a12 12 0 0 1 12-12z` }, g);
-            el("g", { transform: `translate(${x + 16},${y + 16}) scale(1.33)` }, g).innerHTML = ic;
-            const L = wrap(name); L.forEach((t, i) => el("text", { x: x + 32, y: y + 80 + i * 13 }, g).textContent = t); el("text", { x: x + 32, y: y + 80 + L.length * 13, class: "s" }, g).textContent = sub;
-            const b = el("g", { class: "bg" }, g); el("circle", { cx: x + 64, cy: y + 4, r: 9 }, b); el("path", { d: `M${x + 59.5} ${y + 4}l3.2 3.2 6-6.2`, fill: "none", stroke: "#fff", "stroke-width": 2, "stroke-linecap": "round" }, b);
-            D[id] = { g, x, y }
-        });
-        const out = id => [D[id].x + 64, D[id].y + 32], inn = id => [D[id].x, D[id].y + 32], MY = [235, 249, 263, 277], SRC = ["gov", "gem", "lst", "oth"], CNT = [42, 18, 35, 9], EDG = [];
-        function edge(a, b, lab) {
-            const [x1, y1] = a, [x2, y2] = b, dx = Math.max(24, (x2 - x1) / 2);
-            const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1 + dx} ${y1} ${x2 - dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-            const t = lab ? el("text", { x: x1 + 6, y: y1 - 7, class: "il" }, gE) : null; if (t) t.textContent = lab; EDG.push({ p, t }); return EDG.length - 1
-        }
-        const eK = edge(out("trig"), inn("kw")), eF = SRC.map(s => edge(out("kw"), inn(s))), eS = SRC.map((s, i) => edge(out(s), [380, MY[i]], CNT[i] + " items"));
-        const eM = edge(out("merge"), inn("dd"), "104 items"), eD = edge(out("dd"), inn("ai"), "new"), eA = edge(out("ai"), inn("save"), "matches"), eV = edge(out("save"), inn("cnt"), "rows"), eN = edge(out("cnt"), inn("mail"), "rows");
-        MY.forEach(y => el("circle", { cx: 380, cy: y, r: 3.5, class: "pt" }, gN));
-        function fly(i, cls, ms) { return new Promise(res => { const p = EDG[i].p, L = p.getTotalLength(), c = el("circle", { r: 6, class: "pk " + (cls || "") }, gP), t0 = performance.now(); (function f(t) { const k = Math.min(1, (t - t0) / ms), q = p.getPointAtLength(L * k); c.setAttribute("cx", q.x); c.setAttribute("cy", q.y); k < 1 ? requestAnimationFrame(f) : (c.remove(), res()) })(t0) }) }
-        async function go(i, txt, ms = 500) { await fly(i, "", ms); EDG[i].p.classList.add("ok"); if (EDG[i].t) { if (txt) EDG[i].t.textContent = txt; EDG[i].t.classList.add("show") } }
-        async function run(id, ms) { const c = D[id].g.classList; c.add("run"); await sleep(ms); c.remove("run"); c.add("ok") }
-        function reset() { Object.values(D).forEach(n => n.g.setAttribute("class", "nd")); EDG.forEach(e => { e.p.classList.remove("ok"); e.t && e.t.classList.remove("show") }) }
-        const P = [["50 kW rooftop solar panel installation, Govt Polytechnic", "GeM", "Belagavi, Karnataka", 18.5, 6, "solar panels rooftop"], ["Solar street lights (200 units), City Corporation", "Govt Portal", "Hubballi, Karnataka", 24, 12, "solar panels street lights"], ["Solar water heater system for hostel block", "GeM", "Mysuru, Karnataka", 9.2, 3, "solar panels water heater"], ["10 kW solar panels for primary health centre", "Govt Portal", "Dharwad, Karnataka", 7.8, 9, "solar panels"], ["Solar pump sets for farmers scheme", "Listing Site", "Kalaburagi, Karnataka", 42, 15, "solar panels pumps"], ["Solar panel maintenance contract, 5 sites", "Other Site", "Pune, Maharashtra", 6.5, 5, "solar panels"], ["Rooftop solar plant 100 kW, textile unit", "Listing Site", "Coimbatore, Tamil Nadu", 55, 20, "solar plant"], ["Road resurfacing, NH stretch 12 km", "Govt Portal", "Belagavi, Karnataka", 320, 18, "road"], ["Laptops and desktops for govt schools (500)", "GeM", "Bengaluru, Karnataka", 88, 8, "it hardware"], ["Hospital furniture supply", "GeM", "Mangaluru, Karnataka", 14, 11, "furniture"], ["CCTV installation for bus stands", "Govt Portal", "Belagavi, Karnataka", 21, 4, "cctv"], ["Solar panel cleaning robots pilot", "Other Site", "Bengaluru, Karnataka", 12, 22, "solar panels cleaning"]];
-        const fmtD = d => { const x = new Date(); x.setDate(x.getDate() + d); return x.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) };
-        [["Sites scanned"], ["New postings"], ["AI matches"], ["Closing in 7 days"]].forEach(([l], i) => { const d = document.createElement("div"); d.className = "card k"; d.id = "k" + i; d.innerHTML = `<div class="l">${l}</div><div class="v">0</div><div class="d">&nbsp;</div>`; $("kpis").appendChild(d) });
-        const shown = {};
-        function setK(i, val, d, flag) { const c = $("k" + i), v = c.querySelector(".v"), from = shown[i] ?? 0, t0 = performance.now(); shown[i] = val; (function a(t) { const k = Math.min(1, (t - t0) / 600); v.textContent = Math.round(from + (val - from) * k); k < 1 && requestAnimationFrame(a) })(t0); c.querySelector(".d").textContent = d || "\u00a0"; c.classList.toggle("flag", !!flag) }
-        function log(m, c) { const li = document.createElement("li"); if (c) li.className = c; li.innerHTML = `<b>${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</b>${m}`; const u = $("log"); u.prepend(li); while (u.children.length > 7) u.lastChild.remove() }
-        let playing = true, running = false;
-        const IC = { trig: CL, kw: KW, gov: GV, gem: GM, lst: LS, oth: GL, merge: MG, dd: DD, ai: AI, save: SH, cnt: CD, mail: EM };
-        let detail = true, mails = 0; const ndv = $("ndv"), cvEl = document.querySelector(".cv");
-        const Pm = o => Object.entries(o).map(([k, v]) => `<span><b>${k}</b>${v}</span>`).join("");
-        const Tb = (f, r, c) => `<table><tr>${f.map(x => `<th>${x}</th>`).join("")}</tr>${r.map(a => `<tr>${a.map(x => `<td>${x}</td>`).join("")}</tr>`).join("")}</table>${c ? `<p>${c}</p>` : ""}`;
-        const sh = t => t.length > 42 ? t.slice(0, 40) + "\u2026" : t, city = l => l.split(",")[0];
-        async function view(id, sp) {
-            const n = defN.find(d => d[0] == id);
-            ndv.innerHTML = `<div class="nh"><svg viewBox="0 0 24 24">${IC[id]}</svg><div><b>${n[1]}</b><small>${n[2]} node</small></div><span class="pill" id="pl">Running...</span></div><div class="nb"><div><h4>Parameters</h4><div class="pm">${Pm(sp.params)}</div></div><div><h4>What happens inside</h4><div id="lns"></div></div><div class="ot" id="oo" style="display:none"><h4>Output</h4>${sp.out}</div></div>`;
-            cvEl.classList.add("dim"); ndv.classList.add("open"); await sleep(450);
-            const L = $("lns"); for (const h of sp.lines) { const d = document.createElement("div"); d.className = "ln"; d.innerHTML = h; L.appendChild(d); await sleep(400) }
-            $("oo").style.display = "block"; const p = $("pl"); p.textContent = "Success"; p.className = "pill ok"; await sleep(1100);
-            ndv.classList.remove("open"); cvEl.classList.remove("dim"); await sleep(300)
-        }
-        async function runV(id, sp) { const c = D[id].g.classList; c.add("run"); if (detail) await view(id, sp); else await sleep(600); c.remove("run"); c.add("ok") }
-        const SITE = [{ id: "gov", src: "Govt Portal", p: { Method: "GET", URL: ".../tenders/new", Format: "HTML table" }, s: ["Open the government tender listing for the latest postings", "Download the page (an HTML table of new tenders)", "Split the table into one item per tender", "Keep title, department, location, budget, closing date and link"] },
-        { id: "gem", src: "GeM", p: { Method: "GET", URL: ".../bids/list", Format: "JSON" }, s: ["Call the marketplace bids list", "Receive a JSON list of open bids", "n8n splits the list into one item per bid", "Keep bid title, buyer, location, value and end date"] },
-        { id: "lst", src: "Listing Site", p: { Method: "GET", URL: ".../tenders", Format: "HTML cards" }, s: ["Open the private listing site tender page", "Read each listing card on the page", "Turn every card into one item", "Keep title, company, city, budget and deadline"] },
-        { id: "oth", src: "Other Site", p: { Method: "GET", URL: "sites chosen by client", Format: "RSS / HTML" }, s: ["Visit each extra site the client asked for", "Read the RSS feed or the page", "One item per posting", "Keep title, place, budget and deadline"] }];
-        function mailCard(hits, kws) {
-            const body = `New tenders matching <b>${kws.join(", ")}</b>:<br>${hits.slice(0, 5).map(h => `\u2022 ${sh(h[0])} (${city(h[2])}, \u20b9${h[3]} L) closes ${fmtD(h[4])}, <b>${h[4]} days left</b>`).join("<br>")}<br><br>Full list with links is in the Tender Matches sheet.`;
-            return `<div class="em"><div class="eh2"><b>From</b>alerts@yourcompany.com<br><b>To</b>client@yourcompany.com<br><b>Subject</b>${hits.length} new tender(s) match: ${kws.join(", ")}<br><b>Sent</b>${new Date().toLocaleString("en-IN")}</div><div class="eb">${body}</div><div class="dl"><span>\u2713 Composed</span><span>\u2713 Sent (SMTP 250 OK)</span><span>\u2713 Delivered to inbox</span></div></div>`
-        }
-        function mailIn(hits, kws) { mails++; $("inbox").style.display = "block"; $("icnt").textContent = mails; const d = document.createElement("div"); d.className = "ib"; d.innerHTML = `<i></i><div><b>${hits.length} new tender(s) match: ${kws.join(", ")}</b><small>Nearest closes in ${hits[0][4]} days: ${sh(hits[0][0])}</small></div><span class="t">${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} \u00b7 just now</span>`; const l = $("ibl"); l.prepend(d); while (l.children.length > 4) l.lastChild.remove() }
-        async function cycle() {
-            if (running) return; running = true; reset(); $("banner").style.display = "none";
-            const kws = $("kw").value.toLowerCase().split(",").map(s => s.trim()).filter(Boolean);
-            const hits = P.filter(t => kws.every(k => (t[0] + " " + t[2] + " " + t[5]).toLowerCase().includes(k))).sort((a, b) => a[4] - b[4]);
-            const fresh = 22 + Math.floor(Math.random() * 8), tot = CNT.reduce((a, b) => a + b, 0);
-            log("Scan started for keywords: " + kws.join(", "));
-            await runV("trig", { params: { Trigger: "Interval", Every: "6 hours" }, lines: ["Clock reaches the next 6-hour mark", "Workflow starts a new scan", "Passes <em>1 item</em> (the time) to the next node"], out: Tb(["time"], [[new Date().toLocaleString("en-IN")]], "1 item") });
-            await go(eK);
-            await runV("kw", { params: { Mode: "Manual mapping", Fields: "keywords, location" }, lines: ["Read the client\u2019s settings", "keywords = <em>" + kws.join(" + ") + "</em>", "Rule: every keyword must match (AND)", "Sets 1 item with these values for all 4 sites"], out: Tb(["keywords"], [[kws.join(", ")]], "1 item") });
-            for (let i = 0; i < 4; i++) {
-                const x = SITE[i]; await go(eF[i]);
-                const rows = P.filter(p => p[1] == x.src).slice(0, 2).map(p => [sh(p[0]), city(p[2]), p[4] + " days"]);
-                await runV(x.id, { params: x.p, lines: x.s.map((t, k) => `<b>${k + 1}.</b> ${t}`), out: Tb(["Tender", "City", "Closes in"], rows, CNT[i] + " items extracted") })
-            }
-            log("4 sites visited, " + tot + " postings read"); setK(0, 4, "all sites reachable");
-            await Promise.all(SRC.map((s, i) => sleep(i * 110).then(() => go(eS[i], null, 600))));
-            await runV("merge", { params: { Mode: "Append", Inputs: "4" }, lines: ["Waiting until all 4 sites have answered", CNT.join(" + ") + " = <em>" + tot + " postings</em>", "Passing all " + tot + " postings to the next node"], out: Tb(["Site", "Postings"], [["Govt Portal", CNT[0]], ["GeM", CNT[1]], ["Listing Sites", CNT[2]], ["Other Sites", CNT[3]]], tot + " postings total") });
-            await go(eM);
-            await runV("dd", { params: { Compare: "Selected fields", Field: "tender link / id", Memory: "last 30 days" }, lines: ["Compare each tender\u2019s link with the list of already-seen tenders", (tot - fresh) + " already seen \u2192 dropped", "<em>" + fresh + " new postings</em> continue"], out: Tb(["Total", "Seen before", "New"], [[tot, tot - fresh, fresh]], fresh + " new items") });
-            log(fresh + " new postings (rest already seen)"); setK(1, fresh, "after removing duplicates");
-            await go(eD, fresh + " new");
-            const non = P.filter(p => !hits.includes(p)).slice(0, 2);
-            await runV("ai", { params: { Model: "AI chat model", Task: "Match client needs", Output: "JSON" }, lines: ["Prompt: keep only tenders about <em>" + kws.join(" + ") + "</em>", "Reads " + fresh + " new tenders (title, place, budget)"].concat(hits.slice(0, 3).map(h => "\u2713 " + sh(h[0]) + " <em>match</em>"), non.map(h => "\u2717 " + sh(h[0]) + " skipped"), ["Result: <em>" + hits.length + " matches</em> out of " + fresh]), out: Tb(["Tender", "Location", "Budget"], hits.slice(0, 3).map(h => [sh(h[0]), city(h[2]), "\u20b9" + h[3] + " L"]), hits.length + " matches") });
-            setK(2, hits.length, hits.length ? "AI picked these" : "try other keywords", !hits.length);
-            const tb = $("tb"); tb.innerHTML = "";
-            if (!hits.length) { log("AI found no matching tenders", "bad"); setK(3, 0, ""); tb.innerHTML = '<tr><td class="e0" colspan="6">No matching tenders found for these keywords</td></tr>'; await sleep(1500); reset(); running = false; return }
-            log(hits.length + " matches found by AI");
-            await go(eA, hits.length + " matches");
-            await runV("save", { params: { Operation: "Append rows", Sheet: "Tender Matches" }, lines: ["Open the Tender Matches sheet", "Add 1 row per match: name, source, location, budget, deadline, link", "<em>" + hits.length + " rows added</em>", "The same sheet feeds the table on this page"], out: Tb(["Tender", "Source", "Closes"], hits.slice(0, 3).map(h => [sh(h[0]), h[1], fmtD(h[4])]), hits.length + " rows added") });
-            log(hits.length + " matches saved with deadline and link", "good");
-            for (const h of hits) {
-                const c = h[4] <= 3 ? "r" : h[4] <= 7 ? "a" : "g", tr = document.createElement("tr"); tr.className = "in";
-                tr.innerHTML = `<td>${h[0]}</td><td>${h[1]}</td><td>${h[2]}</td><td>\u20b9${h[3]} L</td><td>${fmtD(h[4])}</td><td><span class="cd ${c}">${h[4]} days left</span></td>`; tb.appendChild(tr); await sleep(140)
-            }
-            await go(eV);
-            const soon = hits.filter(h => h[4] <= 7).length;
-            await runV("cnt", { params: { Language: "JavaScript", Mode: "Run once for all items", Urgent: "3 days or less", Soon: "7 days or less" }, lines: hits.slice(0, 4).map(h => `${sh(h[0]).slice(0, 26)}\u2026: ${fmtD(h[4])} \u2212 today = <em class="${h[4] <= 3 ? "w" : ""}">${h[4]} days</em> \u2192 ${h[4] <= 3 ? "URGENT" : h[4] <= 7 ? "SOON" : "OK"}`).concat([`<em>${soon}</em> tender(s) close within 7 days`]), out: Tb(["Tender", "Days left", "Level"], hits.slice(0, 3).map(h => [sh(h[0]), h[4], h[4] <= 3 ? "URGENT" : h[4] <= 7 ? "SOON" : "OK"]), hits.length + " items with countdown") });
-            setK(3, soon, soon ? "act on these first" : "", soon > 0);
-            await go(eN);
-            await runV("mail", { params: { To: "client@yourcompany.com", Subject: hits.length + " new tender(s) match: " + kws.join(", ") }, lines: ["Build the message from the matches and countdowns", "List each tender with its closing date", "Connect to the mail server (SMTP) and send", "Server replies <em>250 OK</em>: delivered to client@yourcompany.com"], out: mailCard(hits, kws) });
-            mailIn(hits, kws); log("Alert delivered to client@yourcompany.com", "good");
-            $("banner").textContent = "Alert sent: " + hits.length + " new tenders, nearest closes in " + hits[0][4] + " days"; $("banner").style.display = "block";
-            await sleep(1800); reset(); running = false
-        }
-        $("det").onclick = e => { detail = !detail; e.target.textContent = "Node details: " + (detail ? "On" : "Off") }; $("go").onclick = () => cycle(); $("kw").addEventListener("keydown", e => { if (e.key === "Enter") cycle() });
-        $("play").onclick = e => { playing = !playing; e.target.textContent = playing ? "Pause auto-scan" : "Resume auto-scan" };
-        log("Ready. Enter keywords and press Find tenders");
-        (async () => { await sleep(1200); cycle(); while (true) { await sleep(30000); if (playing && !running) cycle() } })();
-    </script>
-</body>
-
-</html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Live Workflow: Tender / Opportunity Hunter</title>
+<style>
+:root{--bg:#f3f5fb;--card:rgba(255,255,255,.82);--text:#0f172a;--mut:#64748b;--line:#dde3f0;--good:#059669;--bad:#e11d48;--gold:#d97706;--canvas:#f7f8fb;--dot:#d3d8e4;--nb:#fff;--nl:#c5cad8;--edge:#9aa1b5;--coral:#ff6d5a;--ok:#2fae6b;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070b16;--card:rgba(20,28,50,.72);--text:#eef2ff;--mut:#94a3c4;--line:rgba(148,163,210,.22);--good:#34d399;--bad:#fb7185;--gold:#fbbf24;--canvas:#14161f;--dot:#2c3040;--nb:#262938;--nl:#454a5e;--edge:#6b7390;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#070b16;--card:rgba(20,28,50,.72);--text:#eef2ff;--mut:#94a3c4;--line:rgba(148,163,210,.22);--good:#34d399;--bad:#fb7185;--gold:#fbbf24;--canvas:#14161f;--dot:#2c3040;--nb:#262938;--nl:#454a5e;--edge:#6b7390;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:radial-gradient(900px 480px at 12% -8%,rgba(255,109,90,.16),transparent),radial-gradient(700px 420px at 100% 0,rgba(79,70,229,.12),transparent),var(--bg);background-attachment:fixed;min-height:100vh}
+main{max-width:1040px;margin:0 auto;padding:26px 14px 30px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:30px;margin:0;font-weight:800;letter-spacing:-.035em;background:linear-gradient(90deg,var(--text) 40%,var(--coral));-webkit-background-clip:text;background-clip:text;color:transparent}
+.live{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--good);border:1px solid var(--good);padding:4px 11px;border-radius:999px;display:inline-flex;gap:7px;align-items:center}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--good);animation:pu 1.4s infinite}@keyframes pu{50%{opacity:.25;transform:scale(1.6)}}
+p.sub{margin:6px 0 14px;color:var(--mut);font-size:14px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 10px}.tab{padding:8px 16px;font-size:13.5px}.tab.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+button{font:inherit;font-weight:600;padding:10px 20px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;transition:transform .15s}
+button:active{transform:scale(.96)}button:focus-visible{outline:2px solid var(--coral);outline-offset:2px}button.p{background:linear-gradient(135deg,#ff6d5a,#ff8a5a);border:0;color:#fff;box-shadow:0 10px 24px -10px #ff6d5a}
+.card{background:var(--card);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 18px 40px -20px rgba(15,23,42,.35)}
+.cvw{position:relative}
+.cv{position:relative;border-radius:20px;border:1px solid var(--line);overflow-x:auto;background-color:var(--canvas);background-image:radial-gradient(var(--dot) 1.2px,transparent 1.2px);background-size:22px 22px}
+.cv svg{min-width:880px;width:100%;display:block;transition:opacity .25s}.cv.dim svg{opacity:.25}
+.chip{position:sticky;left:12px;top:12px;display:inline-flex;gap:10px;align-items:center;margin:12px;padding:6px 12px;border-radius:10px;background:var(--nb);border:1px solid var(--nl);font-size:12px;font-weight:600;z-index:2}.chip b{color:var(--ok);font-weight:600}
+.nd .b{fill:var(--nb);stroke:var(--nl);stroke-width:1.5;transition:stroke .25s}
+.nd text{fill:var(--text);font-size:12px;font-weight:600;text-anchor:middle}.nd .s{fill:var(--mut);font-size:10px;font-weight:400}
+.nd.run .b{stroke:var(--coral);stroke-width:2;stroke-dasharray:6 4;animation:d .6s linear infinite;filter:drop-shadow(0 0 6px var(--coral))}
+.nd.ok .b{stroke:var(--ok);stroke-width:2}.nd.gold .b{stroke:var(--gold);stroke-width:2;filter:drop-shadow(0 0 6px var(--gold))}
+.bg{display:none}.nd.ok .bg{display:block}.bg circle{fill:var(--ok)}
+.ed{fill:none;stroke:var(--edge);stroke-width:1.8;transition:stroke .3s}.ed.ok{stroke:var(--ok)}@keyframes d{to{stroke-dashoffset:-10}}
+.mk{fill:var(--edge)}
+.il{fill:var(--ok);font-size:10px;font-weight:600;opacity:0;transition:.3s}.il.show{opacity:1}
+.pk{fill:var(--coral);filter:drop-shadow(0 0 7px var(--coral))}.pk.gold{fill:var(--gold);filter:drop-shadow(0 0 8px var(--gold))}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.k{position:relative;overflow:hidden}.k::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--coral),#ff8a5a)}
+.k .l{color:var(--mut);text-transform:uppercase;letter-spacing:.07em;font-size:11px;font-weight:600}.k .v{font-size:29px;font-weight:800;letter-spacing:-.035em;margin:4px 0;font-variant-numeric:tabular-nums}.k .d{font-size:12px;color:var(--good)}
+.k.flag{border-color:var(--gold)}.k.flag::before{background:var(--gold)}.k.flag .d{color:var(--gold)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+h2{font-size:11.5px;margin:0 0 8px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+ul{list-style:none;margin:0;padding:0;font-size:13px}li{padding:5px 0;border-bottom:1px solid var(--line)}li:last-child{border:0}li b{color:var(--mut);font-weight:500;margin-right:6px}
+li.gold{color:var(--gold)}li.bad{color:var(--bad)}li.good{color:var(--good)}
+.bars rect{fill:var(--coral);opacity:.5;transform-box:fill-box;transform-origin:bottom}.bars rect.vip{fill:var(--gold);opacity:.85}.bars rect.new{opacity:1;animation:g .6s ease-out;filter:drop-shadow(0 0 6px var(--coral))}@keyframes g{from{transform:scaleY(0)}}.bars text{fill:var(--mut);font-size:10px;text-anchor:middle}
+.ndv{position:absolute;left:50%;top:50%;width:min(640px,94%);max-height:96%;overflow:hidden;transform:translate(-50%,-46%) scale(.94);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;background:var(--nb);border:1px solid var(--nl);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);z-index:5}
+.ndv.open{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.nh{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--nl)}.nh svg{width:32px;height:32px;flex:none}.nh b{display:block;font-size:15px}.nh small{color:var(--mut);font-size:11px}
+.pill{margin-left:auto;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--coral);color:var(--coral)}.pill.ok{border-color:var(--ok);color:var(--ok)}
+.nb{padding:12px 16px;display:grid;gap:12px;max-height:390px;overflow-y:auto}.nb h4{margin:0 0 6px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+.pm{display:flex;flex-wrap:wrap;gap:6px}.pm span{font-size:11.5px;padding:3px 9px;border-radius:8px;background:rgba(255,109,90,.12)}.pm span b{color:var(--mut);font-weight:600;margin-right:5px}
+.ln{font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;padding:6px 10px;border-left:3px solid var(--coral);margin-bottom:4px;opacity:0;transform:translateX(-8px);animation:cr .35s forwards;background:rgba(127,127,127,.08);border-radius:0 8px 8px 0}.ln em{font-style:normal;font-weight:700;color:var(--coral)}.ln em.w{color:var(--bad)}.ln b{color:var(--mut)}@keyframes cr{to{opacity:1;transform:none}}
+.ot table{width:100%;border-collapse:collapse;font-size:11.5px}.ot th{text-align:left;color:var(--mut);font-weight:600;padding:3px 6px;border-bottom:1px solid var(--nl)}.ot td{padding:3px 6px}.ot p{margin:6px 0 0;font-size:11.5px;color:var(--ok);font-weight:700}
+.inb{margin:12px 0 0}.ib{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);opacity:0;animation:cr .5s forwards}.ib:last-child{border:0}.ib i{width:9px;height:9px;border-radius:50%;background:var(--gold);margin-top:6px;flex:none}.ib i.g{background:var(--ok)}.ib b{display:block;font-size:13px}.ib small{color:var(--mut);font-size:12px}.ib .t{margin-left:auto;font-size:11px;color:var(--mut);white-space:nowrap}.cnt{display:inline-block;min-width:20px;text-align:center;padding:1px 7px;border-radius:999px;background:var(--gold);color:#fff;font-size:11px;margin-left:6px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
+</style></head><body><main>
+<div class="top"><h1>Tender / Opportunity Hunter</h1><span class="live"><i></i>LIVE SIMULATION</span></div>
+<p class="sub">Autonomous Government & Enterprise Procurement discovery pipeline split into 3 parts as it runs inside n8n: 1) Portal Scraping & NIT Download, 2) AI Scope & Eligibility Scoring, and 3) Priority Alerts & Bid Room Sync. Scrapes GeM, CPPP, and state portals daily.</p>
+<div class="tabs" id="tabs"></div>
+<h2 id="title" style="font-size:18px;color:var(--text);text-transform:none;letter-spacing:-.01em;margin:4px 0 2px"></h2>
+<p class="sub" id="sub" style="margin-top:0"></p>
+<div class="bar"><span id="bt" style="display:contents"></span><button id="play">Pause</button><button id="det">Node details: On</button></div>
+<div class="cvw"><div class="cv"><div class="chip"><span id="chipt"></span> <b>● Active</b></div><svg id="w" viewBox="0 0 1060 500" role="img" aria-label="n8n style tender hunter workflow"></svg></div><div class="ndv" id="ndv"></div></div>
+<div class="card inb" id="inbox" style="display:none"><h2><span id="itt"></span> <span class="cnt" id="icnt">0</span></h2><div id="ibl"></div></div>
+<div class="kpis" id="kpis"></div>
+<div class="two"><div class="card"><h2 id="ctt"></h2><svg class="bars" id="ch" viewBox="0 0 340 130"></svg></div><div class="card"><h2>Activity log</h2><ul id="log"></ul></div></div>
+</main>
+<script>
+const NS="http://www.w3.org/2000/svg",$=i=>document.getElementById(i);
+const el=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)),nf=n=>Math.round(n).toLocaleString("en-IN"),pf=n=>n.toFixed(1)+"%",rnd=a=>a[Math.floor(Math.random()*a.length)],tm=()=>new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+const st=(c,w=2)=>`stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+const IC={
+ wh:`<circle cx="12" cy="12" r="3" fill="#ff6d5a"/><path d="M5 12a7 7 0 0 1 14 0M2 12a10 10 0 0 1 20 0" ${st("#ff6d5a")}/>`,
+ fm:`<rect x="4" y="3" width="16" height="18" rx="2" fill="#ff6d5a"/><path d="M8 8h8M8 12h8M8 16h4" ${st("#fff",1.6)}/>`,
+ ai:'<path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z" fill="#8b5cf6"/>',
+ cd:`<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14" ${st("#0284c7")}/>`,
+ db:`<ellipse cx="12" cy="6" rx="8" ry="3" fill="#0284c7"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" ${st("#0284c7")}/>`,
+ ck:`<rect x="4" y="5" width="16" height="15" rx="2" ${st("#0284c7")}/><path d="M4 10h16M8 3v4M16 3v4" ${st("#0284c7")}/>`,
+ ms:'<path d="M4 5h16v11H9l-5 4z" fill="#10b981"/>',
+ tm:`<circle cx="12" cy="12" r="9" ${st("#8b5cf6")}/><path d="M12 7v5l3 2" ${st("#8b5cf6")}/>`,
+ iff:`<path d="M3 12h6M9 12l8-6M9 12l8 6" ${st("#2fae6b")}/><circle cx="19" cy="6" r="2" fill="#2fae6b"/><circle cx="19" cy="18" r="2" fill="#2fae6b"/>`,
+ bl:`<path d="M6 17v-6a6 6 0 0 1 12 0v6l2 2H4z" fill="#f59e0b"/><path d="M10 21h4" ${st("#f59e0b")}/>`,
+ pr:'<circle cx="12" cy="8" r="4" fill="#0284c7"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z" fill="#0284c7"/>',
+ lg:`<rect x="4" y="3" width="16" height="18" rx="2" fill="#059669"/><path d="M8 9h8M8 13h8M8 17h5" ${st("#fff",1.6)}/>`,
+ sw:`<path d="M3 12h5M8 12l8-7M8 12h8M8 12l8 7" ${st("#8b5cf6")}/>`
+};
+const svg=$("w"),defs=el("defs",{},svg);
+el("path",{d:"M0 0L8 4L0 8z",class:"mk"},el("marker",{id:"ar",markerWidth:8,markerHeight:8,refX:7,refY:4,orient:"auto"},defs));
+const gE=el("g",{},svg),gN=el("g",{},svg),gP=el("g",{},svg);
+const D={},EDG=[],EK={};let NODES=[],wrapN=16;
+const E=(a,b)=>EK[a+">"+b];
+function wrap(s){if(s.length<=wrapN)return[s];const w=s.split(" "),l=[""];w.forEach(x=>{const c=l[l.length-1];if((c+" "+x).trim().length<=wrapN)l[l.length-1]=(c+" "+x).trim();else l.push(x)});return l}
+function addNode([id,name,sub,x,y,ic,tr]){const g=el("g",{class:"nd"},gN);
+ el("path",{class:"b",d:tr?`M${x+32} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+32}a32 32 0 0 1 0-64z`:`M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z`},g);
+ el("g",{transform:`translate(${x+16},${y+16}) scale(1.33)`},g).innerHTML=IC[ic]||IC.cd;
+ const L=wrap(name);L.forEach((t,i)=>el("text",{x:x+32,y:y+80+i*13},g).textContent=t);el("text",{x:x+32,y:y+80+L.length*13,class:"s"},g).textContent=sub;
+ const b=el("g",{class:"bg"},g);el("circle",{cx:x+64,cy:y+4,r:9},b);el("path",{d:`M${x+59.5} ${y+4}l3.2 3.2 6-6.2`,fill:"none",stroke:"#fff","stroke-width":2,"stroke-linecap":"round"},b);
+ D[id]={g,x,y}}
+function addEdge([a,b,lab,dy=-7]){const[x1,y1]=[D[a].x+64,D[a].y+32],[x2,y2]=[D[b].x,D[b].y+32],dx=Math.max(30,(x2-x1)/2);
+ const p=el("path",{class:"ed",d:`M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`,"marker-end":"url(#ar)"},gE);
+ const t=lab?el("text",{x:x1+8,y:y1+dy,class:"il"},gE):null;if(t)t.textContent=lab;EDG.push({p,t});EK[a+">"+b]=EDG.length-1}
+function fly(i,cls,ms){return new Promise(res=>{const p=EDG[i].p,L=p.getTotalLength(),c=el("circle",{r:6,class:"pk "+(cls||"")},gP),t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/ms),q=p.getPointAtLength(L*k);c.setAttribute("cx",q.x);c.setAttribute("cy",q.y);k<1?requestAnimationFrame(f):(c.remove(),res())})(t0)})}
+async function go(a,b,cls,ms=450){const i=E(a,b);await fly(i,cls,ms);EDG[i].p.classList.add("ok");EDG[i].t&&EDG[i].t.classList.add("show")}
+function reset(){Object.values(D).forEach(n=>n.g.setAttribute("class","nd"));EDG.forEach(e=>{e.p.classList.remove("ok");e.t&&e.t.classList.remove("show")})}
+const shown={};let cur,S,running=false,pending=[],detail=true,playing=true,want=null;
+function setK(id,val,f,delta,flag){const c=$("k"+id),v=c.querySelector(".v"),from=shown[id]??val,t0=performance.now();shown[id]=val;(function a(t){const k=Math.min(1,(t-t0)/700);v.textContent=f(from+(val-from)*k);k<1&&requestAnimationFrame(a)})(t0);c.querySelector(".d").textContent=delta||"\u00a0";c.classList.toggle("flag",!!flag)}
+function chart(){const g=$("ch");g.innerHTML="";const m=Math.max(...S.hist,1);S.hist.forEach((v,i)=>{const h=v/m*84,x=8+i*41,last=i==S.hist.length-1;el("rect",{x,y:104-h,width:30,height:h,rx:4,class:(S.xh[i]?"vip ":"")+(last?"new":"")},g);el("text",{x:x+15,y:98-h},g).textContent=v;el("text",{x:x+15,y:120},g).textContent=last?"now":"-"+(S.hist.length-1-i)})}
+function log(m,c){const li=document.createElement("li");if(c)li.className=c;li.innerHTML=`<b>${tm()}</b>${m}`;const u=$("log");u.prepend(li);while(u.children.length>8)u.lastChild.remove()}
+function inboxAdd(b,s,ok){S.q++;S.ib.unshift({b,s,ok,t:tm()});S.ib=S.ib.slice(0,4);drawInbox(true)}
+function drawInbox(anim){const L=$("ibl");L.innerHTML="";$("inbox").style.display=S.ib.length?"block":"none";$("icnt").textContent=S.q;S.ib.forEach((x,i)=>{const d=document.createElement("div");d.className="ib";if(!anim||i)d.style.animation="none",d.style.opacity=1;d.innerHTML=`<i class="${x.ok?"g":""}"></i><div><b>${x.b}</b><small>${x.s}</small></div><span class="t">${x.t}</span>`;L.appendChild(d)})}
+const Pm=o=>Object.entries(o).map(([k,v])=>`<span><b>${k}</b>${v}</span>`).join("");
+const Tb=(f,r,c)=>`<table><tr>${f.map(x=>`<th>${x}</th>`).join("")}</tr>${r.map(a=>`<tr>${a.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</table>${c?`<p>${c}</p>`:""}`;
+const ndv=$("ndv"),cvEl=document.querySelector(".cv");
+async function view(id,sp){
+ const n=NODES.find(x=>x[0]==id);
+ ndv.innerHTML=`<div class="nh"><svg viewBox="0 0 24 24">${IC[n[5]]||IC.cd}</svg><div><b>${n[1]}</b><small>${n[2]} node</small></div><span class="pill" id="pl">Running...</span></div><div class="nb"><div><h4>Parameters</h4><div class="pm">${Pm(sp.params)}</div></div><div><h4>What happens inside</h4><div id="lns"></div></div><div class="ot" id="oo" style="display:none"><h4>Output</h4>${sp.out}</div></div>`;
+ cvEl.classList.add("dim");ndv.classList.add("open");await sleep(400);
+ const L=$("lns");for(const h of sp.lines){const d=document.createElement("div");d.className="ln";d.innerHTML=h;L.appendChild(d);await sleep(340)}
+ $("oo").style.display="block";const p=$("pl");p.textContent="Success";p.className="pill ok";await sleep(900);
+ ndv.classList.remove("open");cvEl.classList.remove("dim");await sleep(250)}
+async function runV(id,sp,cls){const c=D[id].g.classList;c.add("run");if(cls)c.add(cls);if(detail)await view(id,sp);else await sleep(450);c.remove("run");c.add("ok")}
+const done=async()=>{await sleep(1500);reset();running=false;if(want){const k=want;want=null;load(k);return}if(pending.length)DEMOS[cur].run(pending.shift())};
+
+/* ---------- Shared Tender Opportunities ---------- */
+const TENDERS=[
+  ["Supply of Cloud IoT Gateways","Smart City Development Corp","₹85,00,000","GeM Portal",12,91],
+  ["Rooftop Solar EPC Installation","Rail Infrastructure Authority","₹1,40,00,000","CPPP Portal",18,84],
+  ["Campus WiFi & Networking","National Institute of Tech","₹42,00,000","State e-Procure",8,78],
+  ["Data Center Storage Expansion","State Power Discom","₹62,00,000","GeM Portal",21,88],
+  ["Civil Road Resurfacing Works","Public Works Department","₹1,80,00,000","State PWD",15,42]
+];
+const trim=()=>{if(S.hist.length>8){S.hist.shift();S.xh.shift()}};
+
+/* ---------- Part 1: Portal Scraping & NIT Download ---------- */
+async function run1(kind){
+  if(running){pending.push(kind);return}running=true;reset();
+  const [name,auth,val,portal,days,fit]=rnd(TENDERS);
+  const isIneligible=kind==="ineligible"||fit<60;
+  const isMatch=!isIneligible;
+
+  log(`Morning procurement scan: Found tender on ${portal} for ${name}`,"");
+  await runV("cron",{params:{Trigger:"Cron (08:00 AM Daily)",Scope:"GeM + CPPP + State Portals"},lines:["Executing automated multi-portal scraper query",`Active keyword filter: <em>Cloud, IoT, Networking, Solar</em>`],out:Tb(["Scheduler","Status"],[["08:00 AM Daily","Active"]])});
+  await go("cron","scrape");
+  await runV("scrape",{params:{Engine:"Playwright / Cheerio",Target:portal},lines:[`Scraped portal listings: <em>${auth}</em>`,`Found new notice: <strong>${name}</strong>`,`Estimated Value: <em>${val}</em>`],out:Tb(["Notice","Authority"],[[name, auth]],"1 new tender")});
+  await go("scrape","dl");
+  await runV("dl",{params:{App:"HTTP Request",Action:"Download NIT PDF"},lines:[`Download official RFP & Notice Inviting Tender (NIT)`,`Payload: <em>3.8 MB (PDF + Excel BoQ)</em>`],out:Tb(["File","Size"],[["RFP_NIT_Doc.pdf","3.8 MB"]])});
+  await go("dl","ocr");
+  await runV("ocr",{params:{Engine:"PDF Binary Parser",Target:"Eligibility & EMD"},lines:[`Extract mandatory qualifications & past turnover rules`,`Submission Deadline: <strong>${days} days remaining</strong>`,`EMD Status: <em>MSME Exempt / Solvency Required</em>`],out:Tb(["Deadline","EMD"],[[`${days} Days`,"MSME Exempt"]])});
+  await go("ocr","filter");
+  await runV("filter",{params:{Mode:"Switch",Criteria:"Category Match"},lines:[`Evaluating business line criteria`,`Decision: <strong class="${isMatch?'':'w'}">${isMatch?'MATCH (Pass to AI Evaluation)':'SKIP (Civil / Irrelevant)'}</strong>`],out:Tb(["Filter Result"],[[isMatch?"Passed to AI Scoring":"Filtered Out"]])});
+
+  S.tenders++;if(isMatch)S.matched++;S.hist.push(fit);S.xh.push(isMatch?1:0);trim();S.session++;
+  if(isMatch){
+    inboxAdd(`New Tender: ${name}`,`${auth} · ${val} · ${days} days remaining`,true);
+    log(`Tender ${name} passed initial category filters. Ready for AI scoring.`,"good");
+  } else {
+    inboxAdd(`Irrelevant Filtered: ${name}`,`Out of scope category · Automatically skipped`,false);
+    log(`Tender ${name} skipped (out of core domain).`,"gold");
+  }
+  kp1(isMatch);chart();done();
+}
+function kp1(f){setK("a",S.tenders,nf,`+${S.session} this session`);setK("b",S.matched,nf,"rfps parsed",f);setK("c",(S.matched/S.tenders*100),pf,"relevance rate");setK("d",S.avg,n=>n.toFixed(0),"avg win score")}
+
+/* ---------- Part 2: AI Scope & Eligibility Scoring ---------- */
+async function run2(kind){
+  if(running){pending.push(kind);return}running=true;reset();
+  const [name,auth,val,portal,days,baseFit]=rnd(TENDERS);
+  const isHigh=kind==="high"||(!kind&&baseFit>=80);
+  const isDrop=kind==="drop"||baseFit<60;
+  const score=isDrop?45:isHigh?91:baseFit;
+
+  log(`Claude AI scoring tender fit for ${name} (${val})`,"");
+  await runV("trig",{params:{Trigger:"Webhook / Queue Event",Source:"Part 1 Scraping Stream"},lines:[`RFP payload received for technical evaluation`,`Authority: <strong>${auth}</strong>, Value: <em>${val}</em>`],out:Tb(["Tender","Value"],[[name, val]],"1 RFP")});
+  await go("trig","ai");
+  await runV("ai",{params:{Model:"Claude (latest Sonnet)",Rubric:"Turnover + OEM + ISO Rules"},lines:[`Analyze 42 technical specification clauses`,`Turnover requirement: <em>₹25 Lakh past 3 years (Satisfied)</em>`,`Certification check: <em>ISO 27001 & CMMI Level 3 (Verified)</em>`,`Win Probability Score: <strong class="${score>=80?'':'w'}">${score}/100</strong>`],out:Tb(["Fit Score","Win Probability"],[[`${score}/100`,score>=80?"High":score>=60?"Moderate":"Low"]])},score>=80?"":"gold");
+  await go("ai","sw");
+  await runV("sw",{params:{Mode:"Rules Switch",Condition:"Score Thresholds"},lines:[`Routing by qualification score (${score}/100)`,`Branch: <strong>${score>=80?'High Priority Bid Room':score>=60?'Secondary Review':'Disqualified'}</strong>`],out:Tb(["Route Selected"],[[score>=80?"High Priority":score>=60?"Secondary Review":"Disqualified"]])});
+
+  if(score>=80){
+    await go("sw","high");
+    await runV("high",{params:{Priority:"P1 Critical",Action:"Assign Senior Bid Manager"},lines:[`Flagged as prime revenue opportunity`,`Dispatched to fast-track proposal desk`],out:Tb(["Priority"],[["P1 Fast-Track"]])});
+    await go("high","fast","gold");
+    await runV("fast",{params:{App:"HTTP Request",Action:"Trigger Workflow 3 (Bid Room)"},lines:[`Automated trigger sent to Bid Room creation flow`,`Pre-bid meeting countdown initiated`],out:Tb(["Status"],[["Workflow 3 Triggered"]])},"gold");
+    S.high++;
+    inboxAdd(`High-Win Tender: ${name}`,`Score ${score}/100 · ${val} · ${days} days left`,true);
+    log(`Tender ${name} scored ${score}/100. Pushed to Bid Room generation.`,"good");
+  } else if(score>=60){
+    await go("sw","mid");
+    await runV("mid",{params:{Priority:"P2 Secondary",Action:"Team Review"},lines:[`Moderate technical match; subcontractor needed`,`Logged to weekly review queue`],out:Tb(["Priority"],[["P2 Review"]])});
+    inboxAdd(`Review Needed: ${name}`,`Score ${score}/100 · Subcontractor analysis required`,false);
+    log(`Tender ${name} scored ${score}/100. Routed for team review.`,"gold");
+  } else {
+    await go("sw","drop");
+    await runV("drop",{params:{Action:"Archive Record",Reason:"Turnover or OEM mismatch"},lines:[`Disqualification criteria met; bidding unviable`,`Saved to negative archive to prevent rescanning`],out:Tb(["Action"],[["Archived"]])});
+    S.drop++;
+    inboxAdd(`Disqualified: ${name}`,`Score ${score}/100 · Turnover criteria not met`,false);
+    log(`Tender ${name} disqualified (unviable criteria).`,"bad");
+  }
+
+  S.scored++;S.hist.push(score);S.xh.push(score>=80?1:0);trim();S.session++;
+  kp2(score>=80);chart();done();
+}
+function kp2(f){setK("a",S.scored,nf,`+${S.session} this session`);setK("b",S.high,nf,"high-win tenders",f);setK("c",S.scored-S.drop,nf,"qualified bids");setK("d",S.drop,nf,"disqualified")}
+
+/* ---------- Part 3: Priority Alerts & Bid Room Sync ---------- */
+async function run3(kind){
+  if(running){pending.push(kind);return}running=true;reset();
+  const [name,auth,val,portal,days]=rnd(TENDERS);
+
+  log(`Fast-tracking bid package & alerts for ${name} (${auth})`,"");
+  await runV("trig",{params:{Trigger:"High Priority Event Webhook",Score:"91/100"},lines:[`Tender passed technical qualification gate`,`Authority: <strong>${auth}</strong>, Value: <em>${val}</em>`],out:Tb(["Tender","Value"],[[name, val]],"1 bid package")});
+  await go("trig","calc");
+  await runV("calc",{params:{Operation:"JavaScript Code",Engine:"V8"},lines:[`Submission Deadline: <strong>${days} days remaining</strong>`,`Pre-bid Query Deadline: <em>${Math.max(2,days-7)} days</em>`,`EMD Requirement: <em>Exempted for MSME startups</em>`],out:Tb(["Submission","Pre-bid Deadline"],[[`${days} Days`,`${Math.max(2,days-7)} Days`]])});
+  await go("calc","slack");
+  await runV("slack",{params:{App:"Slack & Telegram Bot",Channel:"#procurement-opportunities"},lines:[`Structured opportunity alert posted to #procurement-opportunities`,`Includes 1-tap direct link to tender on <em>${portal}</em>`],out:Tb(["Alert"],[["Delivered to Slack & Telegram"]])});
+
+  await Promise.all([
+    (async()=>{
+      await go("slack","drive");
+      await runV("drive",{params:{App:"Google Drive",Folder:"/Tenders_2026/Active_Bids"},lines:[`Created tender folder: <em>${name.slice(0,25)}</em>`,`Downloaded RFP, BoQ sheets, and Corrigendum PDFs`],out:Tb(["Drive Folder"],[["Created & Organized"]])});
+      await go("drive","doc");
+      await runV("doc",{params:{App:"Google Docs",Template:"prebid_query_template"},lines:[`Auto-drafted Pre-Bid Clarification Query Sheet`,`Populated with clause references from RFP`],out:Tb(["Doc"],[["Pre-Bid Query Draft Ready"]])});
+    })(),
+    (async()=>{
+      await go("slack","sheet");
+      await runV("sheet",{params:{App:"Google Sheets / CRM",Table:"Tender Pipeline"},lines:[`Append row with tender ref, deadline, EMD rules`,`Assigned lead bidding engineer`],out:Tb(["CRM Row"],[["Logged"]])});
+      await go("sheet","cal");
+      await runV("cal",{params:{App:"Google Calendar",Event:"Tender Submission Countdown"},lines:[`Set reminder 48 hours prior to bid lock`,`Calendar invites sent to bidding team`],out:Tb(["Calendar"],[["Alert Scheduled"]])});
+    })()
+  ]);
+
+  S.alerts++;S.hist.push(days);S.xh.push(1);trim();S.session++;
+  inboxAdd(`Bid Room Ready: ${name}`,`${auth} · Slack alerted · Drive room & pre-bid doc generated`,true);
+  log(`Bid room created for ${name}. Slack alerted, CRM updated, pre-bid query drafted.`,"good");
+  kp3(true);chart();done();
+}
+function kp3(f){setK("a",S.alerts,nf,`+${S.session} this session`);setK("b",S.alerts*2,nf,"alerts delivered",f);setK("c",S.alerts,nf,"active bid rooms open");setK("d",0,n=>n,"missed deadlines")}
+
+/* ---------- config: 3-PART TAB CONFIGURATION ---------- */
+const DEMOS={
+d1:{tab:"Part 1: Portal Scraping & NIT Download",title:"Part 1: Procurement Portal Scraping & Document Extraction",sub:"Scheduled morning runner queries GeM, state e-procurement portals, and CPPP registries based on configured client keywords and location filters. Downloads Notice Inviting Tender (NIT) PDFs.",chip:"Portal Scraper & OCR",wrap:15,
+ nodes:[
+   ["cron","Daily 8 AM Scan","Cron",60,200,"tm",1],
+   ["scrape","GeM & CPPP Scraper","Code",270,200,"cd"],
+   ["dl","Download RFP Document","HTTP Request",490,200,"wh"],
+   ["ocr","Parse NIT Text & EMD","Code",720,200,"cd"],
+   ["filter","Eligibility Check","Switch",930,200,"sw"]
+ ],
+ edges:[
+   ["cron","scrape","scheduled run"],
+   ["scrape","dl","new tender notice"],
+   ["dl","ocr","rfp pdf"],
+   ["ocr","filter","tender criteria"]
+ ],
+ btns:[["+ Run Morning Portal Scan","",1],["Simulate GeM IoT Tender (₹85L)","iot"],["Simulate Solar EPC Tender (₹1.4Cr)","solar"],["Simulate Ineligible Category","ineligible"]],
+ k:["Daily Portals Scanned","RFPs Downloaded","Relevance Rate","Avg Quality Score"],chart:"Tender suitability score (gold = high priority)",inbox:"Morning scraped opportunities queue",
+ init:()=>({tenders:342,matched:294,avg:86,hist:[88,91,84,78,92,42,88,85],xh:[1,1,1,0,1,0,1,1],ib:[],q:0,session:0}),kp:()=>kp1(0),run:run1},
+
+d2:{tab:"Part 2: AI Scope & Eligibility Scoring",title:"Part 2: Claude AI Match Scoring & Win Probability",sub:"Claude evaluates the tender scope of work, technical certifications (ISO, CMMI), past performance prerequisites, and financial turnover against company profiles to generate a 1-100 match score.",chip:"AI Bid Evaluation",wrap:15,
+ nodes:[
+   ["trig","Extracted RFP Webhook","Webhook",50,180,"wh",1],
+   ["ai","Claude Evaluates Scope","HTTP Request",250,180,"ai"],
+   ["sw","Win Probability Gate","Switch",470,180,"sw"],
+   ["high","High Priority (80+)","Set",720,80,"ck"],
+   ["mid","Secondary Review (60-79)","Set",720,200,"ms"],
+   ["drop","Disqualified (<60)","Code",720,310,"db"],
+   ["fast","Fast-Track Bid Room","HTTP Request",940,80,"pr"]
+ ],
+ edges:[
+   ["trig","ai"],
+   ["ai","sw","score & rationale"],
+   ["sw","high","High Match (80+)",-14],
+   ["sw","mid","Review (60-79)",0],
+   ["sw","drop","Low Fit (<60)",14],
+   ["high","fast","initiate bid room"]
+ ],
+ btns:[["+ Score Tender Scope","",1],["Simulate High Win Match (91/100)","high"],["Simulate Moderate Opportunity (68/100)","mid"],["Simulate Turnover Disqualification","drop"]],
+ k:["Opportunities Scored","High-Win Tenders","Qualified Bids","Disqualified Early"],chart:"Tender win probability (gold = 80+ fast-track)",inbox:"AI tender qualification queue",
+ init:()=>({scored:186,high:112,drop:24,hist:[91,84,78,92,68,45,88,90],xh:[1,1,0,1,0,0,1,1],ib:[],q:0,session:0}),kp:()=>kp2(0),run:run2},
+
+d3:{tab:"Part 3: Priority Alerts & Bid Room Sync",title:"Part 3: Priority Alerts, Deadlines & Bid Room Sync",sub:"Calculates pre-bid and submission deadlines, alerts the bidding desk via Slack/Telegram with direct portal links, creates a Google Drive bid folder, and drafts pre-bid query sheets.",chip:"Bid Desk Automation",wrap:15,
+ nodes:[
+   ["trig","High Priority Webhook","Webhook",40,200,"wh",1],
+   ["calc","Calculate Deadlines","Code",210,200,"cd"],
+   ["slack","Slack & Telegram Alert","Slack",440,200,"ms"],
+   ["drive","Create Drive Bid Room","Google Drive",680,105,"db"],
+   ["sheet","Log to CRM Tracker","Google Sheets",680,295,"ck"],
+   ["doc","Draft Pre-Bid Query Doc","Google Docs",930,105,"lg"],
+   ["cal","Submission Reminder","Calendar",930,295,"tm"]
+ ],
+ edges:[
+   ["trig","calc"],
+   ["calc","slack","bid brief"],
+   ["slack","drive","create folder",-12],
+   ["slack","sheet","log row",12],
+   ["drive","doc","draft doc"],
+   ["sheet","cal","calendar alert"]
+ ],
+ btns:[["+ Dispatch Bid Package","",1],["Simulate Pre-Bid Alert (12d Left)","urgent"],["Simulate GeM Portal Bid Link","gem"],["Simulate MSME Exemption Flag","msme"]],
+ k:["Bids Fast-Tracked","Alerts Delivered","Active Bid Rooms","Missed Deadlines"],chart:"Submission window in days (gold = active alert)",inbox:"Bidding desk dispatch queue",
+ init:()=>({alerts:84,hist:[12,18,8,21,15,10,14,16],xh:[1,1,1,1,1,1,1,1],ib:[],q:0,session:0}),kp:()=>kp3(0),run:run3}
+};
+
+function load(k){cur=k;const d=DEMOS[k];S=DEMOS[k].S=DEMOS[k].S||d.init();wrapN=d.wrap;
+ document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.k==k));
+ $("title").textContent=d.title;$("sub").textContent=d.sub;$("chipt").textContent=d.chip;$("ctt").textContent=d.chart;$("itt").textContent=d.inbox;
+ gE.innerHTML=gN.innerHTML=gP.innerHTML="";EDG.length=0;for(const i in D)delete D[i];for(const i in EK)delete EK[i];NODES=d.nodes;
+ d.nodes.forEach(addNode);d.edges.forEach(addEdge);
+ $("bt").innerHTML="";d.btns.forEach(([l,kind,pr])=>{const b=document.createElement("button");b.textContent=l;if(pr)b.className="p";b.onclick=()=>d.run(kind);$("bt").appendChild(b)});
+ $("kpis").innerHTML="";for(const i in shown)delete shown[i];d.k.forEach((l,i)=>{const c=document.createElement("div");c.className="card k";c.id="k"+"abcd"[i];c.innerHTML=`<div class="l">${l}</div><div class="v">-</div><div class="d">&nbsp;</div>`;$("kpis").appendChild(c)});
+ $("log").innerHTML="";log("Ready. Press the first button to watch the flow");d.kp();chart();drawInbox(false)}
+const tabs=$("tabs");for(const k in DEMOS){const b=document.createElement("button");b.className="tab";b.dataset.k=k;b.textContent=DEMOS[k].tab;b.onclick=()=>{if(running)want=k;else load(k)};tabs.appendChild(b)}
+$("det").onclick=e=>{detail=!detail;e.target.textContent="Node details: "+(detail?"On":"Off")};
+$("play").onclick=e=>{playing=!playing;e.target.textContent=playing?"Pause":"Resume auto-refresh"};
+load("d1");
+(async()=>{await sleep(1500);while(true){if(playing&&!running)await DEMOS[cur].run("");await sleep(4500)}})();
+</script></body></html>
