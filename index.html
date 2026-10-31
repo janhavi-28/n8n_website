@@ -256,7 +256,7 @@
       border-collapse: separate;
       border-spacing: 0;
       width: 100%;
-      min-width: 1120px
+      min-width: 680px
     }
 
     th,
@@ -336,8 +336,9 @@
 
     td.list {
       min-width: 260px;
-      color: var(--muted);
-      line-height: 1.55
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.6;
     }
 
     .actions {
@@ -1008,7 +1009,7 @@
       operations, accelerate workflows, and scale with predictable ROI.</p>
 
     <div class="bar">
-      <input class="search" id="q" type="search" placeholder="Search 27 automations (e.g. Daily Dashboard, GST, Bank Rec, Quotes...)"
+      <input class="search" id="q" type="search" placeholder="Search automations (e.g. Lead Generation...)"
         aria-label="Search automations">
       <span class="count" id="count"></span>
     </div>
@@ -1017,11 +1018,9 @@
       <table id="tbl">
         <thead>
           <tr>
-            <th scope="col">Automation</th>
-            <th scope="col">Setup fee*</th>
-            <th scope="col">Includes</th>
-            <th scope="col">You provide</th>
-            <th scope="col">Actions</th>
+            <th scope="col" style="width: 28%;">Automation</th>
+            <th scope="col" style="width: 48%;">Detailed Explanation</th>
+            <th scope="col" style="width: 24%;">Actions</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -1030,7 +1029,7 @@
       </div>
     </div>
 
-    <p class="note"><b>* Pricing Transparency:</b> All prices exclude GST. Setup fee is a one-time onboarding,
+    <p class="note" style="display: none;"><b>* Pricing Transparency:</b> All prices exclude GST. Setup fee is a one-time onboarding,
       architecture, and deployment investment. Besides setup fee, additional charges will apply for monthly maintenance
       (from ₹7,500/mo), cloud hosting, AI token consumption, and third-party API credits billed transparently at cost.
     </p>
@@ -1227,279 +1226,331 @@
 
     /* ---- 9 Premium Automations Data ---- */
     const AUTOMATIONS = [
-      {
-        id: "dashboard",
-        name: "Daily Business Dashboard",
-        headline: "See how live executive dashboards work for your business.",
-        desc: "Pulls sales, expenses, inventory and ads into one live executive dashboard with automatic anomaly alerts. Monthly maintenance: ₹9,900/mo.",
-        setup: 49000,
-        maintenance: 9900,
-        includes: "Up to 4 enterprise data sources, custom KPI definitions, anomaly rules, instant Slack/Email alerts, Looker Studio or Sheets executive front-end, hourly refresh. Extra sources available.",
-        needs: "Data source credentials (Sheets, CRM, Ads, Accounting), email/Slack account for alerts, KPI metrics."
-      },
-      {
-        id: "tender",
-        name: "Tender / Opportunity Hunter",
-        headline: "See how automated tender hunting works for your business.",
-        desc: "Scans government and listing portals daily, filtering high-probability tenders with deadline countdown alerts. Monthly maintenance: ₹7,500/mo.",
-        setup: 39000,
-        maintenance: 7500,
-        includes: "GeM and procurement portal scraper, keyword & category intelligence filters, budget and location matching, daily scans, automated deadline alerts.",
-        needs: "Target keywords and category criteria, Google Sheets or database for lead logging, Slack, Telegram or Email for alerts."
-      },
-      {
-        id: "email",
-        name: "Email Campaign Automator",
-        headline: "See how automated email sequences work for your business.",
-        desc: "Automates personalised multi-touch email sequences with dynamic content, automated A/B testing, and deliverability analytics. Monthly maintenance: ₹8,500/mo.",
-        setup: 39000,
-        maintenance: 8500,
-        includes: "Up to 3 custom sequences, A/B test variants, SPF/DKIM/DMARC deliverability setup, CRM list synchronization, weekly analytics summary, up to 10k sends/mo.",
-        needs: "Email service provider account (SES, Mailgun, Brevo or SMTP), verified sending domain, opt-in contact list or CRM, sequence copy."
-      },
-      {
-        id: "lead",
-        name: "Lead Enrichment Pipeline",
-        headline: "See how automated lead enrichment works for your business.",
-        desc: "Enriches raw leads with verified company firmographics, decision-maker contacts, tech stack, and intent signals. Monthly maintenance: ₹9,500/mo.",
-        setup: 59000,
-        maintenance: 9500,
-        includes: "Multi-channel lead intake (form, webhook, Sheet), field mapping, CRM destination sync, deduplication logic, automated lead scoring, up to 1,500 leads/mo.",
-        needs: "Enrichment API key in your own name (Apollo or Hunter), inbound lead sources, destination CRM or database, field mapping schema."
-      },
-      {
-        id: "invoice",
-        name: "Invoice Processing Bot",
-        headline: "See how invoice processing works on auto-pilot.",
-        desc: "Extracts, validates, and routes invoices from email / PDF to your accounting ERP with human review queue. Monthly maintenance: ₹12,500/mo.",
-        setup: 79000,
-        maintenance: 12500,
-        includes: "Dedicated invoice inbox ingestion, OCR extraction, PO and vendor matching rules, accounting ERP push, review queue, up to 500 invoices/mo. Tally bridge available.",
-        needs: "Dedicated invoice inbox (IMAP/Gmail) or Google Drive, accounting software access (Zoho, QuickBooks, Tally bridge), PO and vendor validation rules."
-      },
-      {
-        id: "support",
-        name: "Customer Support AI",
-        headline: "See how 24/7 customer support works with AI.",
-        desc: "Auto-categorises, prioritises, and drafts high-accuracy replies from your company knowledge base with escalation routing. Monthly maintenance: ₹12,500/mo.",
-        setup: 69000,
-        maintenance: 12500,
-        includes: "Helpdesk connection, category and priority classification, knowledge-base AI reply drafting, SLA escalation and routing tags, up to 1,500 tickets/mo.",
-        needs: "Helpdesk with API access (Freshdesk, Zendesk, Intercom), company knowledge base or FAQ documentation, escalation rules and routing tags."
-      },
-
-      {
-        id: "voice",
-        name: "AI Voice Receptionist",
-        headline: "See how AI voice receptionists handle your calls.",
-        desc: "Human-like conversational voice AI that answers inbound phone calls 24/7, qualifies callers, schedules meetings, and routes urgent calls. Monthly maintenance: ₹24,900/mo.",
-        setup: 149000,
-        maintenance: 24900,
-        includes: "Telephony & SIP integration, ultra-low latency voice synthesis, conversational speech AI, calendar booking integration, caller transcription & CRM sync.",
-        needs: "Dedicated business phone number / Twilio or SIP trunk, company FAQ and reception script guidelines, calendar booking integration access."
-      },
-      {
-        id: "sales",
-        name: "AI Sales Agent",
-        headline: "See how autonomous AI sales agents scale revenue.",
-        desc: "Autonomous end-to-end AI sales development agent: identifies target prospects, writes hyper-tailored outreach, handles objections, and books demos.",
-        setup: 199000,
-        maintenance: 29900,
-        includes: "Autonomous lead sourcing, dynamic personalized outreach engine, objection handling AI knowledge base, demo booking automation, full CRM pipeline tracking.",
-        needs: "Ideal Customer Profile (ICP) definitions, sales collateral and playbooks, sales rep calendar booking links, outbound email/LinkedIn infrastructure."
-      },
-      {
-        id: "payment-recovery",
-        name: "Payment Recovery & AR Chaser",
-        headline: "See how automated accounts receivable recovery works.",
-        desc: "Ingests aging balance sheets, sends multi-tier WhatsApp & email payment reminders with 1-tap UPI links, and auto-reconciles payouts.",
-        setup: 69000,
-        maintenance: 9900,
-        includes: "Zoho Books / Tally / QuickBooks sync, aging invoice scanner (1d/7d/15d/30d), dynamic 1-tap UPI payment links, late fee rules, founder escalation alerts.",
-        needs: "Accounting software API (Zoho Books, QuickBooks, or Tally bridge), WhatsApp Cloud API or Twilio, Razorpay or Cashfree payment gateway webhook."
-      },
-      {
-        id: "rto-reduction",
-        name: "E-Commerce NDR & RTO Reduction Bot",
-        headline: "See how AI protects D2C brands from RTO courier losses.",
-        desc: "Verifies address & GPS pin drop via WhatsApp, intercepts courier non-delivery reports (NDR) with automated AI calls, and cuts RTO returns in half.",
-        setup: 79000,
-        maintenance: 12500,
-        includes: "Shopify / WooCommerce webhook listener, automated WhatsApp address confirmation, courier API sync (Shiprocket / Delhivery), outbound AI voice re-attempt scheduler, inventory restock.",
-        needs: "Shopify or WooCommerce store API, Shiprocket or Delhivery logistics API key, WhatsApp Cloud API or Twilio voice."
-      },
-      {
-        id: "review-booster",
-        name: "Google Reviews & Reputation Booster",
-        headline: "See how automated review generation builds local trust.",
-        desc: "Surveys clients after visits via WhatsApp: routes 5-star happy customers directly to Google Maps, while intercepting unhappy 1-star feedback privately to the manager.",
-        setup: 49000,
-        maintenance: 7500,
-        includes: "CRM visit completion webhook, automated WhatsApp star rating poll, smart routing (5★ -> Google Maps; 1-3★ -> Manager private alert), AI SEO review reply generator.",
-        needs: "Google Business Profile admin access, CRM or POS checkout webhook, WhatsApp Cloud API."
-      },
-
-      {
-        id: "content-repurposer",
-        name: "Social Media AI Content Repurposer",
-        headline: "See how 1 video turns into 20+ viral social media posts.",
-        desc: "Ingests founder videos/podcasts from Loom or Google Drive, transcribes with Whisper AI, synthesizes 3 viral LinkedIn posts + 1 Twitter thread, and schedules via Buffer.",
-        setup: 59000,
-        maintenance: 8500,
-        includes: "Google Drive / Loom folder trigger, Whisper large-v3 transcription, Claude 3.5 hook and narrative distiller, LinkedIn & Twitter formatting engine, Buffer / Postiz multi-platform scheduler, Notion editorial calendar sync.",
-        needs: "Google Drive or Loom access, Buffer or Postiz scheduler account, LinkedIn & X profile credentials, brand voice guidelines."
-      },
-      {
-        id: "gst",
-        name: "GST Document Collector",
-        headline: "See how automated GST document collection eliminates manual follow-ups.",
-        desc: "Runs 7 days before filing dates (4th & 18th), scans active clients for pending filing status, and sends automated WhatsApp upload links with real-time status logging.",
-        setup: 49000,
-        maintenance: 7500,
-        includes: "Cron schedule trigger (4th & 18th of month), Google Sheets / Airtable connector, Filing Status filter node, official WhatsApp Business upload link dispatcher, follow-up counter logging.",
-        needs: "Client registry in Google Sheets or Airtable, Meta WhatsApp Cloud API credentials, GST document collection portal link."
-      },
-      {
-        id: "bankrec",
-        name: "Bank Reconciliation Assistant",
-        headline: "See how automated statement parsing reconciles ledgers in minutes.",
-        desc: "Ingests bank CSV/Excel statements via webhook or Drive watcher, parses lines into structured JSON, matches transactions against ERP unpaid invoices, and routes discrepancies to Slack.",
-        setup: 69000,
-        maintenance: 9900,
-        includes: "Statement webhook / Drive watcher trigger, JavaScript CSV parser node, ERP / Airtable unpaid ledger lookup, automated match switch router, Slack / Teams accountant tag with review link.",
-        needs: "Bank statement export access (CSV or Excel), Accounting / ERP API (Zoho Books, Tally, QuickBooks), Slack or Microsoft Teams webhook."
-      },
-      {
-        id: "expense",
-        name: "Employee Expense Claim Bot",
-        headline: "See how WhatsApp receipt photos convert into approved expense vouchers.",
-        desc: "Employees snap receipt photos on WhatsApp; AI extracts vendor, date, and items via structured OCR, checks policy compliance limits, and auto-logs or requests manager sign-off.",
-        setup: 59000,
-        maintenance: 8500,
-        includes: "WhatsApp Business media listener, Meta binary download pipeline, Claude/OpenAI structured receipt OCR, policy limit matrix evaluation (e.g. food, fuel, travel), Zoho Expense / Sheets integration.",
-        needs: "Meta WhatsApp Cloud API credentials, OpenAI or Anthropic API key, Zoho Expense or Google Sheets destination."
-      },
-      {
-        id: "quote",
-        name: "Quotation and Proposal Generator",
-        headline: "See how inbound inquiries turn into branded PDF proposals in seconds.",
-        desc: "Captures web inquiries from Elementor or Typeform, fetches live SKU pricing & taxes from Postgres, compiles customized branded PDF proposals, emails the client, and schedules follow-up nudges.",
-        setup: 49000,
-        maintenance: 7500,
-        includes: "Website form webhook listener, Supabase / PostgreSQL pricing engine, Carbone / Google Docs PDF compiler, Gmail / Outlook email sender with thread tracking, 3-day wait auto-followup sequence.",
-        needs: "Website lead form webhook endpoint, PostgreSQL or Supabase database with SKU rates, Google Workspace or Microsoft 365 credentials."
-      },
-      {
-        id: "orders",
-        name: "WhatsApp Order Capture for Dealers",
-        headline: "See how voice notes and texts from dealers convert directly into Tally sales orders.",
-        desc: "Listens for text and voice notes from distributor numbers, transcribes voice via Whisper AI, matches items against vector product catalogs, requests confirmation, and injects sales orders into ERP.",
-        setup: 79000,
-        maintenance: 12500,
-        includes: "WhatsApp Business Cloud API listener, OpenAI Whisper voice-to-text converter, semantic product SKU vector matcher, dynamic confirmation interactive loop, Tally / Zoho Books sales order injection.",
-        needs: "Meta WhatsApp Cloud API access, OpenAI API key, Tally Prime (with API/bridge) or Zoho Books account."
-      },
-      {
-        id: "reorder",
-        name: "Inventory Reorder and Supplier PO",
-        headline: "See how stockout prevention automatically audits inventory and drafts supplier POs.",
-        desc: "Runs every midnight to audit stock balances across your ERP, detects items dipping below safety thresholds, drafts formal POs in Google Docs, and alerts procurement managers on Slack for approval.",
-        setup: 59000,
-        maintenance: 8900,
-        includes: "Daily midnight Cron scheduler, Tally Prime / ERP connector, inventory threshold filter node, Google Docs PO template generator, Slack interactive approval card, automated supplier email dispatch.",
-        needs: "ERP inventory database access, Slack workspace with bot permissions, Google Workspace account."
-      },
-      {
-        id: "renewals",
-        name: "Compliance and Renewal Tracker",
-        headline: "See how tiered reminders eliminate compliance fines and lapsed licenses.",
-        desc: "Scans contracts, SaaS subscriptions, trade licenses, and insurance policies daily; sends multi-tier escalations at 60/30/15/7 days to owners, facility managers, and company directors.",
-        setup: 39000,
-        maintenance: 5900,
-        includes: "Daily morning Cron scanner, Airtable / Notion compliance table reader, 4-tier timeframe switch node, automated email notifications (60/30d), SMS/WhatsApp facility alerts (15d), Slack directors channel escalation (7d).",
-        needs: "Document registry in Airtable, Notion, or Google Sheets, Slack or Microsoft Teams webhook, WhatsApp or SMS gateway."
-      },
-      {
-        id: "recruit",
-        name: "Resume Screening and Interview Scheduler",
-        headline: "See how AI scores applicant resumes against job descriptions and books calls.",
-        desc: "Ingests incoming resumes from portals or inbox, reads PDF/DOCX binaries, scores candidate fit 1-100 against your role rubric with OpenAI, and sends calendar booking links to top talent.",
-        setup: 59000,
-        maintenance: 8500,
-        includes: "Applicant webhook / Email inbox reader, PDF/DOCX binary text extractor, OpenAI structured scoring rubric (1-100), qualification gatekeeper (score > 75), Cal.com / Calendly calendar integration, candidate email sender.",
-        needs: "Job description evaluation prompt, OpenAI API key, Cal.com or Calendly account, recruitment inbox access."
-      },
-      {
-        id: "payroll",
-        name: "Attendance-to-Payslip Prep",
-        headline: "See how monthly biometric attendance transforms into verified payslips.",
-        desc: "Triggers on the 1st of every month, ingests biometric logs and HRMS leave balances, calculates gross, deductions, and net payouts, flags negative leave anomalies, and bulk-distributes PDF payslips.",
-        setup: 69000,
-        maintenance: 9900,
-        includes: "1st of month Cron trigger, Biometric log / HRMS API aggregator, salary calculation code engine (PF, ESI, TDS, LOP), anomaly review gatekeeper, bulk PDF slip generator, secure WhatsApp & Email distribution.",
-        needs: "Biometric machine API or HRMS credentials, salary and tax rule structure, Google Workspace or SMTP email sender."
-      },
-      {
-        id: "realestate",
-        name: "Real Estate Lead Qualifier",
-        headline: "See how 99acres and MagicBricks leads are qualified on WhatsApp within 30 seconds.",
-        desc: "Ingests fresh property inquiries from 99acres, MagicBricks, or Meta Ads, logs them in CRM, triggers interactive WhatsApp budget & timeline surveys, and instantly connects high-intent buyers with sales reps.",
-        setup: 49000,
-        maintenance: 7500,
-        includes: "Portal webhook listener (99acres, MagicBricks, Meta Lead Ads), HubSpot / Salesforce CRM connector, WhatsApp Business interactive budget questionnaire, hot lead live call routing, email nurture drip.",
-        needs: "Real estate portal webhook access or lead sync app, Meta WhatsApp Cloud API credentials, CRM account (HubSpot, LeadSquared, Salesforce)."
-      },
-      {
-        id: "dispatch",
-        name: "Service Job Dispatcher",
-        headline: "See how maintenance tickets are automatically assigned to nearby field technicians.",
-        desc: "Captures customer service tickets, matches postal codes against technician operational territories, pings technicians on WhatsApp with 1-tap Accept/Reject buttons, and updates customers with live ETAs.",
-        setup: 69000,
-        maintenance: 9900,
-        includes: "Support ticket / portal webhook listener, Google Maps postal zone geocoder, WhatsApp interactive dispatch message with action buttons, technician response listener, customer ETA notification engine.",
-        needs: "Helpdesk software API (Freshdesk, Zoho Desk) or custom portal webhook, Google Maps Distance Matrix API, WhatsApp Cloud API."
-      },
-      {
-        id: "admissions",
-        name: "Student Admission and Parent Update Bot",
-        headline: "See how school inquiries convert to enrolled students with instant follow-ups.",
-        desc: "Captures school landing page inquiries, sends prospectus brochures over WhatsApp & Email, creates follow-up tasks for academic counselors, monitors Razorpay fee links, and confirms admissions.",
-        setup: 49000,
-        maintenance: 7500,
-        includes: "Landing page inquiry webhook, automated brochure PDF dispatch via Email & WhatsApp, ClickUp / Google Tasks counselor task creation, Razorpay fee payment webhook monitor, admission confirmation messaging.",
-        needs: "School landing page form endpoint, Meta WhatsApp Cloud API credentials, Razorpay or Instamojo payment gateway account."
-      },
-      {
-        id: "cart",
-        name: "Abandoned Cart Recovery",
-        headline: "See how automated 45-minute recovery sequences rescue lost D2C revenue.",
-        desc: "Hooks into Shopify/WooCommerce cart abandonment events, pauses for 45 minutes to allow organic checkout, checks if order was completed, and triggers personalized WhatsApp/email recovery discounts.",
-        setup: 39000,
-        maintenance: 6500,
-        includes: "Shopify / WooCommerce abandoned checkout webhook listener, 45-minute smart delay timer, post-delay order verification node, personalized WhatsApp & Email recovery sender with dynamic 5% coupon link.",
-        needs: "Shopify or WooCommerce store admin API, WhatsApp Cloud API or Klaviyo / Mailchimp account."
-      },
-      {
-        id: "sync",
-        name: "Multi-Channel Stock and Price Sync",
-        headline: "See how warehouse inventory changes broadcast across Amazon, Flipkart, and Shopify in 3 seconds.",
-        desc: "Eliminates stockouts and marketplace penalties by catching inventory update events on your master store, standardizing SKU counts, and executing parallel API updates across WooCommerce, Amazon, and Flipkart.",
-        setup: 69000,
-        maintenance: 9900,
-        includes: "Master store inventory webhook listener, SKU standardizer and batch splitter, parallel execution broadcast engine, WooCommerce REST API sync, Amazon SP-API & Flipkart Marketplace Merchant API update nodes.",
-        needs: "Shopify / WooCommerce store API, Amazon Seller SP-API credentials, Flipkart Seller API access."
-      },
-      {
-        id: "knowledge",
-        name: "Company Knowledge Assistant",
-        headline: "See how internal SOPs and policies answer staff questions with verified citations.",
-        desc: "Staff ask questions in Slack or WhatsApp; AI creates query embeddings, searches your Pinecone/Qdrant vector database of indexed company SOPs, and returns grounded answers with exact source links.",
-        setup: 79000,
-        maintenance: 12500,
-        includes: "Slack & WhatsApp Bot trigger listener, OpenAI text embeddings pipeline, Pinecone / Qdrant vector database connector for company SOPs/PDFs, Claude / GPT-4o grounded answer generator with source citations.",
-        needs: "Company SOPs, handbooks, or policy PDFs, Slack workspace or WhatsApp Business account, Pinecone or Qdrant vector database, OpenAI API key."
-      }
-    ];
+  {
+    "id": "dashboard",
+    "name": "Daily Business Dashboard",
+    "headline": "See how live executive dashboards work for your business.",
+    "desc": "Pulls sales, expenses, inventory and ads into one live executive dashboard with automatic anomaly alerts. Monthly maintenance: ₹9,900/mo.",
+    "setup": 49000,
+    "maintenance": 9900,
+    "includes": "Up to 4 enterprise data sources, custom KPI definitions, anomaly rules, instant Slack/Email alerts, Looker Studio or Sheets executive front-end, hourly refresh. Extra sources available.",
+    "needs": "Data source credentials (Sheets, CRM, Ads, Accounting), email/Slack account for alerts, KPI metrics.",
+    "summary": "Consolidates sales, ad spend, inventory, and CRM data from multiple sources into a real-time executive dashboard with automated anomaly detection and Slack/email alerts.",
+    "hidden": true
+  },
+  {
+    "id": "tender",
+    "name": "Tender / Opportunity Hunter",
+    "headline": "See how automated tender hunting works for your business.",
+    "desc": "Scans government and listing portals daily, filtering high-probability tenders with deadline countdown alerts. Monthly maintenance: ₹7,500/mo.",
+    "setup": 39000,
+    "maintenance": 7500,
+    "includes": "GeM and procurement portal scraper, keyword & category intelligence filters, budget and location matching, daily scans, automated deadline alerts.",
+    "needs": "Target keywords and category criteria, Google Sheets or database for lead logging, Slack, Telegram or Email for alerts.",
+    "summary": "Scrapes GeM and e-procurement portals daily, filters opportunities using AI keyword matching, and delivers instant alerts with direct bid links.",
+    "hidden": true
+  },
+  {
+    "id": "email",
+    "name": "Email Campaign Automator",
+    "headline": "See how automated email sequences work for your business.",
+    "desc": "Automates personalised multi-touch email sequences with dynamic content, automated A/B testing, and deliverability analytics. Monthly maintenance: ₹8,500/mo.",
+    "setup": 39000,
+    "maintenance": 8500,
+    "includes": "Up to 3 custom sequences, A/B test variants, SPF/DKIM/DMARC deliverability setup, CRM list synchronization, weekly analytics summary, up to 10k sends/mo.",
+    "needs": "Email service provider account (SES, Mailgun, Brevo or SMTP), verified sending domain, opt-in contact list or CRM, sequence copy.",
+    "summary": "Orchestrates multi-stage personalized cold and warm email sequences with A/B testing, deliverability safeguards, and CRM reply tracking.",
+    "hidden": true
+  },
+  {
+    "id": "lead",
+    "name": "Lead Generation Pipeline",
+    "headline": "See how automated lead enrichment works for your business.",
+    "desc": "Enriches raw leads with verified company firmographics, decision-maker contacts, tech stack, and intent signals. Monthly maintenance: ₹9,500/mo.",
+    "setup": 59000,
+    "maintenance": 9500,
+    "includes": "Multi-channel lead intake (form, webhook, Sheet), field mapping, CRM destination sync, deduplication logic, automated lead scoring, up to 1,500 leads/mo.",
+    "needs": "Enrichment API key in your own name (Apollo or Hunter), inbound lead sources, destination CRM or database, field mapping schema.",
+    "summary": "Captures inbound leads across web forms, landing pages, and email channels, enriches company & verified contact data, scores buyer intent with AI, and routes qualified prospects directly to your CRM.",
+    "hidden": false
+  },
+  {
+    "id": "invoice",
+    "name": "Invoice Processing Bot",
+    "headline": "See how invoice processing works on auto-pilot.",
+    "desc": "Extracts, validates, and routes invoices from email / PDF to your accounting ERP with human review queue. Monthly maintenance: ₹12,500/mo.",
+    "setup": 79000,
+    "maintenance": 12500,
+    "includes": "Dedicated invoice inbox ingestion, OCR extraction, PO and vendor matching rules, accounting ERP push, review queue, up to 500 invoices/mo. Tally bridge available.",
+    "needs": "Dedicated invoice inbox (IMAP/Gmail) or Google Drive, accounting software access (Zoho, QuickBooks, Tally bridge), PO and vendor validation rules.",
+    "summary": "Ingests billing emails, extracts line items via OCR, performs automated 3-way matching against POs, and books verified invoices into your ERP system.",
+    "hidden": true
+  },
+  {
+    "id": "support",
+    "name": "Customer Support AI",
+    "headline": "See how 24/7 customer support works with AI.",
+    "desc": "Auto-categorises, prioritises, and drafts high-accuracy replies from your company knowledge base with escalation routing. Monthly maintenance: ₹12,500/mo.",
+    "setup": 69000,
+    "maintenance": 12500,
+    "includes": "Helpdesk connection, category and priority classification, knowledge-base AI reply drafting, SLA escalation and routing tags, up to 1,500 tickets/mo.",
+    "needs": "Helpdesk with API access (Freshdesk, Zendesk, Intercom), company knowledge base or FAQ documentation, escalation rules and routing tags.",
+    "summary": "Classifies incoming helpdesk tickets by sentiment and urgency, drafts instant AI resolutions from your knowledge base, and escalates critical P1 issues.",
+    "hidden": true
+  },
+  {
+    "id": "voice",
+    "name": "AI Voice Receptionist",
+    "headline": "See how AI voice receptionists handle your calls.",
+    "desc": "Human-like conversational voice AI that answers inbound phone calls 24/7, qualifies callers, schedules meetings, and routes urgent calls. Monthly maintenance: ₹24,900/mo.",
+    "setup": 149000,
+    "maintenance": 24900,
+    "includes": "Telephony & SIP integration, ultra-low latency voice synthesis, conversational speech AI, calendar booking integration, caller transcription & CRM sync.",
+    "needs": "Dedicated business phone number / Twilio or SIP trunk, company FAQ and reception script guidelines, calendar booking integration access.",
+    "summary": "Handles incoming business phone calls with natural, ultra-low latency voice AI, answers common FAQs, books calendar appointments, and transfers VIP callers.",
+    "hidden": true
+  },
+  {
+    "id": "sales",
+    "name": "AI Sales Agent",
+    "headline": "See how autonomous AI sales agents scale revenue.",
+    "desc": "Autonomous end-to-end AI sales development agent: identifies target prospects, writes hyper-tailored outreach, handles objections, and books demos.",
+    "setup": 199000,
+    "maintenance": 29900,
+    "includes": "Autonomous lead sourcing, dynamic personalized outreach engine, objection handling AI knowledge base, demo booking automation, full CRM pipeline tracking.",
+    "needs": "Ideal Customer Profile (ICP) definitions, sales collateral and playbooks, sales rep calendar booking links, outbound email/LinkedIn infrastructure.",
+    "summary": "Researches prospects, drafts hyper-personalized multi-channel sales outreach, handles common objections, and schedules qualified demos on sales reps' calendars.",
+    "hidden": true
+  },
+  {
+    "id": "payment-recovery",
+    "name": "Payment Recovery & AR Chaser",
+    "headline": "See how automated accounts receivable recovery works.",
+    "desc": "Ingests aging balance sheets, sends multi-tier WhatsApp & email payment reminders with 1-tap UPI links, and auto-reconciles payouts.",
+    "setup": 69000,
+    "maintenance": 9900,
+    "includes": "Zoho Books / Tally / QuickBooks sync, aging invoice scanner (1d/7d/15d/30d), dynamic 1-tap UPI payment links, late fee rules, founder escalation alerts.",
+    "needs": "Accounting software API (Zoho Books, QuickBooks, or Tally bridge), WhatsApp Cloud API or Twilio, Razorpay or Cashfree payment gateway webhook.",
+    "summary": "Monitors overdue invoices across aging tiers, dispatches polite 1-tap UPI WhatsApp payment reminders, and auto-reconciles incoming payments in your ledger.",
+    "hidden": true
+  },
+  {
+    "id": "rto-reduction",
+    "name": "E-Commerce NDR & RTO Reduction Bot",
+    "headline": "See how AI protects D2C brands from RTO courier losses.",
+    "desc": "Verifies address & GPS pin drop via WhatsApp, intercepts courier non-delivery reports (NDR) with automated AI calls, and cuts RTO returns in half.",
+    "setup": 79000,
+    "maintenance": 12500,
+    "includes": "Shopify / WooCommerce webhook listener, automated WhatsApp address confirmation, courier API sync (Shiprocket / Delhivery), outbound AI voice re-attempt scheduler, inventory restock.",
+    "needs": "Shopify or WooCommerce store API, Shiprocket or Delhivery logistics API key, WhatsApp Cloud API or Twilio voice.",
+    "summary": "Verifies COD delivery addresses and locations via WhatsApp, intercepts courier delivery failures (NDRs) with automated AI voice calls, and prevents return losses.",
+    "hidden": true
+  },
+  {
+    "id": "review-booster",
+    "name": "Google Reviews & Reputation Booster",
+    "headline": "See how automated review generation builds local trust.",
+    "desc": "Surveys clients after visits via WhatsApp: routes 5-star happy customers directly to Google Maps, while intercepting unhappy 1-star feedback privately to the manager.",
+    "setup": 49000,
+    "maintenance": 7500,
+    "includes": "CRM visit completion webhook, automated WhatsApp star rating poll, smart routing (5★ -> Google Maps; 1-3★ -> Manager private alert), AI SEO review reply generator.",
+    "needs": "Google Business Profile admin access, CRM or POS checkout webhook, WhatsApp Cloud API.",
+    "summary": "Polls customers for feedback right after service completion, routes 5-star ratings to Google Maps with one tap, and alerts managers privately on negative sentiment.",
+    "hidden": true
+  },
+  {
+    "id": "content-repurposer",
+    "name": "Social Media AI Content Repurposer",
+    "headline": "See how 1 video turns into 20+ viral social media posts.",
+    "desc": "Ingests founder videos/podcasts from Loom or Google Drive, transcribes with Whisper AI, synthesizes 3 viral LinkedIn posts + 1 Twitter thread, and schedules via Buffer.",
+    "setup": 59000,
+    "maintenance": 8500,
+    "includes": "Google Drive / Loom folder trigger, Whisper large-v3 transcription, Claude 3.5 hook and narrative distiller, LinkedIn & Twitter formatting engine, Buffer / Postiz multi-platform scheduler, Notion editorial calendar sync.",
+    "needs": "Google Drive or Loom access, Buffer or Postiz scheduler account, LinkedIn & X profile credentials, brand voice guidelines.",
+    "summary": "Transcribes long-form audio and video recordings, extracts core insights with AI, and automatically generates formatted LinkedIn posts and X/Twitter threads.",
+    "hidden": true
+  },
+  {
+    "id": "gst",
+    "name": "GST Document Collector",
+    "headline": "See how automated GST document collection eliminates manual follow-ups.",
+    "desc": "Runs 7 days before filing dates (4th & 18th), scans active clients for pending filing status, and sends automated WhatsApp upload links with real-time status logging.",
+    "setup": 49000,
+    "maintenance": 7500,
+    "includes": "Cron schedule trigger (4th & 18th of month), Google Sheets / Airtable connector, Filing Status filter node, official WhatsApp Business upload link dispatcher, follow-up counter logging.",
+    "needs": "Client registry in Google Sheets or Airtable, Meta WhatsApp Cloud API credentials, GST document collection portal link.",
+    "summary": "Audits monthly client filing statuses, filters missing documents, and dispatches automated WhatsApp reminders with secure upload links to ensure zero late fees.",
+    "hidden": true
+  },
+  {
+    "id": "bankrec",
+    "name": "Bank Reconciliation Assistant",
+    "headline": "See how automated statement parsing reconciles ledgers in minutes.",
+    "desc": "Ingests bank CSV/Excel statements via webhook or Drive watcher, parses lines into structured JSON, matches transactions against ERP unpaid invoices, and routes discrepancies to Slack.",
+    "setup": 69000,
+    "maintenance": 9900,
+    "includes": "Statement webhook / Drive watcher trigger, JavaScript CSV parser node, ERP / Airtable unpaid ledger lookup, automated match switch router, Slack / Teams accountant tag with review link.",
+    "needs": "Bank statement export access (CSV or Excel), Accounting / ERP API (Zoho Books, Tally, QuickBooks), Slack or Microsoft Teams webhook.",
+    "summary": "Parses incoming bank statements, runs automated transaction matching against open invoices and ledger entries, and flags anomalies for one-click accountant sign-off.",
+    "hidden": true
+  },
+  {
+    "id": "expense",
+    "name": "Employee Expense Claim Bot",
+    "headline": "See how WhatsApp receipt photos convert into approved expense vouchers.",
+    "desc": "Employees snap receipt photos on WhatsApp; AI extracts vendor, date, and items via structured OCR, checks policy compliance limits, and auto-logs or requests manager sign-off.",
+    "setup": 59000,
+    "maintenance": 8500,
+    "includes": "WhatsApp Business media listener, Meta binary download pipeline, Claude/OpenAI structured receipt OCR, policy limit matrix evaluation (e.g. food, fuel, travel), Zoho Expense / Sheets integration.",
+    "needs": "Meta WhatsApp Cloud API credentials, OpenAI or Anthropic API key, Zoho Expense or Google Sheets destination.",
+    "summary": "Extracts vendor and amount details from WhatsApp receipt photos via OCR, audits claims against corporate spending policies, and routes exceptions for manager approval.",
+    "hidden": true
+  },
+  {
+    "id": "quote",
+    "name": "Quotation and Proposal Generator",
+    "headline": "See how inbound inquiries turn into branded PDF proposals in seconds.",
+    "desc": "Captures web inquiries from Elementor or Typeform, fetches live SKU pricing & taxes from Postgres, compiles customized branded PDF proposals, emails the client, and schedules follow-up nudges.",
+    "setup": 49000,
+    "maintenance": 7500,
+    "includes": "Website form webhook listener, Supabase / PostgreSQL pricing engine, Carbone / Google Docs PDF compiler, Gmail / Outlook email sender with thread tracking, 3-day wait auto-followup sequence.",
+    "needs": "Website lead form webhook endpoint, PostgreSQL or Supabase database with SKU rates, Google Workspace or Microsoft 365 credentials.",
+    "summary": "Transforms incoming form inquiries into custom-branded PDF proposals with dynamic pricing and tax rules, sending automated email follow-ups if unopened.",
+    "hidden": true
+  },
+  {
+    "id": "orders",
+    "name": "WhatsApp Order Capture for Dealers",
+    "headline": "See how voice notes and texts from dealers convert directly into Tally sales orders.",
+    "desc": "Listens for text and voice notes from distributor numbers, transcribes voice via Whisper AI, matches items against vector product catalogs, requests confirmation, and injects sales orders into ERP.",
+    "setup": 79000,
+    "maintenance": 12500,
+    "includes": "WhatsApp Business Cloud API listener, OpenAI Whisper voice-to-text converter, semantic product SKU vector matcher, dynamic confirmation interactive loop, Tally / Zoho Books sales order injection.",
+    "needs": "Meta WhatsApp Cloud API access, OpenAI API key, Tally Prime (with API/bridge) or Zoho Books account.",
+    "summary": "Transcribes dealer voice notes and messages into structured sales orders, verifies catalog SKUs, sends summary confirmations, and injects approved orders into your ERP.",
+    "hidden": true
+  },
+  {
+    "id": "reorder",
+    "name": "Inventory Reorder and Supplier PO",
+    "headline": "See how stockout prevention automatically audits inventory and drafts supplier POs.",
+    "desc": "Runs every midnight to audit stock balances across your ERP, detects items dipping below safety thresholds, drafts formal POs in Google Docs, and alerts procurement managers on Slack for approval.",
+    "setup": 59000,
+    "maintenance": 8900,
+    "includes": "Daily midnight Cron scheduler, Tally Prime / ERP connector, inventory threshold filter node, Google Docs PO template generator, Slack interactive approval card, automated supplier email dispatch.",
+    "needs": "ERP inventory database access, Slack workspace with bot permissions, Google Workspace account.",
+    "summary": "Audits inventory stock levels daily against safety reorder points, drafts vendor purchase orders automatically, and emails suppliers upon manager approval.",
+    "hidden": true
+  },
+  {
+    "id": "renewals",
+    "name": "Compliance and Renewal Tracker",
+    "headline": "See how tiered reminders eliminate compliance fines and lapsed licenses.",
+    "desc": "Scans contracts, SaaS subscriptions, trade licenses, and insurance policies daily; sends multi-tier escalations at 60/30/15/7 days to owners, facility managers, and company directors.",
+    "setup": 39000,
+    "maintenance": 5900,
+    "includes": "Daily morning Cron scanner, Airtable / Notion compliance table reader, 4-tier timeframe switch node, automated email notifications (60/30d), SMS/WhatsApp facility alerts (15d), Slack directors channel escalation (7d).",
+    "needs": "Document registry in Airtable, Notion, or Google Sheets, Slack or Microsoft Teams webhook, WhatsApp or SMS gateway.",
+    "summary": "Tracks corporate licenses, insurance, and vendor contracts against upcoming expiry dates, triggering multi-tier email, WhatsApp, and Slack escalation alerts.",
+    "hidden": true
+  },
+  {
+    "id": "recruit",
+    "name": "Resume Screening and Interview Scheduler",
+    "headline": "See how AI scores applicant resumes against job descriptions and books calls.",
+    "desc": "Ingests incoming resumes from portals or inbox, reads PDF/DOCX binaries, scores candidate fit 1-100 against your role rubric with OpenAI, and sends calendar booking links to top talent.",
+    "setup": 59000,
+    "maintenance": 8500,
+    "includes": "Applicant webhook / Email inbox reader, PDF/DOCX binary text extractor, OpenAI structured scoring rubric (1-100), qualification gatekeeper (score > 75), Cal.com / Calendly calendar integration, candidate email sender.",
+    "needs": "Job description evaluation prompt, OpenAI API key, Cal.com or Calendly account, recruitment inbox access.",
+    "summary": "Parses uploaded candidate resumes, scores qualifications against job criteria with AI, and automatically delivers interview scheduling links to top-scoring applicants.",
+    "hidden": true
+  },
+  {
+    "id": "payroll",
+    "name": "Attendance-to-Payslip Prep",
+    "headline": "See how monthly biometric attendance transforms into verified payslips.",
+    "desc": "Triggers on the 1st of every month, ingests biometric logs and HRMS leave balances, calculates gross, deductions, and net payouts, flags negative leave anomalies, and bulk-distributes PDF payslips.",
+    "setup": 69000,
+    "maintenance": 9900,
+    "includes": "1st of month Cron trigger, Biometric log / HRMS API aggregator, salary calculation code engine (PF, ESI, TDS, LOP), anomaly review gatekeeper, bulk PDF slip generator, secure WhatsApp & Email distribution.",
+    "needs": "Biometric machine API or HRMS credentials, salary and tax rule structure, Google Workspace or SMTP email sender.",
+    "summary": "Aggregates biometric clock-ins and leaves, calculates gross-to-net salary payouts, flags anomalies for HR review, and bulk-distributes digital payslips.",
+    "hidden": true
+  },
+  {
+    "id": "realestate",
+    "name": "Real Estate Lead Qualifier",
+    "headline": "See how 99acres and MagicBricks leads are qualified on WhatsApp within 30 seconds.",
+    "desc": "Ingests fresh property inquiries from 99acres, MagicBricks, or Meta Ads, logs them in CRM, triggers interactive WhatsApp budget & timeline surveys, and instantly connects high-intent buyers with sales reps.",
+    "setup": 49000,
+    "maintenance": 7500,
+    "includes": "Portal webhook listener (99acres, MagicBricks, Meta Lead Ads), HubSpot / Salesforce CRM connector, WhatsApp Business interactive budget questionnaire, hot lead live call routing, email nurture drip.",
+    "needs": "Real estate portal webhook access or lead sync app, Meta WhatsApp Cloud API credentials, CRM account (HubSpot, LeadSquared, Salesforce).",
+    "summary": "Captures property inquiries from portals and ads, qualifies buyer budget and timeline via WhatsApp interactive menus, and instantly routes hot leads to sales agents.",
+    "hidden": true
+  },
+  {
+    "id": "dispatch",
+    "name": "Service Job Dispatcher",
+    "headline": "See how maintenance tickets are automatically assigned to nearby field technicians.",
+    "desc": "Captures customer service tickets, matches postal codes against technician operational territories, pings technicians on WhatsApp with 1-tap Accept/Reject buttons, and updates customers with live ETAs.",
+    "setup": 69000,
+    "maintenance": 9900,
+    "includes": "Support ticket / portal webhook listener, Google Maps postal zone geocoder, WhatsApp interactive dispatch message with action buttons, technician response listener, customer ETA notification engine.",
+    "needs": "Helpdesk software API (Freshdesk, Zoho Desk) or custom portal webhook, Google Maps Distance Matrix API, WhatsApp Cloud API.",
+    "summary": "Geocodes incoming service tickets, matches technician availability by postal zone, sends interactive WhatsApp dispatch requests, and alerts customers with live ETAs.",
+    "hidden": true
+  },
+  {
+    "id": "admissions",
+    "name": "Student Admission and Parent Update Bot",
+    "headline": "See how school inquiries convert to enrolled students with instant follow-ups.",
+    "desc": "Captures school landing page inquiries, sends prospectus brochures over WhatsApp & Email, creates follow-up tasks for academic counselors, monitors Razorpay fee links, and confirms admissions.",
+    "setup": 49000,
+    "maintenance": 7500,
+    "includes": "Landing page inquiry webhook, automated brochure PDF dispatch via Email & WhatsApp, ClickUp / Google Tasks counselor task creation, Razorpay fee payment webhook monitor, admission confirmation messaging.",
+    "needs": "School landing page form endpoint, Meta WhatsApp Cloud API credentials, Razorpay or Instamojo payment gateway account.",
+    "summary": "Engages school and course inquiries instantly with curriculum brochures, creates follow-up tasks for counselors, and monitors fee clearance via payment webhooks.",
+    "hidden": true
+  },
+  {
+    "id": "cart",
+    "name": "Abandoned Cart Recovery",
+    "headline": "See how automated 45-minute recovery sequences rescue lost D2C revenue.",
+    "desc": "Hooks into Shopify/WooCommerce cart abandonment events, pauses for 45 minutes to allow organic checkout, checks if order was completed, and triggers personalized WhatsApp/email recovery discounts.",
+    "setup": 39000,
+    "maintenance": 6500,
+    "includes": "Shopify / WooCommerce abandoned checkout webhook listener, 45-minute smart delay timer, post-delay order verification node, personalized WhatsApp & Email recovery sender with dynamic 5% coupon link.",
+    "needs": "Shopify or WooCommerce store admin API, WhatsApp Cloud API or Klaviyo / Mailchimp account.",
+    "summary": "Watches for abandoned shopping checkouts, waits optimal recovery intervals, and sends personalized WhatsApp nudges with time-limited discount incentives.",
+    "hidden": true
+  },
+  {
+    "id": "sync",
+    "name": "Multi-Channel Stock and Price Sync",
+    "headline": "See how warehouse inventory changes broadcast across Amazon, Flipkart, and Shopify in 3 seconds.",
+    "desc": "Eliminates stockouts and marketplace penalties by catching inventory update events on your master store, standardizing SKU counts, and executing parallel API updates across WooCommerce, Amazon, and Flipkart.",
+    "setup": 69000,
+    "maintenance": 9900,
+    "includes": "Master store inventory webhook listener, SKU standardizer and batch splitter, parallel execution broadcast engine, WooCommerce REST API sync, Amazon SP-API & Flipkart Marketplace Merchant API update nodes.",
+    "needs": "Shopify / WooCommerce store API, Amazon Seller SP-API credentials, Flipkart Seller API access.",
+    "summary": "Listens for stock updates across master store channels and instantly synchronizes inventory levels across WooCommerce, Amazon, and marketplace seller portals.",
+    "hidden": true
+  },
+  {
+    "id": "knowledge",
+    "name": "Company Knowledge Assistant",
+    "headline": "See how internal SOPs and policies answer staff questions with verified citations.",
+    "desc": "Staff ask questions in Slack or WhatsApp; AI creates query embeddings, searches your Pinecone/Qdrant vector database of indexed company SOPs, and returns grounded answers with exact source links.",
+    "setup": 79000,
+    "maintenance": 12500,
+    "includes": "Slack & WhatsApp Bot trigger listener, OpenAI text embeddings pipeline, Pinecone / Qdrant vector database connector for company SOPs/PDFs, Claude / GPT-4o grounded answer generator with source citations.",
+    "needs": "Company SOPs, handbooks, or policy PDFs, Slack workspace or WhatsApp Business account, Pinecone or Qdrant vector database, OpenAI API key.",
+    "summary": "Answers internal team questions in Slack and WhatsApp by querying indexed company SOPs, manuals, and Notion docs with direct reference citations.",
+    "hidden": true
+  }
+];
 
     /* ---- Preview Simulation Paths ---- */
     const PREVIEW_URLS = {
@@ -1726,16 +1777,11 @@
     const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
     const rows = document.getElementById("rows");
 
-    rows.innerHTML = AUTOMATIONS.map(a => `
+    const visibleAutomations = AUTOMATIONS.filter(a => !a.hidden);
+    rows.innerHTML = visibleAutomations.map(a => `
   <tr data-name="${esc(a.name.toLowerCase())}">
     <td><button type="button" class="name" aria-describedby="tip" data-desc="${esc(a.desc)}">${esc(a.name)}</button></td>
-    <td class="price">
-      ${inr(a.setup)}
-      <small>one-time setup</small>
-      <span class="charges-sub">+ Additional charges apply*</span>
-    </td>
-    <td class="list">${esc(a.includes)}</td>
-    <td class="list">${esc(a.needs)}</td>
+    <td class="list">${esc(a.summary || a.includes)}</td>
     <td><div class="actions">
       <button class="btn sim" type="button" onclick="watchSimulation('${a.id}')">Watch live simulation</button>
       <button class="btn" type="button" onclick="getAutomation('${a.id}')">Get this automation</button>
@@ -1751,7 +1797,7 @@
         r.style.display = ok ? "" : "none";
         if (ok) n++;
       });
-      count.textContent = n + " of " + AUTOMATIONS.length + " automations";
+      count.textContent = n + " of " + visibleAutomations.length + " automation" + (visibleAutomations.length === 1 ? "" : "s");
       empty.style.display = n ? "none" : "block";
     }
     q.addEventListener("input", filter);
