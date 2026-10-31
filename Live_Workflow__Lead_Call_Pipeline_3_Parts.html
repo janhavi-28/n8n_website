@@ -59,7 +59,7 @@ li.gold{color:var(--gold)}li.bad{color:var(--bad)}li.good{color:var(--good)}
 <h2 id="title" style="font-size:18px;color:var(--text);text-transform:none;letter-spacing:-.01em;margin:4px 0 2px"></h2>
 <p class="sub" id="sub" style="margin-top:0"></p>
 <div class="bar"><span id="bt" style="display:contents"></span><button id="play">Pause</button><button id="det">Node details: On</button></div>
-<div class="cvw"><div class="cv"><div class="chip"><span id="chipt"></span> <b>● Active</b></div><svg id="w" viewBox="0 0 1060 500" role="img" aria-label="n8n style lead pipeline workflow"></svg></div><div class="ndv" id="ndv"></div></div>
+<div class="cvw"><div class="cv"><div class="chip"><span id="chipt"></span> <b>● Active</b></div><svg id="w" viewBox="0 0 1060 520" role="img" aria-label="n8n style lead pipeline workflow"></svg></div><div class="ndv" id="ndv"></div></div>
 <div class="card inb" id="inbox" style="display:none"><h2><span id="itt"></span> <span class="cnt" id="icnt">0</span></h2><div id="ibl"></div></div>
 <div class="kpis" id="kpis"></div>
 <div class="two"><div class="card"><h2 id="ctt"></h2><svg class="bars" id="ch" viewBox="0 0 340 130"></svg></div><div class="card"><h2>Activity log</h2><ul id="log"></ul></div></div>
@@ -312,13 +312,13 @@ d2:{tab:"Part 2: Post-Call Routing",title:"Part 2: Post-Call Scoring & Site Visi
    ["score","Claude Scores Lead","HTTP Request",370,90,"ai"],
    ["parse","Parse Score","Code",530,90,"cd"],
    ["sw","Route by Lead Score","Switch",680,90,"sw"],
-   ["hot","Trigger Call Analysis (W3)","HTTP Request",850,20,"ph"],
-   ["book","Book Agent Calendar","Calendar",850,90,"ck"],
-   ["cold","Add to Follow-up List","Google Sheets",850,165,"db"],
-   ["trig2","Transfer Lookup Webhook","Webhook",80,340,"wh",1],
-   ["avail","Check Agent Availability","Calendar",330,340,"ck"],
-   ["pick","Pick Agent Number","Code",580,340,"cd"],
-   ["dest","Return Transfer Destination","Respond",830,340,"ph"]
+   ["hot","Trigger Call Analysis (W3)","HTTP Request",840,20,"ph"],
+   ["book","Book Agent Calendar","Calendar",960,135,"ck"],
+   ["cold","Add to Follow-up List","Google Sheets",840,230,"db"],
+   ["trig2","Transfer Lookup Webhook","Webhook",60,380,"wh",1],
+   ["avail","Check Agent Availability","Calendar",320,380,"ck"],
+   ["pick","Pick Agent Number","Code",580,380,"cd"],
+   ["dest","Return Transfer Destination","Respond",840,380,"ph"]
  ],
  edges:[
    ["trig","ext"],
@@ -345,9 +345,9 @@ d3:{tab:"Part 3: Call Analysis",title:"Part 3: Call Transcription & Follow-up An
    ["bld","Build Transcript","Code",570,200,"cd"],
    ["ai","Claude Analyzes Transcript","HTTP Request",700,200,"ai"],
    ["parse","Parse Analysis","Code",820,200,"cd"],
-   ["crm","Update CRM","HubSpot",940,85,"pr"],
-   ["em","Send Follow-up Email","Gmail",940,200,"ms"],
-   ["doc","Create Proposal Doc","Google Docs",940,315,"lg"]
+   ["crm","Update CRM","HubSpot",950,55,"pr"],
+   ["em","Send Follow-up Email","Gmail",950,195,"ms"],
+   ["doc","Create Proposal Doc","Google Docs",950,335,"lg"]
  ],
  edges:[
    ["trig","iff"],

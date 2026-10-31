@@ -58,7 +58,7 @@ li.gold{color:var(--gold)}li.bad{color:var(--bad)}li.good{color:var(--good)}
 <h2 id="title" style="font-size:18px;color:var(--text);text-transform:none;letter-spacing:-.01em;margin:4px 0 2px"></h2>
 <p class="sub" id="sub" style="margin-top:0"></p>
 <div class="bar"><span id="bt" style="display:contents"></span><button id="play">Pause</button><button id="det">Node details: On</button></div>
-<div class="cvw"><div class="cv"><div class="chip"><span id="chipt"></span> <b>● Active</b></div><svg id="w" viewBox="0 0 1060 500" role="img" aria-label="n8n style tender hunter workflow"></svg></div><div class="ndv" id="ndv"></div></div>
+<div class="cvw"><div class="cv"><div class="chip"><span id="chipt"></span> <b>● Active</b></div><svg id="w" viewBox="0 0 1060 520" role="img" aria-label="n8n style tender hunter workflow"></svg></div><div class="ndv" id="ndv"></div></div>
 <div class="card inb" id="inbox" style="display:none"><h2><span id="itt"></span> <span class="cnt" id="icnt">0</span></h2><div id="ibl"></div></div>
 <div class="kpis" id="kpis"></div>
 <div class="two"><div class="card"><h2 id="ctt"></h2><svg class="bars" id="ch" viewBox="0 0 340 130"></svg></div><div class="card"><h2>Activity log</h2><ul id="log"></ul></div></div>
@@ -260,10 +260,10 @@ d2:{tab:"Part 2: AI Scope & Eligibility Scoring",title:"Part 2: Claude AI Match 
    ["trig","Extracted RFP Webhook","Webhook",50,180,"wh",1],
    ["ai","Claude Evaluates Scope","HTTP Request",250,180,"ai"],
    ["sw","Win Probability Gate","Switch",470,180,"sw"],
-   ["high","High Priority (80+)","Set",720,80,"ck"],
-   ["mid","Secondary Review (60-79)","Set",720,200,"ms"],
+   ["high","High Priority (80+)","Set",720,50,"ck"],
+   ["mid","Secondary Review (60-79)","Set",850,180,"ms"],
    ["drop","Disqualified (<60)","Code",720,310,"db"],
-   ["fast","Fast-Track Bid Room","HTTP Request",940,80,"pr"]
+   ["fast","Fast-Track Bid Room","HTTP Request",940,50,"pr"]
  ],
  edges:[
    ["trig","ai"],
