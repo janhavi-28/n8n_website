@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lead Generation Pipeline - Architecture & Pricing | AIVATIKA</title>
+  <meta name="description"
+    content="Production-grade Lead Generation and Firmographic Enrichment pipeline in n8n. Architecture diagram, prerequisites, external costs, and deployment pricing.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --subtle: #64748b;
+      --line: #e2e8f0;
+      --accent: #f2563f;
+      --accent-hover: #dc3e26;
+      --accent-soft: #fff0ed;
+      --accent-border: #fecdd3;
+      --live: #059669;
+      --live-bg: #e6f7f0;
+      --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, .06), 0 2px 6px -1px rgba(15, 23, 42, .04);
+      --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      padding-bottom: 60px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header Nav */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .nav-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -.02em;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #ff7a63);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-nav-back {
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: transparent;
+      transition: all .15s ease;
+    }
+
+    .btn-nav-back:hover {
+      background: #f1f5f9;
+      color: var(--text);
+    }
+
+    .btn-nav-primary {
+      font-family: inherit;
+      padding: 8px 18px;
+      font-size: .88rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--text);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+
+    .btn-nav-primary:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 32px 20px 0;
+    }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .84rem;
+      color: var(--subtle);
+      margin-bottom: 16px;
+    }
+
+    .breadcrumbs a {
+      color: var(--subtle);
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .breadcrumbs a:hover {
+      color: var(--accent);
+    }
+
+    .breadcrumbs span.sep {
+      color: #cbd5e1;
+    }
+
+    /* Hero Header */
+    .hero-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 36px 36px 32px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      background: linear-gradient(180deg, var(--accent), #ff7a63);
+    }
+
+    .badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--live-bg);
+      color: var(--live);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .badge-status i {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--live);
+      animation: pulseDot 1.4s infinite;
+    }
+
+    @keyframes pulseDot {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.6); opacity: 0.4; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .badge-tag {
+      background: #f1f5f9;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 820px;
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-sim-large {
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: .94rem;
+      padding: 12px 24px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(242, 86, 63, .35);
+      transition: all .15s ease;
+    }
+
+    .btn-sim-large:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(242, 86, 63, .45);
+    }
+
+    .btn-cta-secondary {
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 700;
+      font-size: .94rem;
+      padding: 12px 22px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+
+    .btn-cta-secondary:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    /* Section Styling */
+    .section-title-wrap {
+      margin: 40px 0 16px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--text);
+    }
+
+    .section-sub {
+      font-size: .88rem;
+      color: var(--subtle);
+    }
+
+    /* Workflow Diagram Block */
+    .workflow-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 36px;
+      overflow-x: auto;
+    }
+
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      min-width: 880px;
+      position: relative;
+    }
+
+    .pipeline-step {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 16px;
+      position: relative;
+      transition: all .2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .pipeline-step:hover {
+      background: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 6px 18px -4px rgba(242, 86, 63, .15);
+      transform: translateY(-2px);
+    }
+
+    .step-num {
+      font-size: .7rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .step-time {
+      font-size: .68rem;
+      color: var(--subtle);
+      font-weight: 600;
+      background: #fff;
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+    }
+
+    .step-title {
+      font-size: .96rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .step-desc {
+      font-size: .8rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .step-node-tag {
+      font-size: .74rem;
+      font-weight: 600;
+      color: var(--subtle);
+      background: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      width: fit-content;
+    }
+
+    .step-connector {
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--subtle);
+      font-size: 10px;
+      z-index: 2;
+    }
+
+    /* Tables */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 36px;
+      overflow: hidden;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: .92rem;
+    }
+
+    table.data-table thead th {
+      background: #f8fafc;
+      padding: 14px 20px;
+      font-weight: 700;
+      font-size: .78rem;
+      color: var(--subtle);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--line);
+    }
+
+    table.data-table tbody td {
+      padding: 16px 20px;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    table.data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.data-table tbody tr:hover {
+      background: #fafafa;
+    }
+
+    .row-title {
+      font-weight: 700;
+      color: var(--text);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .row-sub {
+      font-size: .8rem;
+      color: var(--subtle);
+    }
+
+    .cost-highlight {
+      font-weight: 800;
+      font-size: .98rem;
+      color: var(--text);
+    }
+
+    .cost-badge-included {
+      display: inline-block;
+      background: var(--live-bg);
+      color: var(--live);
+      font-weight: 700;
+      font-size: .74rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .cost-badge-optional {
+      display: inline-block;
+      background: #f1f5f9;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .74rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* Bottom CTA Card */
+    .bottom-cta {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #fff;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      margin: 48px 0 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bottom-cta h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: 10px;
+    }
+
+    .bottom-cta p {
+      color: #94a3b8;
+      font-size: 1.02rem;
+      max-width: 600px;
+      margin: 0 auto 24px;
+    }
+
+    .bottom-cta-btns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn-cta-primary {
+      font-family: inherit;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: .94rem;
+      padding: 13px 26px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(242, 86, 63, .4);
+      transition: all .15s ease;
+    }
+
+    .btn-cta-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-cta-outline {
+      font-family: inherit;
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      font-weight: 700;
+      font-size: .94rem;
+      padding: 13px 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .2);
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+
+    .btn-cta-outline:hover {
+      background: rgba(255, 255, 255, .18);
+    }
+
+    /* Modal Styling */
+    .sim-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+
+    .sim-modal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sim-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, .65);
+      backdrop-filter: blur(4px);
+    }
+
+    .sim-modal-dialog {
+      position: relative;
+      background: var(--surface);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 1080px;
+      height: 90vh;
+      max-height: 840px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, .4);
+      border: 1px solid var(--line);
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .sim-modal-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafafa;
+    }
+
+    .sim-modal-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sim-modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sim-modal-btn {
+      font-family: inherit;
+      padding: 6px 12px;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      text-decoration: none;
+      background: #fff;
+    }
+
+    .sim-modal-close {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--subtle);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    .sim-modal-body {
+      flex: 1;
+      position: relative;
+      background: #f8fafc;
+    }
+
+    .sim-modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Contact Modal */
+    .contact-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+
+    .contact-modal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .contact-dialog {
+      position: relative;
+      background: #fff;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      padding: 32px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, .3);
+      border: 1px solid var(--line);
+      z-index: 2;
+    }
+
+    .contact-dialog h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .contact-dialog p {
+      font-size: .88rem;
+      color: var(--subtle);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: .92rem;
+      font-family: inherit;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: var(--text);
+      color: #fff;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: .95rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background .15s;
+    }
+
+    .btn-submit:hover {
+      background: #1e293b;
+    }
+
+    @media (max-width: 768px) {
+      .hero-card {
+        padding: 24px 20px;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+      .bottom-cta {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navigation Header -->
+  <header>
+    <div class="nav-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-logo">Ai</span>
+        <span>Aivatika</span>
+      </a>
+      <div class="nav-actions">
+        <a href="index.html" class="btn-nav-back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Automations
+        </a>
+        <button type="button" class="btn-nav-primary" onclick="openContactModal()">Contact Us</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+      <a href="index.html">Automations</a>
+      <span class="sep">/</span>
+      <span>Sales & Growth</span>
+      <span class="sep">/</span>
+      <span style="color: var(--text); font-weight: 600;">Lead Generation Pipeline</span>
+    </div>
+
+    <!-- Hero Card -->
+    <div class="hero-card">
+      <div class="badges">
+        <span class="badge-status"><i></i> Production Pipeline • Active</span>
+        <span class="badge-tag">End-to-End n8n Engine</span>
+        <span class="badge-tag">Avg. Speed: 2.4s / lead</span>
+      </div>
+
+      <h1>Lead Generation & Intelligence Pipeline</h1>
+
+      <p class="hero-desc">
+        Transforms incoming website forms, emails, and landing page leads into fully enriched, verified, and AI-scored sales opportunities in your CRM. Eliminates manual prospecting research and assigns high-intent deals to your sales reps in real time.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn-sim-large" type="button" onclick="openSimulation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Watch Live Simulation
+        </button>
+
+        <button class="btn-cta-secondary" type="button" onclick="openContactModal()">
+          Deploy This Pipeline
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Section 1: Workflow Block Diagram -->
+    <div class="section-title-wrap">
+      <div>
+        <h2 class="section-title">Automated Pipeline Architecture</h2>
+        <p class="section-sub">Step-by-step logic executed inside n8n for every incoming prospect.</p>
+      </div>
+    </div>
+
+    <div class="workflow-card">
+      <div class="pipeline-grid">
+
+        <!-- Step 1 -->
+        <div class="pipeline-step">
+          <div>
+            <div class="step-num">
+              <span>Step 01</span>
+              <span class="step-time">0.1s</span>
+            </div>
+            <div class="step-title">Multi-Source Intake</div>
+            <div class="step-desc">Captures raw leads instantly from Typeform, Webflow, Meta Lead Ads, or inbound email triggers.</div>
+          </div>
+          <div class="step-node-tag">⚡ Webhook Trigger</div>
+          <div class="step-connector">→</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="pipeline-step">
+          <div>
+            <div class="step-num">
+              <span>Step 02</span>
+              <span class="step-time">0.3s</span>
+            </div>
+            <div class="step-title">Domain & MX Check</div>
+            <div class="step-desc">Extracts corporate email domain, strips disposable inboxes (Gmail, Yahoo), and checks mailserver validity.</div>
+          </div>
+          <div class="step-node-tag">⚙️ Code Sanitizer</div>
+          <div class="step-connector">→</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="pipeline-step">
+          <div>
+            <div class="step-num">
+              <span>Step 03</span>
+              <span class="step-time">0.8s</span>
+            </div>
+            <div class="step-title">Apollo B2B Enrichment</div>
+            <div class="step-desc">Queries Apollo/Hunter API for company employee count, industry, annual revenue, LinkedIn URL, and tech stack.</div>
+          </div>
+          <div class="step-node-tag">🔍 Apollo.io API</div>
+          <div class="step-connector">→</div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="pipeline-step">
+          <div>
+            <div class="step-num">
+              <span>Step 04</span>
+              <span class="step-time">0.7s</span>
+            </div>
+            <div class="step-title">AI Intent & ICP Scoring</div>
+            <div class="step-desc">Claude 3.5 Sonnet evaluates lead fit against your ICP rubric, assigning a score (1–100) and generating an SDR brief.</div>
+          </div>
+          <div class="step-node-tag">🤖 Claude 3.5 Sonnet</div>
+          <div class="step-connector">→</div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="pipeline-step">
+          <div>
+            <div class="step-num">
+              <span>Step 05</span>
+              <span class="step-time">0.5s</span>
+            </div>
+            <div class="step-title">CRM Injection & Alert</div>
+            <div class="step-desc">Creates or updates contact & deal in HubSpot/Salesforce, assigns SDR owner, and alerts the team on Slack.</div>
+          </div>
+          <div class="step-node-tag">🚀 HubSpot / Slack</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Section 2: Client Prerequisites & External Running Costs -->
+    <div class="section-title-wrap">
+      <div>
+        <h2 class="section-title">Client Prerequisites & Third-Party Operating Costs</h2>
+        <p class="section-sub">Required subscriptions and external accounts billed directly to your company at actual cost.</p>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 28%;">Component / Tool</th>
+            <th style="width: 28%;">What You Provide</th>
+            <th style="width: 22%;">Estimated Running Cost</th>
+            <th style="width: 22%;">Role in Pipeline</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <span class="row-title">B2B Data Enrichment API</span>
+              <span class="row-sub">Apollo.io / Hunter.co</span>
+            </td>
+            <td>Apollo.io or Hunter account API Key (Free tier or Basic plan).</td>
+            <td>
+              <span class="cost-highlight">Free – $49/mo</span>
+              <span class="row-sub">Free tier includes 100 credits/mo</span>
+            </td>
+            <td>Fetches verified corporate email, company size, LinkedIn, and revenue.</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">AI Language Model</span>
+              <span class="row-sub">Anthropic Claude / OpenAI</span>
+            </td>
+            <td>Anthropic or OpenAI API Key (Pay-as-you-go).</td>
+            <td>
+              <span class="cost-highlight">~$5 – $15/mo</span>
+              <span class="row-sub">Based on ~1,500 leads evaluated</span>
+            </td>
+            <td>Analyzes firmographics against ICP criteria and writes custom sales briefing.</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Destination CRM</span>
+              <span class="row-sub">HubSpot / Salesforce / Zoho</span>
+            </td>
+            <td>CRM API key or OAuth access to destination pipeline.</td>
+            <td>
+              <span class="cost-highlight">Existing Plan</span>
+              <span class="row-sub">Zero additional CRM fees</span>
+            </td>
+            <td>Stores enriched contacts, pipeline stages, activity notes, and rep assignments.</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Workflow Execution Host</span>
+              <span class="row-sub">Self-Hosted or Cloud VPS</span>
+            </td>
+            <td>Cloud server or n8n cloud subscription (AWS / Hetzner / DigitalOcean).</td>
+            <td>
+              <span class="cost-highlight">~$10 – $20/mo</span>
+              <span class="row-sub">Or existing private server</span>
+            </td>
+            <td>Runs your automation 24/7 with zero data sharing outside your cloud.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 3: Aivatika Service & Implementation Pricing -->
+    <div class="section-title-wrap">
+      <div>
+        <h2 class="section-title">Aivatika Engineering & Implementation Pricing</h2>
+        <p class="section-sub">Transparent, flat-rate pricing for production deployment, custom logic, and SLA support.</p>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 30%;">Deliverable</th>
+            <th style="width: 36%;">Scope & Specifications</th>
+            <th style="width: 18%;">Investment</th>
+            <th style="width: 16%;">Timeline & SLA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <span class="row-title">Custom Pipeline Architecture & Build</span>
+              <span class="row-sub">Full n8n implementation</span>
+            </td>
+            <td>
+              End-to-end webhook intake, Apollo & Claude integration, CRM custom field mapping schema, deduplication rules, and instant Slack notifications.
+            </td>
+            <td>
+              <span class="cost-highlight">₹59,000</span>
+              <span class="row-sub">One-time setup fee</span>
+            </td>
+            <td>
+              <strong>5 Business Days</strong>
+              <span class="row-sub">Turnkey deployment</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Custom ICP Scoring Prompts</span>
+              <span class="row-sub">Tailored to your business</span>
+            </td>
+            <td>
+              Custom prompt engineering and scoring rubrics aligned with your sales team's qualification criteria (Hot/Warm/Low tier routing).
+            </td>
+            <td>
+              <span class="cost-badge-included">Included in Setup</span>
+            </td>
+            <td>
+              Collaborative sign-off with sales lead
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">QA Testing & Fail-Safe Safeguards</span>
+              <span class="row-sub">Zero-lead-loss guarantee</span>
+            </td>
+            <td>
+              Disposable email filtration, API rate-limiting retries, error queue buffers, and comprehensive simulated test runs.
+            </td>
+            <td>
+              <span class="cost-badge-included">Included in Setup</span>
+            </td>
+            <td>
+              Pre-launch verification
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Team Handover & Runbook</span>
+              <span class="row-sub">Documentation & Video SOP</span>
+            </td>
+            <td>
+              Recorded team walkthrough, n8n JSON workflow export, architecture diagram, and credential management guide.
+            </td>
+            <td>
+              <span class="cost-badge-included">Included in Setup</span>
+            </td>
+            <td>
+              Handover session
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Ongoing SLA Maintenance & Monitoring</span>
+              <span class="row-sub">Optional Monthly Support</span>
+            </td>
+            <td>
+              24/7 uptime monitoring, third-party API deprecation fixes, monthly prompt tuning, and priority incident response (< 4 hours).
+            </td>
+            <td>
+              <span class="cost-highlight">₹9,500/mo</span>
+              <span class="cost-badge-optional">Optional</span>
+            </td>
+            <td>
+              Month-to-month
+              <span class="row-sub">Cancel anytime</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Bottom CTA -->
+    <div class="bottom-cta">
+      <h2>Deploy This Pipeline for Your Business</h2>
+      <p>Have your sales team receiving verified, enriched leads in your CRM within 5 business days.</p>
+      <div class="bottom-cta-btns">
+        <button class="btn-cta-primary" type="button" onclick="openContactModal()">
+          Book Architecture Call
+        </button>
+        <button class="btn-cta-outline" type="button" onclick="openSimulation()">
+          Launch Live Simulation
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Live Simulation Modal -->
+  <div id="sim-modal" class="sim-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="sim-modal-backdrop" onclick="closeSimulation()"></div>
+    <div class="sim-modal-dialog">
+      <div class="sim-modal-header">
+        <div class="sim-modal-title">
+          <span>Lead Generation & Enrichment Pipeline</span>
+          <span style="background: var(--live-bg); color: var(--live); font-size: 11px; padding: 2px 8px; border-radius: 999px;">LIVE DEMO</span>
+        </div>
+        <div class="sim-modal-actions">
+          <a href="automations/lead_enrichment_live.html" target="_blank" rel="noopener noreferrer" class="sim-modal-btn">
+            Open in New Tab ↗
+          </a>
+          <button class="sim-modal-close" onclick="closeSimulation()" aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="sim-modal-body">
+        <iframe id="sim-iframe" src="" title="Live workflow simulation"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contact-modal" class="contact-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="sim-modal-backdrop" onclick="closeContactModal()"></div>
+    <div class="contact-dialog">
+      <h3>Deploy Lead Generation Pipeline</h3>
+      <p>Leave your details and an automation architect will contact you within one business day.</p>
+      <form id="contact-form" onsubmit="submitForm(event)">
+        <div class="form-group">
+          <label for="c-name">Your Name</label>
+          <input type="text" id="c-name" placeholder="Priya Sharma" required>
+        </div>
+        <div class="form-group">
+          <label for="c-biz">Company Name</label>
+          <input type="text" id="c-biz" placeholder="Sunrise Health" required>
+        </div>
+        <div class="form-group">
+          <label for="c-phone">Phone Number (WhatsApp)</label>
+          <input type="tel" id="c-phone" placeholder="+91 98765 43210" required>
+        </div>
+        <button type="submit" class="btn-submit">Submit Request →</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const simModal = document.getElementById('sim-modal');
+    const simIframe = document.getElementById('sim-iframe');
+    const contactModal = document.getElementById('contact-modal');
+
+    function openSimulation() {
+      simIframe.src = 'automations/lead_enrichment_live.html';
+      simModal.classList.add('is-open');
+      simModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSimulation() {
+      simModal.classList.remove('is-open');
+      simModal.setAttribute('aria-hidden', 'true');
+      simIframe.src = '';
+      document.body.style.overflow = '';
+    }
+
+    function openContactModal() {
+      contactModal.classList.add('is-open');
+      contactModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeContactModal() {
+      contactModal.classList.remove('is-open');
+      contactModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function submitForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('c-name').value.trim();
+      const biz = document.getElementById('c-biz').value.trim();
+      const phone = document.getElementById('c-phone').value.trim();
+
+      const subject = encodeURIComponent(`Lead Generation Pipeline Inquiry - ${biz}`);
+      const mailBody = encodeURIComponent(
+        `Hi Aivatika Team,\n\nI am interested in deploying the Lead Generation & Enrichment Pipeline.\n\nDetails:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n\nPlease reach out for next steps!\n\nThanks,\n${name}`
+      );
+
+      window.open(`mailto:contact@aivatika.com?subject=${subject}&body=${mailBody}`, '_self');
+      closeContactModal();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeSimulation();
+        closeContactModal();
+      }
+    });
+  </script>
+</body>
+
+</html>
