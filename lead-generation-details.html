@@ -4,788 +4,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Lead Generation Pipeline - Architecture & Pricing | AIVATIKA</title>
+  <title>Lead Generation Pipeline - Architecture & Pricing | Aivatika</title>
   <meta name="description"
     content="Production-grade Lead Generation and Firmographic Enrichment pipeline in n8n. Architecture diagram, prerequisites, external costs, and deployment pricing.">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
-
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --muted: #475569;
-      --subtle: #64748b;
-      --line: #e2e8f0;
-      --accent: #f2563f;
-      --accent-hover: #dc3e26;
-      --accent-soft: #fff0ed;
-      --accent-border: #fecdd3;
-      --live: #059669;
-      --live-bg: #e6f7f0;
-      --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, .06), 0 2px 6px -1px rgba(15, 23, 42, .04);
-      --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: var(--font);
-      background-color: var(--bg);
-      color: var(--text);
-      line-height: 1.55;
-      padding-bottom: 60px;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Header Nav */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--line);
-      position: sticky;
-      top: 0;
-      z-index: 40;
-    }
-
-    .nav-inner {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--text);
-      font-weight: 800;
-      font-size: 1.15rem;
-      letter-spacing: -.02em;
-    }
-
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--accent), #ff7a63);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .btn-nav-back {
-      font-family: inherit;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      font-size: .88rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-decoration: none;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: transparent;
-      transition: all .15s ease;
-    }
-
-    .btn-nav-back:hover {
-      background: #f1f5f9;
-      color: var(--text);
-    }
-
-    .btn-nav-primary {
-      font-family: inherit;
-      padding: 8px 18px;
-      font-size: .88rem;
-      font-weight: 700;
-      color: #fff;
-      background: var(--text);
-      border: none;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all .15s ease;
-    }
-
-    .btn-nav-primary:hover {
-      background: #1e293b;
-      transform: translateY(-1px);
-    }
-
-    /* Container */
-    .container {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 32px 20px 0;
-    }
-
-    /* Breadcrumbs */
-    .breadcrumbs {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: .84rem;
-      color: var(--subtle);
-      margin-bottom: 16px;
-    }
-
-    .breadcrumbs a {
-      color: var(--subtle);
-      text-decoration: none;
-      transition: color .15s;
-    }
-
-    .breadcrumbs a:hover {
-      color: var(--accent);
-    }
-
-    .breadcrumbs span.sep {
-      color: #cbd5e1;
-    }
-
-    /* Hero Header */
-    .hero-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 36px 36px 32px;
-      box-shadow: var(--card-shadow);
-      margin-bottom: 32px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-card::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 5px;
-      background: linear-gradient(180deg, var(--accent), #ff7a63);
-    }
-
-    .badges {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-
-    .badge-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--live-bg);
-      color: var(--live);
-      font-size: .75rem;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 999px;
-    }
-
-    .badge-status i {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--live);
-      animation: pulseDot 1.4s infinite;
-    }
-
-    @keyframes pulseDot {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.6); opacity: 0.4; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .badge-tag {
-      background: #f1f5f9;
-      color: var(--muted);
-      font-size: .78rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 6px;
-    }
-
-    h1 {
-      font-size: 2.1rem;
-      font-weight: 800;
-      letter-spacing: -.03em;
-      color: var(--text);
-      line-height: 1.25;
-      margin-bottom: 12px;
-    }
-
-    .hero-desc {
-      font-size: 1.05rem;
-      color: var(--muted);
-      max-width: 820px;
-      line-height: 1.65;
-      margin-bottom: 24px;
-    }
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .btn-sim-large {
-      font-family: inherit;
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 700;
-      font-size: .94rem;
-      padding: 12px 24px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(242, 86, 63, .35);
-      transition: all .15s ease;
-    }
-
-    .btn-sim-large:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(242, 86, 63, .45);
-    }
-
-    .btn-cta-secondary {
-      font-family: inherit;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #fff;
-      color: var(--text);
-      font-weight: 700;
-      font-size: .94rem;
-      padding: 12px 22px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      cursor: pointer;
-      transition: all .15s ease;
-    }
-
-    .btn-cta-secondary:hover {
-      background: #f8fafc;
-      border-color: #cbd5e1;
-    }
-
-    /* Section Styling */
-    .section-title-wrap {
-      margin: 40px 0 16px;
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .section-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      letter-spacing: -.02em;
-      color: var(--text);
-    }
-
-    .section-sub {
-      font-size: .88rem;
-      color: var(--subtle);
-    }
-
-    /* Workflow Diagram Block */
-    .workflow-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 28px 24px;
-      box-shadow: var(--card-shadow);
-      margin-bottom: 36px;
-      overflow-x: auto;
-    }
-
-    .pipeline-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 16px;
-      min-width: 880px;
-      position: relative;
-    }
-
-    .pipeline-step {
-      background: #f8fafc;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 18px 16px;
-      position: relative;
-      transition: all .2s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .pipeline-step:hover {
-      background: #fff;
-      border-color: var(--accent);
-      box-shadow: 0 6px 18px -4px rgba(242, 86, 63, .15);
-      transform: translateY(-2px);
-    }
-
-    .step-num {
-      font-size: .7rem;
-      font-weight: 800;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .step-time {
-      font-size: .68rem;
-      color: var(--subtle);
-      font-weight: 600;
-      background: #fff;
-      padding: 1px 6px;
-      border-radius: 4px;
-      border: 1px solid var(--line);
-    }
-
-    .step-title {
-      font-size: .96rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-
-    .step-desc {
-      font-size: .8rem;
-      color: var(--muted);
-      line-height: 1.45;
-      margin-bottom: 12px;
-    }
-
-    .step-node-tag {
-      font-size: .74rem;
-      font-weight: 600;
-      color: var(--subtle);
-      background: #fff;
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: 1px solid var(--line);
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      width: fit-content;
-    }
-
-    .step-connector {
-      position: absolute;
-      right: -10px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 20px;
-      height: 20px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--subtle);
-      font-size: 10px;
-      z-index: 2;
-    }
-
-    /* Tables */
-    .table-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      box-shadow: var(--card-shadow);
-      margin-bottom: 36px;
-      overflow: hidden;
-    }
-
-    table.data-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: .92rem;
-    }
-
-    table.data-table thead th {
-      background: #f8fafc;
-      padding: 14px 20px;
-      font-weight: 700;
-      font-size: .78rem;
-      color: var(--subtle);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      border-bottom: 1px solid var(--line);
-    }
-
-    table.data-table tbody td {
-      padding: 16px 20px;
-      vertical-align: top;
-      border-bottom: 1px solid var(--line);
-      color: var(--text);
-    }
-
-    table.data-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    table.data-table tbody tr:hover {
-      background: #fafafa;
-    }
-
-    .row-title {
-      font-weight: 700;
-      color: var(--text);
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .row-sub {
-      font-size: .8rem;
-      color: var(--subtle);
-    }
-
-    .cost-highlight {
-      font-weight: 800;
-      font-size: .98rem;
-      color: var(--text);
-    }
-
-    .cost-badge-included {
-      display: inline-block;
-      background: var(--live-bg);
-      color: var(--live);
-      font-weight: 700;
-      font-size: .74rem;
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    .cost-badge-optional {
-      display: inline-block;
-      background: #f1f5f9;
-      color: var(--muted);
-      font-weight: 700;
-      font-size: .74rem;
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    /* Bottom CTA Card */
-    .bottom-cta {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: #fff;
-      border-radius: 20px;
-      padding: 40px;
-      text-align: center;
-      margin: 48px 0 20px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .bottom-cta h2 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -.02em;
-      margin-bottom: 10px;
-    }
-
-    .bottom-cta p {
-      color: #94a3b8;
-      font-size: 1.02rem;
-      max-width: 600px;
-      margin: 0 auto 24px;
-    }
-
-    .bottom-cta-btns {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .btn-cta-primary {
-      font-family: inherit;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 700;
-      font-size: .94rem;
-      padding: 13px 26px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(242, 86, 63, .4);
-      transition: all .15s ease;
-    }
-
-    .btn-cta-primary:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn-cta-outline {
-      font-family: inherit;
-      background: rgba(255, 255, 255, .1);
-      color: #fff;
-      font-weight: 700;
-      font-size: .94rem;
-      padding: 13px 24px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, .2);
-      cursor: pointer;
-      transition: all .15s ease;
-    }
-
-    .btn-cta-outline:hover {
-      background: rgba(255, 255, 255, .18);
-    }
-
-    /* Modal Styling */
-    .sim-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .2s ease;
-    }
-
-    .sim-modal.is-open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .sim-modal-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(15, 23, 42, .65);
-      backdrop-filter: blur(4px);
-    }
-
-    .sim-modal-dialog {
-      position: relative;
-      background: var(--surface);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 1080px;
-      height: 90vh;
-      max-height: 840px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, .4);
-      border: 1px solid var(--line);
-      z-index: 2;
-      overflow: hidden;
-    }
-
-    .sim-modal-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #fafafa;
-    }
-
-    .sim-modal-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .sim-modal-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .sim-modal-btn {
-      font-family: inherit;
-      padding: 6px 12px;
-      font-size: .8rem;
-      font-weight: 600;
-      color: var(--muted);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      text-decoration: none;
-      background: #fff;
-    }
-
-    .sim-modal-close {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      color: var(--subtle);
-      padding: 4px;
-      display: flex;
-      align-items: center;
-    }
-
-    .sim-modal-body {
-      flex: 1;
-      position: relative;
-      background: #f8fafc;
-    }
-
-    .sim-modal-body iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* Contact Modal */
-    .contact-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 110;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .2s ease;
-    }
-
-    .contact-modal.is-open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .contact-dialog {
-      position: relative;
-      background: #fff;
-      border-radius: 20px;
-      width: 100%;
-      max-width: 480px;
-      padding: 32px;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, .3);
-      border: 1px solid var(--line);
-      z-index: 2;
-    }
-
-    .contact-dialog h3 {
-      font-size: 1.4rem;
-      font-weight: 800;
-      margin-bottom: 6px;
-    }
-
-    .contact-dialog p {
-      font-size: .88rem;
-      color: var(--subtle);
-      margin-bottom: 20px;
-    }
-
-    .form-group {
-      margin-bottom: 14px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: .8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: var(--muted);
-      margin-bottom: 5px;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 10px 14px;
-      font-size: .92rem;
-      font-family: inherit;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      outline: none;
-      transition: border-color .15s;
-    }
-
-    .form-group input:focus {
-      border-color: var(--accent);
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 12px;
-      background: var(--text);
-      color: #fff;
-      font-family: inherit;
-      font-weight: 700;
-      font-size: .95rem;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background .15s;
-    }
-
-    .btn-submit:hover {
-      background: #1e293b;
-    }
-
-    @media (max-width: 768px) {
-      .hero-card {
-        padding: 24px 20px;
-      }
-      h1 {
-        font-size: 1.6rem;
-      }
-      .bottom-cta {
-        padding: 30px 20px;
-      }
-    }
-  </style>
+  <style>:root{--bg:#f8fafc;--surface:#ffffff;--surface-secondary:#f1f5f9;--text:#0f172a;--muted:#475569;--subtle:#64748b;--line:#e2e8f0;--accent:#f2563f;--accent-hover:#dc3e26;--accent-soft:#fff0ed;--accent-border:#fecdd3;--live:#059669;--live-bg:#e6f7f0;--warning-bg:#fffbeb;--warning-border:#fef3c7;--warning-text:#b45309;--card-shadow:0 4px 20px -2px rgba(15,23,42,.06),0 2px 6px -1px rgba(15,23,42,.04);--font:'Plus Jakarta Sans',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}@media (prefers-color-scheme:dark){:root{--bg:#0b0f17;--surface:#131b2b;--surface-secondary:#1a2438;--text:#f1f5f9;--muted:#94a3b8;--subtle:#64748b;--line:#1e293b;--accent-soft:rgba(242,86,63,0.16);--accent-border:rgba(242,86,63,0.35);--live-bg:rgba(5,150,105,0.2);--live:#34d399;--warning-bg:rgba(180,83,9,0.15);--warning-border:rgba(180,83,9,0.3);--warning-text:#fbbf24;--card-shadow:0 4px 24px -2px rgba(0,0,0,.45)}}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font);background-color:var(--bg);color:var(--text);line-height:1.55;padding-bottom:60px;-webkit-font-smoothing:antialiased}a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}header{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}.nav-inner{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:800;font-size:1.15rem;letter-spacing:-.02em}.brand-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff7a63);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}.nav-actions{display:flex;align-items:center;gap:12px}.btn-nav-back{font-family:inherit;display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s ease}.btn-nav-back:hover{background:var(--surface-secondary);color:var(--text);border-color:var(--subtle)}.container{max-width:1180px;margin:0 auto;padding:0 20px}.hero-section{padding:48px 0 36px;text-align:center;max-width:860px;margin:0 auto}.hero-headline{font-size:clamp(2rem,4vw,2.85rem);font-weight:800;letter-spacing:-.03em;line-height:1.18;color:var(--text);margin-bottom:16px}.hero-subheading{font-size:1.1rem;color:var(--muted);line-height:1.6;margin-bottom:28px}.hero-buttons{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:32px}.btn-primary{font-family:inherit;display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-weight:700;font-size:.95rem;padding:13px 26px;border-radius:999px;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(242,86,63,.35);transition:all .15s ease;text-decoration:none}.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 6px 18px rgba(242,86,63,.45)}.btn-outline{font-family:inherit;display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text);font-weight:700;font-size:.95rem;padding:13px 24px;border-radius:999px;border:1px solid var(--line);cursor:pointer;transition:all .15s ease;text-decoration:none}.btn-outline:hover{background:var(--surface-secondary);border-color:var(--subtle)}.hero-stats{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--line)}.proof-stat{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted)}.proof-stat-dot{width:7px;height:7px;border-radius:50%;background:var(--live)}.section-title-wrap{margin:44px 0 20px}.section-title{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;color:var(--text)}.section-sub{font-size:.92rem;color:var(--muted);margin-top:4px}.diagram-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 20px;box-shadow:var(--card-shadow);margin-bottom:28px;overflow-x:auto}.diagram-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:1px dashed var(--line);flex-wrap:wrap;gap:10px}.diagram-badge{display:inline-flex;align-items:center;gap:6px;background:var(--live-bg);color:var(--live);font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}.n8n-canvas{min-width:820px;display:flex;flex-direction:column;gap:22px;padding:10px 4px}.n8n-main-row{display:flex;align-items:center;justify-content:space-between;position:relative}.n8n-node{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:152px;box-shadow:0 2px 8px rgba(15,23,42,.05);position:relative;transition:transform .15s ease,border-color .15s ease}.n8n-node:hover{transform:translateY(-2px);border-color:var(--accent)}.node-header{display:flex;align-items:center;gap:7px;margin-bottom:6px}.node-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--surface-secondary)}.node-type{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--subtle)}.node-name{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.3}.node-sub{font-size:11px;color:var(--muted);margin-top:2px}.n8n-arrow{color:var(--accent);font-weight:800;font-size:16px;user-select:none;display:flex;align-items:center;justify-content:center}.n8n-branches{display:flex;gap:16px;margin-left:512px}.n8n-branch-node{background:var(--surface-secondary);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;width:160px;font-size:11.5px}.n8n-branch-title{font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:5px}.n8n-branch-title.error{color:#ef4444}.n8n-branch-title.nurture{color:var(--warning-text)}.n8n-branch-desc{color:var(--muted);font-size:10.5px;line-height:1.35}.pipeline-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch}@media (max-width:900px){.pipeline-grid{grid-template-columns:1fr}}.pipeline-step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 16px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;justify-content:space-between;position:relative}.step-num{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.step-num span:first-child{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.06em;text-transform:uppercase}.step-time{font-size:11px;font-weight:600;color:var(--subtle);background:var(--surface-secondary);padding:2px 7px;border-radius:999px}.step-title{font-size:.96rem;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}.step-desc{font-size:12.5px;color:var(--muted);line-height:1.45;margin-bottom:12px}.step-node-tag{font-size:11px;font-weight:700;color:var(--muted);background:var(--surface-secondary);border-radius:6px;padding:5px 8px;display:inline-flex;align-items:center;gap:5px;width:fit-content}.step-arrow-badge{display:flex;align-items:center;justify-content:center;margin-top:10px;color:var(--accent);font-weight:700}.sample-output-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:var(--card-shadow);margin-bottom:32px}.sample-badge-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px}.sample-badge{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 10px;border-radius:999px}.sample-grid{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:stretch}@media (max-width:768px){.sample-grid{grid-template-columns:1fr}}.lead-meta-panel{background:var(--surface-secondary);border-radius:12px;padding:16px;font-size:13px}.lead-name{font-size:1.05rem;font-weight:800;color:var(--text)}.lead-role{font-size:12px;color:var(--muted);margin-bottom:14px}.meta-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.meta-row:last-child{border-bottom:none}.meta-label{color:var(--subtle);font-size:12px}.meta-val{font-weight:600;color:var(--text);font-size:12px;text-align:right}.lead-score-pill{display:inline-flex;align-items:center;gap:6px;background:var(--live-bg);color:var(--live);font-weight:800;font-size:12px;padding:3px 8px;border-radius:6px}.ai-brief-panel{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;justify-content:space-between}.ai-brief-header{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--subtle);margin-bottom:10px;display:flex;align-items:center;gap:6px}.ai-brief-lines{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.45}.ai-brief-lines li{padding-left:14px;position:relative;color:var(--text)}.ai-brief-lines li::before{content:"•";color:var(--accent);position:absolute;left:0;font-weight:bold}.table-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow-x:auto;box-shadow:var(--card-shadow);margin-bottom:24px}.data-table{width:100%;border-collapse:collapse;text-align:left;font-size:13.5px;min-width:680px}.data-table thead th{background:var(--surface-secondary);padding:14px 18px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--subtle);border-bottom:1px solid var(--line)}.data-table tbody td{padding:16px 18px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--text)}.data-table tbody tr:last-child td{border-bottom:none}.row-title{font-weight:700;display:block;color:var(--text)}.row-sub{font-size:12px;color:var(--muted);display:block;margin-top:3px}.cost-highlight{font-weight:800;color:var(--accent);font-size:14.5px}.cost-badge-optional{display:inline-block;font-size:11px;font-weight:700;color:var(--subtle);background:var(--surface-secondary);padding:2px 7px;border-radius:999px;margin-top:3px}.privacy-note{display:flex;align-items:flex-start;gap:10px;background:var(--surface-secondary);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:28px}.roi-box{background:var(--warning-bg);border:1px solid var(--warning-border);border-radius:12px;padding:16px 18px;font-size:13px;color:var(--warning-text);line-height:1.5;margin-top:14px;margin-bottom:24px}.roi-title{font-weight:800;font-size:13.5px;margin-bottom:4px}.final-cta-section{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:40px 24px;text-align:center;margin-top:48px;box-shadow:var(--card-shadow)}.final-cta-section h2{font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;color:var(--text)}.final-cta-section p{color:var(--muted);font-size:1rem;max-width:620px;margin:0 auto 24px}.final-cta-actions{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}.contact-placeholders{font-size:13px;color:var(--subtle);display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}.contact-link{color:var(--accent);text-decoration:none;font-weight:600}.contact-link:hover{text-decoration:underline}.sim-modal,.contact-modal{display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;padding:16px}.sim-modal.is-open,.contact-modal.is-open{display:flex}.sim-modal-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.65);backdrop-filter:blur(4px)}.sim-modal-dialog{position:relative;background:var(--surface);border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,.35);width:100%;max-width:1100px;height:90vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line)}.sim-modal-header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}.sim-modal-title{font-weight:700;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px}.sim-modal-actions{display:flex;align-items:center;gap:10px}.sim-modal-btn{font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line);background:transparent;padding:5px 10px;border-radius:6px;text-decoration:none;cursor:pointer}.sim-modal-btn:hover{background:var(--surface-secondary);color:var(--text)}.sim-modal-close{background:transparent;border:none;cursor:pointer;color:var(--subtle);display:flex;align-items:center;justify-content:center;padding:4px;border-radius:6px}.sim-modal-close:hover{color:var(--text);background:var(--surface-secondary)}.sim-modal-body{flex:1;background:#0b0f17;position:relative}.sim-modal-body iframe{width:100%;height:100%;border:none;display:block}.contact-dialog{position:relative;background:var(--surface);border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,.35);width:100%;max-width:440px;padding:28px 24px;border:1px solid var(--line)}.contact-dialog h3{font-size:1.25rem;font-weight:800;margin-bottom:6px;color:var(--text)}.contact-dialog p{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.45}.form-group{margin-bottom:14px}.form-group label{display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px}.form-group input{width:100%;padding:10px 12px;font-size:13.5px;border:1px solid var(--line);border-radius:8px;font-family:inherit;background:var(--surface);color:var(--text)}.btn-submit{width:100%;padding:12px;background:var(--accent);color:#fff;font-weight:700;font-size:.95rem;border:none;border-radius:8px;cursor:pointer;margin-top:8px}.btn-submit:hover{background:var(--accent-hover)}</style>
 </head>
 
 <body>
 
-  <!-- Navigation Header -->
+  <!-- Sticky Header -->
   <header>
     <div class="nav-inner">
       <a href="index.html" class="brand">
@@ -801,112 +29,279 @@
           </svg>
           Back to Automations
         </a>
-        
       </div>
     </div>
   </header>
 
   <main class="container">
 
-    <!-- Top Action: Watch Live Simulation -->
-    <div style="margin: 32px 0 24px; display: flex; align-items: center; justify-content: flex-start;">
-      <button class="btn-sim-large" type="button" onclick="openSimulation()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="5 3 19 12 5 21 5 3"></polygon>
-        </svg>
-        Watch Live Simulation
-      </button>
-    </div>
+    <!-- 1. Hero Section -->
+    <section class="hero-section">
+      <h1 class="hero-headline">Every lead scored, enriched and routed in under 3 seconds.</h1>
+      <p class="hero-subheading">
+        Autonomous B2B inbound qualification pipeline in n8n—connecting multi-source intake, Apollo enrichment, AI ICP grading, and instant CRM routing.
+      </p>
+      <div class="hero-buttons">
+        <button class="btn-primary" type="button" onclick="openSimulation()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Watch Live Simulation
+        </button>
+        <button class="btn-outline" type="button" onclick="openContactModal()">
+          Book a call
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="proof-stat">
+          <span class="proof-stat-dot"></span>
+          <span>5-day go-live</span>
+        </div>
+        <div class="proof-stat">
+          <span class="proof-stat-dot"></span>
+          <span>24/7 monitoring</span>
+        </div>
+        <div class="proof-stat">
+          <span class="proof-stat-dot"></span>
+          <span>Works with HubSpot, Salesforce, Zoho</span>
+        </div>
+      </div>
+    </section>
 
-    <!-- Section 1: Workflow Block Diagram -->
+    <!-- 2. Architecture Section -->
     <div class="section-title-wrap">
-      <div>
-        <h2 class="section-title">Automated Pipeline Architecture</h2>
-        <p class="section-sub">Step-by-step logic executed inside n8n for every incoming prospect.</p>
+      <h2 class="section-title">Automated Pipeline Architecture</h2>
+      <p class="section-sub">Visual n8n execution diagram and step-by-step logic running inside your cloud workspace.</p>
+    </div>
+
+    <!-- Visual Flow Diagram in n8n style -->
+    <div class="diagram-card">
+      <div class="diagram-header">
+        <span class="diagram-badge">⚡ n8n Production Workflow Logic</span>
+        <span style="font-size: 12px; color: var(--subtle); font-weight: 600;">Left-to-right execution with automated retry & routing branches</span>
+      </div>
+
+      <div class="n8n-canvas">
+        <!-- Main row -->
+        <div class="n8n-main-row">
+          <!-- Node 1 -->
+          <div class="n8n-node">
+            <div class="node-header">
+              <span class="node-icon">⚡</span>
+              <span class="node-type">Trigger</span>
+            </div>
+            <div class="node-name">Multi-source intake</div>
+            <div class="node-sub">Webhooks & Forms</div>
+          </div>
+
+          <div class="n8n-arrow">→</div>
+
+          <!-- Node 2 -->
+          <div class="n8n-node">
+            <div class="node-header">
+              <span class="node-icon">⚙️</span>
+              <span class="node-type">Validator</span>
+            </div>
+            <div class="node-name">Domain & MX check</div>
+            <div class="node-sub">+ Deduplication logic</div>
+          </div>
+
+          <div class="n8n-arrow">→</div>
+
+          <!-- Node 3 -->
+          <div class="n8n-node">
+            <div class="node-header">
+              <span class="node-icon">🔍</span>
+              <span class="node-type">Enrichment</span>
+            </div>
+            <div class="node-name">Apollo enrichment</div>
+            <div class="node-sub">Firmographics & Size</div>
+          </div>
+
+          <div class="n8n-arrow">→</div>
+
+          <!-- Node 4 -->
+          <div class="n8n-node" style="border-color: var(--accent);">
+            <div class="node-header">
+              <span class="node-icon">🤖</span>
+              <span class="node-type" style="color: var(--accent);">AI Model</span>
+            </div>
+            <div class="node-name">AI scoring</div>
+            <div class="node-sub">Claude (latest Sonnet)</div>
+          </div>
+
+          <div class="n8n-arrow">→</div>
+
+          <!-- Node 5 -->
+          <div class="n8n-node">
+            <div class="node-header">
+              <span class="node-icon">🚀</span>
+              <span class="node-type">Destination</span>
+            </div>
+            <div class="node-name">CRM & Slack alert</div>
+            <div class="node-sub">HubSpot / Salesforce</div>
+          </div>
+        </div>
+
+        <!-- Error & Nurture branches under AI Node -->
+        <div class="n8n-branches">
+          <div class="n8n-branch-node">
+            <div class="n8n-branch-title error">
+              <span>⚠️</span>
+              <span>Error Fallback</span>
+            </div>
+            <div class="n8n-branch-desc">API down → Retry 3 times → Alert engineering team on Slack</div>
+          </div>
+
+          <div class="n8n-branch-node">
+            <div class="n8n-branch-title nurture">
+              <span>📁</span>
+              <span>Low-Score Branch</span>
+            </div>
+            <div class="n8n-branch-desc">Score &lt; 50 → Route lead to automated email nurture list</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="workflow-card">
-      <div class="pipeline-grid">
-
-        <!-- Step 1 -->
-        <div class="pipeline-step">
-          <div>
-            <div class="step-num">
-              <span>Step 01</span>
-              <span class="step-time">0.1s</span>
-            </div>
-            <div class="step-title">Multi-Source Intake</div>
-            <div class="step-desc">Captures raw leads instantly from Typeform, Webflow, Meta Lead Ads, or inbound email triggers.</div>
+    <!-- Step Cards below diagram -->
+    <div class="pipeline-grid">
+      <!-- Step 1 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 01</span>
+            <span class="step-time">typical 0.1s</span>
           </div>
-          <div class="step-node-tag">⚡ Webhook Trigger</div>
-          <div class="step-connector">→</div>
+          <div class="step-title">Multi-Source Intake</div>
+          <div class="step-desc">Captures raw leads instantly from Typeform, Webflow, Meta Lead Ads, or inbound email webhooks.</div>
         </div>
+        <div class="step-node-tag">⚡ Webhook Trigger</div>
+        <div class="step-arrow-badge">→</div>
+      </div>
 
-        <!-- Step 2 -->
-        <div class="pipeline-step">
-          <div>
-            <div class="step-num">
-              <span>Step 02</span>
-              <span class="step-time">0.3s</span>
-            </div>
-            <div class="step-title">Domain & MX Check</div>
-            <div class="step-desc">Extracts corporate email domain, strips disposable inboxes (Gmail, Yahoo), and checks mailserver validity.</div>
+      <!-- Step 2 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 02</span>
+            <span class="step-time">typical 0.3s</span>
           </div>
-          <div class="step-node-tag">⚙️ Code Sanitizer</div>
-          <div class="step-connector">→</div>
+          <div class="step-title">Domain, MX & Deduplication</div>
+          <div class="step-desc">Extracts corporate domain, performs deduplication against existing CRM records, and verifies mailserver MX validity. Free-tier email filtering (Gmail and Yahoo filtering is optional per client).</div>
         </div>
+        <div class="step-node-tag">⚙️ Code Sanitizer</div>
+        <div class="step-arrow-badge">→</div>
+      </div>
 
-        <!-- Step 3 -->
-        <div class="pipeline-step">
-          <div>
-            <div class="step-num">
-              <span>Step 03</span>
-              <span class="step-time">0.8s</span>
-            </div>
-            <div class="step-title">Apollo B2B Enrichment</div>
-            <div class="step-desc">Queries Apollo/Hunter API for company employee count, industry, annual revenue, LinkedIn URL, and tech stack.</div>
+      <!-- Step 3 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 03</span>
+            <span class="step-time">typical 0.8s</span>
           </div>
-          <div class="step-node-tag">🔍 Apollo.io API</div>
-          <div class="step-connector">→</div>
+          <div class="step-title">Apollo B2B Enrichment</div>
+          <div class="step-desc">Queries Apollo/Hunter API for company employee count, industry, annual revenue estimate, LinkedIn URL, and tech stack.</div>
         </div>
+        <div class="step-node-tag">🔍 Apollo.io API</div>
+        <div class="step-arrow-badge">→</div>
+      </div>
 
-        <!-- Step 4 -->
-        <div class="pipeline-step">
-          <div>
-            <div class="step-num">
-              <span>Step 04</span>
-              <span class="step-time">0.7s</span>
-            </div>
-            <div class="step-title">AI Intent & ICP Scoring</div>
-            <div class="step-desc">Claude 3.5 Sonnet evaluates lead fit against your ICP rubric, assigning a score (1–100) and generating an SDR brief.</div>
+      <!-- Step 4 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 04</span>
+            <span class="step-time">typical 0.7s</span>
           </div>
-          <div class="step-node-tag">🤖 Claude 3.5 Sonnet</div>
-          <div class="step-connector">→</div>
+          <div class="step-title">AI Intent & ICP Scoring</div>
+          <div class="step-desc">Claude (latest Sonnet model) evaluates lead fit against your custom ICP rubric, assigning a score (1–100) and generating an executive sales brief.</div>
         </div>
+        <div class="step-node-tag">🤖 Claude (latest Sonnet)</div>
+        <div class="step-arrow-badge">→</div>
+      </div>
 
-        <!-- Step 5 -->
-        <div class="pipeline-step">
-          <div>
-            <div class="step-num">
-              <span>Step 05</span>
-              <span class="step-time">0.5s</span>
-            </div>
-            <div class="step-title">CRM Injection & Alert</div>
-            <div class="step-desc">Creates or updates contact & deal in HubSpot/Salesforce, assigns SDR owner, and alerts the team on Slack.</div>
+      <!-- Step 5 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 05</span>
+            <span class="step-time">typical 0.5s</span>
           </div>
-          <div class="step-node-tag">🚀 HubSpot / Slack</div>
+          <div class="step-title">CRM Injection & Alert</div>
+          <div class="step-desc">Creates or updates contact & deal in HubSpot/Salesforce, assigns SDR owner, and alerts the team on Slack.</div>
         </div>
-
+        <div class="step-node-tag">🚀 HubSpot / Slack</div>
       </div>
     </div>
 
-    <!-- Section 2: Client Prerequisites & External Running Costs -->
+    <!-- 3. Sample Output Section -->
     <div class="section-title-wrap">
-      <div>
-        <h2 class="section-title">Client Prerequisites & Third-Party Operating Costs</h2>
-        <p class="section-sub">Required subscriptions and external accounts billed directly to your company at actual cost.</p>
+      <h2 class="section-title">Enriched Prospect Output</h2>
+      <p class="section-sub">Live data payload injected directly into your sales reps' CRM view within 3 seconds.</p>
+    </div>
+
+    <div class="sample-output-card">
+      <div class="sample-badge-bar">
+        <span class="sample-badge">Sample output</span>
+        <span style="font-size: 12px; color: var(--subtle); font-weight: 600;">Simulated Lead Record (Synthetic Demo Data)</span>
       </div>
+
+      <div class="sample-grid">
+        <!-- Lead Meta Panel -->
+        <div class="lead-meta-panel">
+          <div class="lead-name">Rohan Sharma [Sample]</div>
+          <div class="lead-role">VP of Operations &amp; Technology</div>
+
+          <div class="meta-row">
+            <span class="meta-label">Company</span>
+            <span class="meta-val">Apex Logistics Tech</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Industry</span>
+            <span class="meta-val">Supply Chain &amp; Logistics SaaS</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Employee Count</span>
+            <span class="meta-val">120 – 250 employees</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Annual Revenue</span>
+            <span class="meta-val">₹25Cr – ₹50Cr</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Fit Score</span>
+            <span class="meta-val">
+              <span class="lead-score-pill">86 / 100 • Tier 1</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- AI SDR Brief Panel -->
+        <div class="ai-brief-panel">
+          <div>
+            <div class="ai-brief-header">
+              <span>🤖</span>
+              <span>Claude AI Sales Brief (Auto-Generated)</span>
+            </div>
+            <ul class="ai-brief-lines">
+              <li><strong>High ICP Alignment:</strong> Fast-growing mid-market logistics software company scaling regional sales headcount across India and APAC.</li>
+              <li><strong>Buying Signal:</strong> Inbound form submission specifically requested automated triage to eliminate a 48-hour manual sales response lag.</li>
+              <li><strong>Recommended Next Step:</strong> Fast-track discovery call within 2 business hours; assign to Senior Enterprise SDR with customized ROI deck.</li>
+            </ul>
+          </div>
+          <div style="font-size: 11px; color: var(--subtle); margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 8px;">
+            Enriched via Apollo.io + Claude (latest Sonnet model) • Synchronized to CRM Deal Pipeline
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Cost and Pricing Sections -->
+    <div class="section-title-wrap">
+      <h2 class="section-title">Client Prerequisites &amp; Third-Party Operating Costs</h2>
+      <p class="section-sub">Required subscriptions and external accounts billed directly to your company at actual cost.</p>
     </div>
 
     <div class="table-card">
@@ -935,7 +330,7 @@
           <tr>
             <td>
               <span class="row-title">AI Language Model</span>
-              <span class="row-sub">Anthropic Claude / OpenAI</span>
+              <span class="row-sub">Claude (latest Sonnet model) / OpenAI</span>
             </td>
             <td>Anthropic Claude or OpenAI API Key (Pay-per-token credits).</td>
             <td>
@@ -966,18 +361,25 @@
               <span class="cost-highlight">~₹850 – ₹1,700/mo</span>
               <span class="row-sub">Or client's existing private cloud server</span>
             </td>
-            <td>Executes the automated pipeline 24/7 with zero data sharing outside your cloud.</td>
+            <td>runs in your own cloud. Data is sent only to the services you approve.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Section 3: Aivatika Service & Implementation Pricing -->
-    <div class="section-title-wrap">
+    <!-- DPDP Act Privacy Note -->
+    <div class="privacy-note">
+      <span style="font-size: 16px;">🛡️</span>
       <div>
-        <h2 class="section-title">Aivatika Engineering & Implementation Pricing</h2>
-        <p class="section-sub">Transparent, flat-rate pricing for production deployment, custom logic, and SLA support.</p>
+        <strong>Privacy &amp; Regulatory Compliance (India DPDP Act):</strong>
+        All prospect and company data is processed in strict alignment with India's Digital Personal Data Protection (DPDP) Act. The workflow runs in your own cloud. Data is sent only to the services you approve, ensuring zero unauthorized third-party leakage.
       </div>
+    </div>
+
+    <!-- Aivatika Implementation Pricing -->
+    <div class="section-title-wrap">
+      <h2 class="section-title">Aivatika Engineering &amp; Implementation Pricing</h2>
+      <p class="section-sub">Transparent, flat-rate pricing for production deployment, custom logic, and SLA support.</p>
     </div>
 
     <div class="table-card">
@@ -985,19 +387,19 @@
         <thead>
           <tr>
             <th style="width: 30%;">Deliverable</th>
-            <th style="width: 36%;">Scope & Specifications</th>
+            <th style="width: 36%;">Scope &amp; Specifications</th>
             <th style="width: 18%;">Investment</th>
-            <th style="width: 16%;">Timeline & SLA</th>
+            <th style="width: 16%;">Timeline &amp; SLA</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>
-              <span class="row-title">One-Time Setup & Architecture</span>
+              <span class="row-title">One-Time Setup &amp; Architecture</span>
               <span class="row-sub">Turnkey Production Pipeline</span>
             </td>
             <td>
-              End-to-end webhook intake, Apollo & Claude AI enrichment integration, custom ICP scoring rules, CRM field mapping schema, deduplication logic, and Slack alert routing.
+              End-to-end webhook intake, Apollo &amp; Claude AI enrichment integration, custom ICP scoring rules, CRM field mapping schema, deduplication logic, and Slack alert routing.
             </td>
             <td>
               <span class="cost-highlight">₹59,000</span>
@@ -1005,16 +407,16 @@
             </td>
             <td>
               <strong>5 Business Days</strong>
-              <span class="row-sub">Full production go-live</span>
+              <span class="row-sub">Timeline starts once API keys and CRM access are provided.</span>
             </td>
           </tr>
           <tr>
             <td>
-              <span class="row-title">Additional Monthly Maintenance & Support</span>
+              <span class="row-title">Additional Monthly Maintenance &amp; Support</span>
               <span class="row-sub">Optional Ongoing SLA</span>
             </td>
             <td>
-              24/7 automated pipeline uptime monitoring, third-party API deprecation updates, monthly prompt optimization, and priority engineering response (< 4 hours).
+              24/7 automated pipeline uptime monitoring, third-party API deprecation updates, monthly prompt optimization, and priority engineering response (&lt; 4 hours).
             </td>
             <td>
               <span class="cost-highlight">₹9,500/mo</span>
@@ -1029,7 +431,33 @@
       </table>
     </div>
 
+    <!-- Return on Investment Line -->
+    <div class="roi-box">
+      <div class="roi-title">📈 Estimated Return on Investment (Example)</div>
+      <div>If your team closes even <strong>[N]</strong> extra deals per month (at an average deal value of ₹<strong>[X]</strong>), this automation pays back in <strong>[M]</strong> months.</div>
+    </div>
 
+    <!-- 5. Final Call-to-Action Section -->
+    <section class="final-cta-section">
+      <h2>Ready to automate lead qualification?</h2>
+      <p>Have your sales team receiving verified, enriched leads in your CRM within 5 business days.</p>
+      <div class="final-cta-actions">
+        <button class="btn-primary" type="button" onclick="openContactModal()">
+          Book a call
+        </button>
+        <button class="btn-outline" type="button" onclick="openSimulation()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Watch Live Simulation
+        </button>
+      </div>
+      <div class="contact-placeholders">
+        <span>Email: <a href="mailto:contact@aivatika.com" class="contact-link">contact@aivatika.com</a></span>
+        <span>•</span>
+        <span>WhatsApp: <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" class="contact-link">+91 98XXX XXXXX [Placeholder]</a></span>
+      </div>
+    </section>
 
   </main>
 
@@ -1039,7 +467,7 @@
     <div class="sim-modal-dialog">
       <div class="sim-modal-header">
         <div class="sim-modal-title">
-          <span>Lead Generation & Enrichment Pipeline</span>
+          <span>Lead Generation &amp; Enrichment Pipeline</span>
           <span style="background: var(--live-bg); color: var(--live); font-size: 11px; padding: 2px 8px; border-radius: 999px;">LIVE DEMO</span>
         </div>
         <div class="sim-modal-actions">
@@ -1065,8 +493,8 @@
   <div id="contact-modal" class="contact-modal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="sim-modal-backdrop" onclick="closeContactModal()"></div>
     <div class="contact-dialog">
-      <h3>Deploy Lead Generation Pipeline</h3>
-      <p>Leave your details and an automation architect will contact you within one business day.</p>
+      <h3>Book an Architecture Call</h3>
+      <p>Leave your details and an automation engineer will contact you within one business day.</p>
       <form id="contact-form" onsubmit="submitForm(event)">
         <div class="form-group">
           <label for="c-name">Your Name</label>
@@ -1074,7 +502,7 @@
         </div>
         <div class="form-group">
           <label for="c-biz">Company Name</label>
-          <input type="text" id="c-biz" placeholder="Sunrise Health" required>
+          <input type="text" id="c-biz" placeholder="Apex Logistics" required>
         </div>
         <div class="form-group">
           <label for="c-phone">Phone Number (WhatsApp)</label>
@@ -1122,9 +550,9 @@
       const biz = document.getElementById('c-biz').value.trim();
       const phone = document.getElementById('c-phone').value.trim();
 
-      const subject = encodeURIComponent(`Lead Generation Pipeline Inquiry - ${biz}`);
+      const subject = encodeURIComponent(`Lead Generation Pipeline Architecture Call - ${biz}`);
       const mailBody = encodeURIComponent(
-        `Hi Aivatika Team,\n\nI am interested in deploying the Lead Generation & Enrichment Pipeline.\n\nDetails:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n\nPlease reach out for next steps!\n\nThanks,\n${name}`
+        `Hi Aivatika Team,\n\nI would like to book an architecture call for the Lead Generation & Enrichment Pipeline.\n\nContact Details:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n\nPlease reach out with scheduling options.\n\nThanks,\n${name}`
       );
 
       window.open(`mailto:contact@aivatika.com?subject=${subject}&body=${mailBody}`, '_self');
@@ -1141,4 +569,3 @@
 </body>
 
 </html>
-
