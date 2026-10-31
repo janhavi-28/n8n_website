@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Live Workflow: AI Lead Generation and Call Pipeline</title>
+<title>Live Workflow: Real Estate AI Lead & Call Pipeline</title>
 <style>
 :root{--bg:#f3f5fb;--card:rgba(255,255,255,.82);--text:#0f172a;--mut:#64748b;--line:#dde3f0;--good:#059669;--bad:#e11d48;--gold:#d97706;--canvas:#f7f8fb;--dot:#d3d8e4;--nb:#fff;--nl:#c5cad8;--edge:#9aa1b5;--coral:#ff6d5a;--ok:#2fae6b;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070b16;--card:rgba(20,28,50,.72);--text:#eef2ff;--mut:#94a3c4;--line:rgba(148,163,210,.22);--good:#34d399;--bad:#fb7185;--gold:#fbbf24;--canvas:#14161f;--dot:#2c3040;--nb:#262938;--nl:#454a5e;--edge:#6b7390;color-scheme:dark}}
@@ -53,8 +53,8 @@ li.gold{color:var(--gold)}li.bad{color:var(--bad)}li.good{color:var(--good)}
 .inb{margin:12px 0 0}.ib{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);opacity:0;animation:cr .5s forwards}.ib:last-child{border:0}.ib i{width:9px;height:9px;border-radius:50%;background:var(--gold);margin-top:6px;flex:none}.ib i.g{background:var(--ok)}.ib b{display:block;font-size:13px}.ib small{color:var(--mut);font-size:12px}.ib .t{margin-left:auto;font-size:11px;color:var(--mut);white-space:nowrap}.cnt{display:inline-block;min-width:20px;text-align:center;padding:1px 7px;border-radius:999px;background:var(--gold);color:#fff;font-size:11px;margin-left:6px}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
 </style></head><body><main>
-<div class="top"><h1>AI Lead Generation and Call Pipeline</h1><span class="live"><i></i>LIVE SIMULATION</span></div>
-<p class="sub">One lead pipeline split into three parts as it looks inside n8n: intake and AI call, post-call routing, and call analysis. All data is simulated and the voice, SMS and Slack steps are mock nodes. Pick a part, then press the buttons.</p>
+<div class="top"><h1>Real Estate AI Lead & Call Pipeline</h1><span class="live"><i></i>LIVE SIMULATION</span></div>
+<p class="sub">Autonomous Real Estate pipeline split into 3 parts as it runs inside n8n: 1) Property Lead Intake & AI Call, 2) Post-Call Scoring & Site Visit Routing, and 3) Call Transcription & Buyer Analysis. Tailored exclusively for property buyers, site visits, and builder sales teams.</p>
 <div class="tabs" id="tabs"></div>
 <h2 id="title" style="font-size:18px;color:var(--text);text-transform:none;letter-spacing:-.01em;margin:4px 0 2px"></h2>
 <p class="sub" id="sub" style="margin-top:0"></p>
@@ -125,108 +125,188 @@ async function view(id,sp){const n=NODES.find(d=>d[0]==id);
 async function runV(id,sp,cls){const c=D[id].g.classList;c.add("run");if(cls)c.add(cls);if(detail)await view(id,sp);else await sleep(500);c.remove("run");c.add("ok")}
 const done=async()=>{await sleep(1500);reset();running=false;if(want){const k=want;want=null;load(k);return}if(pending.length)DEMOS[cur].run(pending.shift())};
 /* ---------- shared ---------- */
-const L=[["Aarav Shah","Nimbus Tech","Head of Growth","SaaS",85],["Divya Menon","Kestrel Logistics","VP Operations","Logistics",420],["Rohit Verma","BrightPath Edu","Founder","EdTech",40],["Neha Kapoor","Orion Retail","CMO","Retail",1200]];
-const mail=(n,co)=>n.split(" ")[0].toLowerCase()+"@"+co.toLowerCase().replace(/\s/g,"")+".com",dur=s=>Math.floor(s/60)+"m "+String(s%60).padStart(2,"0")+"s";
-const trim=(a,b)=>{if(S.hist.length>8){S.hist.shift();S.xh.shift()}};
-/* ---------- Part 1: intake and call ---------- */
+const L=[
+  ["Rohan Mehta","Prestige Lakeside Habitat","3 BHK Luxury","Whitefield","₹1.85 Cr",88],
+  ["Ananya Sharma","Godrej Woods Premium","2 BHK Garden","Sector 150","₹1.15 Cr",72],
+  ["Vikramaditya Singhania","DLF Magnolias Penthouse","4 BHK Ultra","Golf Course","₹4.50 Cr",95],
+  ["Priya Desai","Brigade Vista Villas","3 BHK Villa","Gachibowli","₹2.20 Cr",64],
+  ["Suresh Nair","Sobha Dream Acres","2 BHK Deluxe","Panathur","₹85 Lakh",52]
+];
+const dur=s=>Math.floor(s/60)+"m "+String(s%60).padStart(2,"0")+"s";
+const trim=()=>{if(S.hist.length>8){S.hist.shift();S.xh.shift()}};
+
+/* ---------- Part 1: Lead Intake + AI Call ---------- */
 async function run1(kind){
- if(running){pending.push(kind);return}running=true;reset();
- const [n,co,role,ind,hc]=rnd(L),cold=kind=="cold",hot=kind=="hot"||kind=="noans",src=rnd(["Typeform","Webflow form","Meta Lead Ad"]),em=mail(n,co);
- const size=cold?Math.min(10,Math.round(Math.log10(hc+1)*12)):Math.min(35,Math.round(Math.log10(hc+1)*12)),fit=cold?6:hot?30:22+Math.floor(Math.random()*9),intent=cold?4:hot?28:14+Math.floor(Math.random()*13),score=Math.min(100,size+fit+intent),call=score>=60,ans=call&&kind!="noans"&&(kind=="hot"||Math.random()<.72),secs=140+Math.floor(Math.random()*120);
- log(`New lead ${n} (${co}) from ${src}`,"");
- await runV("trig",{params:{Trigger:"Webhook",Sources:"Typeform, Webflow, Meta"},lines:[`New submission from <em>${src}</em>`,`${n}, ${role} at ${co}`],out:Tb(["Name","Company","Email"],[[n,co,em]],"1 lead")});
- await go("trig","clean");
- await runV("clean",{params:{Language:"JavaScript",FreeEmailFilter:"configurable"},lines:[`<b>1.</b> Domain <em>${em.split("@")[1]}</em>`,`<b>2.</b> MX record: <em>valid</em>`,`<b>3.</b> Duplicate in CRM? <em>NO</em>`,`<b>4.</b> Free-email filter is off for this client`],out:Tb(["domain","mx","duplicate"],[[em.split("@")[1],"valid","no"]],"1 item")});
- await go("clean","apollo");
- await runV("apollo",{params:{API:"Apollo.io",Operation:"Enrich"},lines:[`Look up <em>${co}</em>`,`Employees: <em>${nf(hc)}</em>, industry: <em>${ind}</em>`,"Add LinkedIn URL and tech stack"],out:Tb(["Company","Employees","Industry"],[[co,nf(hc),ind]],"1 company")});
- await go("apollo","score");
- await runV("score",{params:{Model:"Claude",Output:"JSON"},lines:[`<b>1. Size</b> ${nf(hc)} staff = <em>${size}</em> pts`,`<b>2. ICP fit</b> ${ind} = <em>${fit}</em> pts`,`<b>3. Intent</b> form answers = <em>${intent}</em> pts`,`<b>4. Total</b> <em class="${call?"":"w"}">${score}/100</em>`],out:Tb(["score","brief"],[[score,"3-line SDR brief ready"]],"1 item")},call?"":"gold");
- await go("score","iff");
- await runV("iff",{params:{Condition:"Score >= 60"},lines:[`Score <em>${score}</em>`,`Result: <em class="${call?"":"w"}">${call?"TRUE":"FALSE"}</em>`,call?"Branch TRUE: place an AI call":"Branch FALSE: add to nurture list"],out:Tb(["Call now"],[[call?"yes":"no"]])});
- if(call){await go("iff","call");
-  await runV("call",{params:{Provider:"AI voice agent",Language:"English / Hindi"},lines:["Dial the lead's number","AI agent introduces itself and asks permission to continue",ans?`Lead answered: <em>${dur(secs)}</em> conversation`:`<em class="w">No answer</em>, voicemail left`],out:Tb(["Lead","Result","Duration"],[[n,ans?"answered":"no answer",ans?dur(secs):"-"]])},ans?"":"gold");
-  await go("call","rec");
-  await runV("rec",{params:{Storage:"Cloud bucket",STT:"Speech-to-text"},lines:ans?["Save the call audio","Transcribe the conversation","Send to the post-call routing flow"]:["No audio to save","Mark the lead for a retry tomorrow"],out:Tb(["Recording","Transcript"],[[ans?"saved":"none",ans?"ready":"-"]])})}
- else{await go("iff","nurture");
-  await runV("nurture",{params:{App:"CRM",List:"Nurture"},lines:["Create the contact with the score","Add to the email nurture list","Re-score in 30 days"],out:Tb(["Contact","List"],[[n,"Nurture"]],"1 contact")},"gold")}
- S.leads++;S.avg=(S.avg*(S.leads-1)+score)/S.leads;if(call)S.qual++;if(ans)S.conn++;S.hist.push(score);S.xh.push(score>=80?1:0);trim();S.session++;
- inboxAdd(`${n}, ${co}`,call?`Score ${score} · AI call ${ans?"connected":"no answer, retry set"}`:`Score ${score} · added to nurture list`,call);
- log(call?`${n} scored ${score}, AI call ${ans?"connected":"unanswered"}`:`${n} scored ${score}, sent to nurture`,call?"good":"gold");kp1(score>=80);chart();done()}
-function kp1(f){setK("a",S.leads,nf,"+"+S.session+" this session");setK("b",S.qual/S.leads*100,pf,"scored 60 or more");setK("c",S.conn,nf,"live conversations",f);setK("d",S.avg,n=>n.toFixed(0),"out of 100")}
-/* ---------- Part 2: post-call routing ---------- */
-const OUT={interested:["I like this. Can we see a demo this week?","Interested"],callback:["I'm in a meeting. Please call me tomorrow afternoon.","Callback"],noanswer:["(Voicemail, no conversation)","No answer"],notint:["We already use another vendor, not looking right now.","Not interested"]};
+  if(running){pending.push(kind);return}running=true;reset();
+  const [n,proj,config,loc,val,sc]=rnd(L);
+  const cold=kind==="cold",hot=kind==="hot",noans=kind==="noans";
+  const score=cold?45:hot?92:sc;
+  const ans=!noans&&(hot||Math.random()<0.75);
+  const secs=ans?(120+Math.floor(Math.random()*90)):20;
+  const src=rnd(["Housing.com Webhook","99acres Lead Portal","Meta Real Estate Ad","MagicBricks Campaign"]);
+
+  log(`New property enquiry: ${n} for ${proj} (${config}) via ${src}`,"");
+  await runV("trig",{params:{Trigger:"Webhook (POST)",Source:src},lines:[`Enquiry received: <strong>${n}</strong>`,`Interested in: <em>${proj} (${config})</em>`,`Budget bracket: <em>${val}</em>`],out:Tb(["Buyer","Project","Config"],[[n,proj,config]],"1 lead")});
+  await go("trig","clean");
+  await runV("clean",{params:{Operation:"Set / Normalize",RERA:"Verified"},lines:[`<b>1.</b> Normalize phone: <em>+91 98XXX XXXXX</em>`,`<b>2.</b> Micro-market tag: <em>${loc}</em>`,`<b>3.</b> Deduplication: <em>Verified unique buyer</em>`,`<b>4.</b> Budget tag: <em>${val}</em>`],out:Tb(["Buyer","Locality","Status"],[[n,loc,"Normalized"]],"1 lead")});
+
+  await Promise.all([
+    (async()=>{
+      await go("clean","em");
+      await runV("em",{params:{App:"Gmail / SendGrid",Template:"luxury_brochure"},lines:[`Send PDF brochure & floor plans for <em>${proj}</em>`,`Attach RERA certificate & price sheet`],out:Tb(["Brochure","Status"],[[proj,"Dispatched"]])});
+      await go("em","sms");
+      await runV("sms",{params:{App:"Twilio / WhatsApp",Template:"instant_whatsapp"},lines:[`Send WhatsApp 1-tap link to virtual 3D tour`,`Notify buyer: AI property specialist is dialing now`],out:Tb(["WhatsApp","Status"],[[n,"Delivered"]])});
+    })(),
+    (async()=>{
+      await go("clean","call");
+      await runV("call",{params:{App:"HTTP Request (Vapi/Retell)",Voice:"Indian Accent (Aarti)"},lines:[`Place outbound call to <em>${n}</em>`,`AI Script: "Hi ${n.split(" ")[0]}, this is Aarti from ${proj}. Looking for ${config}?"`,ans?`Buyer answered: <em>${dur(secs)}</em> conversation`:`<em class="w">No answer · Voicemail link left</em>`],out:Tb(["Call Status","Duration"],[[ans?"Connected":"Unanswered",ans?dur(secs):"-"]])},ans?"":"gold");
+    })()
+  ]);
+
+  S.leads++;if(ans)S.conn++;S.hist.push(score);S.xh.push(score>=80?1:0);trim();S.session++;
+  inboxAdd(`${n} · ${proj}`,ans?`AI call connected (${dur(secs)}) · Brochure delivered`:`Brochure sent · AI call retry scheduled`,ans);
+  log(ans?`Call with ${n} completed (${dur(secs)}). Verified buyer intent: ${score}/100`:`Call to ${n} unanswered. WhatsApp & retry queued.`,ans?"good":"gold");
+  kp1(ans&&score>=80);chart();done();
+}
+function kp1(f){setK("a",S.leads,nf,`+${S.session} this session`);setK("b",S.conn,nf,"calls connected",f);setK("c",(S.conn/S.leads*100),pf,"connection rate");setK("d",S.avg,n=>n.toFixed(0),"out of 100")}
+
+/* ---------- Part 2: Post-Call Scoring + Routing ---------- */
 async function run2(kind){
- if(running){pending.push(kind);return}running=true;reset();
- const k=kind||rnd(["interested","interested","callback","noanswer","notint"]),[n,co]=rnd(L),[line,lab]=OUT[k],conf=k=="noanswer"?99:88+Math.floor(Math.random()*10),secs=k=="interested"?150+Math.floor(Math.random()*80):k=="noanswer"?25:40+Math.floor(Math.random()*40),slot=rnd(["Tue 11:00 AM","Wed 3:30 PM","Thu 10:00 AM"]),cb=rnd(["Tomorrow, 3:00 PM","Monday, 11:00 AM"]);
- log(`Call with ${n} ended (${dur(secs)})`,"");
- await runV("trig",{params:{Trigger:"Webhook",From:"Voice platform"},lines:["Call ended event received",`Lead: <em>${n}</em>, ${co}`,`Duration: ${dur(secs)}`],out:Tb(["Lead","Duration"],[[n,dur(secs)]],"1 call")});
- await go("trig","cls");
- await runV("cls",{params:{Model:"Claude",Labels:"4 outcomes"},lines:[`Read the transcript: "${line}"`,`Outcome: <em>${lab}</em>`,`Confidence: <em>${conf}%</em>`],out:Tb(["outcome","confidence"],[[lab,conf+"%"]])},k=="interested"?"":"");
- await go("cls","sw");
- await runV("sw",{params:{Mode:"Rules",Field:"outcome"},lines:[`Outcome <em>${lab}</em>`,`Take output: <em>${k=="interested"?"1 Interested":k=="callback"?"2 Callback":k=="noanswer"?"3 No answer":"4 Not interested"}</em>`],out:Tb(["Route"],[[lab]])});
- if(k=="interested"){await go("sw","book","gold");
-  await runV("book",{params:{App:"Calendar",Operation:"Create event"},lines:[`Find a free slot: <em>${slot}</em>`,"Send the calendar invite to the lead"],out:Tb(["Lead","Demo"],[[n,slot]],"1 demo booked")},"gold");
-  await go("book","alert");
-  await runV("alert",{params:{Channel:"Slack",To:"#sdr-hot-leads"},lines:["Post the lead summary to the SDR channel","Include the call transcript link"],out:card([["Channel","#sdr-hot-leads"]],`<b>Hot lead:</b> ${n} (${co}) wants a demo. Booked ${slot}.`)},"gold");
-  await go("alert","crm");S.demo++;inboxAdd(`Demo booked: ${n}`,`${co} · ${slot}`,true)}
- else if(k=="callback"){await go("sw","retry");
-  await runV("retry",{params:{Operation:"Wait until",Retries:"2"},lines:[`Schedule a call for <em>${cb}</em>`,"Resume the flow at that time"],out:Tb(["Lead","Call again"],[[n,cb]],"1 callback")});
-  await go("retry","crm");S.cb++;inboxAdd(`Callback: ${n}`,`${co} · ${cb}`,false)}
- else if(k=="noanswer"){await go("sw","sms");
-  await runV("sms",{params:{Channel:"SMS",Template:"missed_call"},lines:["Send a short message with a booking link"],out:card([["To",n]],`Hi ${n.split(" ")[0]}, sorry we missed you. Pick a time that suits you: <b>aivatika.in/book</b>`)});
-  await go("sms","crm");S.sms++}
- else{await go("sw","nurt");
-  await runV("nurt",{params:{App:"CRM",List:"Nurture 90 days"},lines:["Mark as not interested","Re-contact in 90 days","Stop calls"],out:Tb(["Lead","Next contact"],[[n,"in 90 days"]])});
-  await go("nurt","crm");S.nur++}
- await runV("crm",{params:{App:"HubSpot",Operation:"Update deal"},lines:[`Stage: <em>${k=="interested"?"Demo booked":k=="callback"?"Callback":k=="noanswer"?"Follow-up SMS":"Nurture"}</em>`,"Attach the call summary and transcript"],out:Tb(["Lead","Stage"],[[n,lab]],"1 deal updated")});
- S.routed++;S.hist.push(secs);S.xh.push(k=="interested"?1:0);trim();S.session++;log(`${n}: ${lab}`,k=="interested"?"good":k=="notint"?"bad":"gold");kp2(k=="interested");chart();done()}
-function kp2(f){setK("a",S.routed,nf,"+"+S.session+" this session");setK("b",S.demo,nf,"hot leads to SDR",f);setK("c",S.cb,nf,"auto retries set");setK("d",S.nur+S.sms,nf,"nurture and SMS")}
-/* ---------- Part 3: call analysis ---------- */
-const OBJ=["Price is too high","Already using a competitor","Bad timing","Needs boss approval"],FLG=["Recording disclosure was missed","Promised a discount that is not approved","Lead asked to stop, agent continued"];
+  if(running){pending.push(kind);return}running=true;reset();
+  const [n,proj,config,loc,val,sc]=rnd(L);
+  const isTransfer=kind==="transfer";
+
+  if(isTransfer){
+    log(`Mid-call transfer request: Buyer ${n} requesting senior property advisor`,"");
+    await runV("trig2",{params:{Trigger:"Transfer Lookup Webhook",Status:"In Call"},lines:[`Buyer <strong>${n}</strong> requested live pricing desk`,`Property: <em>${proj} (${config})</em>`],out:Tb(["Buyer","Project"],[[n,proj]],"Transfer request")});
+    await go("trig2","avail");
+    await runV("avail",{params:{App:"Google Calendar",Department:"Real Estate Sales"},lines:[`Check availability of on-site consultants for <em>${loc}</em>`,`Found 2 active consultants free now`],out:Tb(["Locality","Free Agents"],[[loc,"2 Available"]])});
+    await go("avail","pick");
+    await runV("pick",{params:{Language:"JavaScript",Strategy:"Round Robin"},lines:[`Assigned Senior Advisor: <em>Rajesh Varma</em>`,`Phone destination: <em>+91 99XXX 12345</em>`],out:Tb(["Advisor","Extension"],[["Rajesh Varma","Ext 104"]])});
+    await go("pick","dest");
+    await runV("dest",{params:{App:"Respond to Webhook",Destination:"SIP / Tel"},lines:[`Route caller audio seamlessly to extension 104`,`Zero call drop, transfer latency 420ms`],out:Tb(["Call Status","Destination"],[["Transferred","Ext 104"]])});
+    S.routed++;S.cb++;S.hist.push(85);S.xh.push(1);trim();S.session++;
+    inboxAdd(`Live Call Transferred: ${n}`,`Senior Advisor Rajesh Varma connected`,true);
+    log(`Live call for ${n} transferred to on-site advisor.`,"good");
+    kp2(true);chart();done();
+    return;
+  }
+
+  const k=kind||rnd(["hot","warm","cold"]);
+  const score=k==="hot"?88+Math.floor(Math.random()*10):k==="warm"?68+Math.floor(Math.random()*12):35+Math.floor(Math.random()*20);
+  const slot=rnd(["Saturday 11:30 AM","Sunday 3:00 PM","Monday 10:00 AM"]);
+  const secs=k==="hot"?240:k==="warm"?150:45;
+
+  log(`Call concluded for ${n} (${dur(secs)}). Extracting metrics...`,"");
+  await runV("trig",{params:{Trigger:"Vapi End-of-Call Webhook",Duration:dur(secs)},lines:[`Call ended event received from telephony server`,`Buyer: <strong>${n}</strong>, Project: <em>${proj}</em>`],out:Tb(["Buyer","Duration"],[[n,dur(secs)]],"1 call")});
+  await go("trig","ext");
+  await runV("ext",{params:{Operation:"Code / JSON Parsing",Engine:"V8"},lines:[`Extracted transcript: <em>${Math.round(secs*2.2)} words</em>`,`Extracted budget: <em>${val}</em>`,`Extracted timeline: <em>Ready to move / 3 months</em>`],out:Tb(["Buyer","Budget"],[[n,val]])});
+  await go("ext","score");
+  await runV("score",{params:{Model:"Claude (latest Sonnet)",Focus:"Real Estate ICP"},lines:[`Evaluate purchase power & timeline: <em>${score}/100</em>`,`Budget fit: High, Timeline: Immediate`,`Categorization: <strong class="${score>=80?'':'w'}">${score>=85?'Hot':score>=60?'Warm':'Cold'}</strong>`],out:Tb(["Score","Classification"],[[score+"/100",score>=85?"Hot":score>=60?"Warm":"Cold"]])},score>=85?"":"gold");
+  await go("score","parse");
+  await runV("parse",{params:{Operation:"Code / Normalize",Output:"JSON"},lines:[`Payload formatted for n8n Switch router`,`Target route: <em>${score>=85?'Hot':score>=60?'Warm':'Cold'}</em>`],out:Tb(["Route","Priority"],[[score>=85?"Hot":score>=60?"Warm":"Cold",score>=85?"P1":"P2"]])});
+  await go("parse","sw");
+  await runV("sw",{params:{Mode:"Rules Switch",Field:"route"},lines:[`Evaluating condition on score ${score}`,`Selecting branch: <strong>${score>=85?'Hot Branch':score>=60?'Warm Branch':'Cold Branch'}</strong>`],out:Tb(["Branch Selected"],[[score>=85?"Hot (Trigger Workflow 3)":score>=60?"Warm (Book Calendar)":"Cold (Google Sheets)"]])});
+
+  if(score>=85){
+    await go("sw","hot","gold");
+    await runV("hot",{params:{App:"HTTP Request",Target:"Workflow 3 (Call Analysis)"},lines:[`Trigger deep AI analysis & proposal generation`,`Fast-track notification dispatched to sales director`],out:Tb(["Analysis","Status"],[["Workflow 3","Triggered"]])},"gold");
+    S.demo++;
+    inboxAdd(`Hot Real Estate Lead: ${n}`,`Score ${score}/100 · Site visit priority`,true);
+  } else if(score>=60){
+    await go("sw","book");
+    await runV("book",{params:{App:"Google Calendar",Operation:"Create Event"},lines:[`Book weekend site visit slot: <em>${slot}</em>`,`Send calendar invite with Google Maps location`],out:Tb(["Site Visit","Slot"],[[proj,slot]])});
+    S.cb++;
+    inboxAdd(`Site Visit Booked: ${n}`,`${proj} · ${slot}`,true);
+  } else {
+    await go("sw","cold");
+    await runV("cold",{params:{App:"Google Sheets / CRM",List:"14-Day Nurture"},lines:[`Append buyer to 14-day WhatsApp nurture sheet`,`Schedule follow-up when upcoming towers launch`],out:Tb(["List","Wait"],[["Nurture List","14 Days"]])});
+    S.nur++;
+    inboxAdd(`Nurture Queue: ${n}`,`Score ${score}/100 · Added to follow-up sheet`,false);
+  }
+
+  S.routed++;S.hist.push(score);S.xh.push(score>=85?1:0);trim();S.session++;
+  log(`Buyer ${n} scored ${score}/100. Routed to ${score>=85?'Hot Priority':score>=60?'Site Visit Calendar':'Follow-up Nurture'}.`,score>=85?"good":score>=60?"good":"gold");
+  kp2(score>=85);chart();done();
+}
+function kp2(f){setK("a",S.routed,nf,`+${S.session} this session`);setK("b",S.demo,nf,"hot leads fast-tracked",f);setK("c",S.cb,nf,"site visits booked");setK("d",S.nur,nf,"nurture queue")}
+
+/* ---------- Part 3: Call Transcription + Analysis + Follow-up ---------- */
 async function run3(kind){
- if(running){pending.push(kind);return}running=true;reset();
- const great=kind=="great",bad=kind=="flag"||(!kind&&Math.random()<.12),[n,co]=rnd(L),secs=170+Math.floor(Math.random()*200),a=great?19:bad?10:13+Math.floor(Math.random()*6),b=great?28:bad?15:19+Math.floor(Math.random()*8),c=great?23:bad?14:15+Math.floor(Math.random()*8),d=great?23:bad?12:16+Math.floor(Math.random()*8),q=a+b+c+d,obj=rnd(OBJ),flag=rnd(FLG),sent=great?"positive":bad?"negative":rnd(["positive","positive","neutral"]),talk=38+Math.floor(Math.random()*18),act=sent=="negative"?"Manager call-back within 24h":sent=="neutral"?"Send case study, follow up in 3 days":"Book demo this week";
- log(`Recording ready: call with ${n} (${dur(secs)})`,"");
- await runV("trig",{params:{Trigger:"Webhook",From:"Voice platform"},lines:["New recording uploaded",`Lead ${n}, ${co}, ${dur(secs)}`],out:Tb(["Lead","Length"],[[n,dur(secs)]],"1 recording")});
- await go("trig","tr");
- await runV("tr",{params:{Engine:"Speech-to-text",Language:"English / Hindi"},lines:["Convert audio to text with speaker labels",`<em>${Math.round(secs*2.4)}</em> words transcribed`],out:Tb(["Speaker","Sample"],[["Agent","Hi, is this a good time?"],["Lead",bad?"Please stop calling.":"Yes, go ahead."]],"transcript ready")});
- await go("tr","ai");
- await runV("ai",{params:{Model:"Claude",Output:"JSON"},lines:[`<b>1. Summary</b> lead asked about pricing and setup time`,`<b>2. Sentiment</b> <em class="${sent=="negative"?"w":""}">${sent}</em>`,`<b>3. Objection</b> <em>${obj}</em>`,`<b>4. Talk ratio</b> agent ${talk}%, lead ${100-talk}%`,`<b>5. Next action</b> ${act}`],out:Tb(["sentiment","objection","next action"],[[sent,obj,act]])},bad?"gold":"");
- await go("ai","qual");
- await runV("qual",{params:{Language:"JavaScript",Rubric:"4 parts"},lines:[`Opening <em>${a}/20</em>`,`Discovery questions <em>${b}/30</em>`,`Objection handling <em>${c}/25</em>`,`Clear next step <em>${d}/25</em>`,`Total <em class="${q<70?"w":""}">${q}/100</em>`],out:Tb(["Part","Score"],[["Opening",a],["Discovery",b],["Objections",c],["Next step",d]],"Total "+q+"/100")});
- await go("qual","iff");
- await runV("iff",{params:{Condition:"Score under 65 or compliance flag"},lines:[`Score <em>${q}</em>, compliance issue: <em class="${bad?"w":""}">${bad?"YES":"none"}</em>`,bad?"Branch TRUE: alert the manager":"Branch FALSE: save and finish"],out:Tb(["Review needed"],[[bad?"yes":"no"]])});
- if(bad){await go("iff","flag","gold");
-  await runV("flag",{params:{Channel:"Slack and email",To:"Sales manager"},lines:["Post the call summary and the flagged moment","Link the exact timestamp"],out:card([["To","sales.manager@aivatika.in"],["Subject","Call needs review"]],`${n} (${co}): <b>${flag}</b>. Quality ${q}/100.`)},"gold");
-  await go("flag","save");S.fl++;inboxAdd(`Review: call with ${n}`,flag,false)}
- else await go("iff","save");
- await runV("save",{params:{App:"Database",Table:"call_insights"},lines:["Store scores, sentiment and objection","Update the objection counts for the dashboard"],out:Tb(["Lead","Score","Objection"],[[n,q,obj]],"1 row saved")});
- await go("save","crm");
- await runV("crm",{params:{App:"HubSpot",Operation:"Add note"},lines:["Add the AI summary as a note",`Next action: <em>${act}</em>`],out:Tb(["Lead","Note"],[[n,"summary added"]],"1 note added")});
- if(great)inboxAdd(`Great call: ${n}`,"Saved as a coaching example",true);
- S.n++;S.avg=(S.avg*(S.n-1)+q)/S.n;if(sent=="positive")S.pos++;S.hist.push(q);S.xh.push(bad?1:0);trim();S.session++;
- log(bad?`${n}: score ${q}, flagged: ${flag}`:`${n}: score ${q}, sentiment ${sent}`,bad?"bad":"good");kp3(bad);chart();done()}
-function kp3(f){setK("a",S.n,nf,"+"+S.session+" this session");setK("b",S.avg,n=>n.toFixed(0),"out of 100");setK("c",S.fl,nf,"sent to manager",f);setK("d",S.pos/S.n*100,pf,"of analysed calls")}
+  if(running){pending.push(kind);return}running=true;reset();
+  const [n,proj,config,loc,val]=rnd(L);
+  const hasAudio=kind!=="no";
+  const isFlag=kind==="flag";
+  const secs=hasAudio?(160+Math.floor(Math.random()*140)):0;
+  const objections=["Possession timeline enquiry","Seeking 5% booking discount","Carpet area clarification","Bank loan pre-approval assistance"];
+  const obj=rnd(objections);
+  const qScore=isFlag?62:88+Math.floor(Math.random()*10);
+
+  log(`Processing call transcript & intelligence for ${n} (${proj})`,"");
+  await runV("trig",{params:{Trigger:"Call Analysis Webhook",Format:"JSON"},lines:[`Webhook payload received with call session ID`,`Buyer: <strong>${n}</strong>, Recording available: <em>${hasAudio?'Yes':'Direct stream'}</em>`],out:Tb(["Buyer","Audio"],[[n,hasAudio?"Yes":"Live Stream"]],"1 call")});
+  await go("trig","iff");
+  await runV("iff",{params:{Condition:"hasRecording === true"},lines:[`Check audio recording availability`,`Condition evaluated: <strong>${hasAudio?'TRUE (Download Audio)':'FALSE (Live Stream)'}</strong>`],out:Tb(["Has Audio"],[[hasAudio?"true":"false"]])});
+
+  if(hasAudio){
+    await go("iff","dl","yes");
+    await runV("dl",{params:{App:"HTTP Request",Method:"GET"},lines:[`Download WAV/MP3 recording from cloud storage`,`Downloaded ${(secs*0.032).toFixed(1)} MB audio payload`],out:Tb(["File","Size"],[["recording.wav",(secs*0.032).toFixed(1)+" MB"]])});
+    await go("dl","tr");
+    await runV("tr",{params:{Engine:"Whisper Speech-to-Text",Language:"English / Hindi"},lines:[`Transcribe audio with dual-channel diarization`,`Generated <em>${Math.round(secs*2.3)} words</em> formatted transcript`],out:Tb(["Words","Accuracy"],[[Math.round(secs*2.3)+" words","98.4%"]])});
+    await go("tr","bld");
+  } else {
+    await go("iff","bld","no");
+  }
+
+  await runV("bld",{params:{Operation:"Code / Format",Output:"Clean Text"},lines:[`Assemble buyer dialogue and timeline into structured text`,`Clean background telephony artifacts`],out:Tb(["Transcript","Status"],[["Ready","Cleaned"]])});
+  await go("bld","ai");
+  await runV("ai",{params:{Model:"Claude (latest Sonnet)",Task:"Real Estate Analysis"},lines:[`<b>1. Buyer Summary:</b> Interested in ${config} facing clubhouse`,`<b>2. Key Query / Objection:</b> <em>${obj}</em>`,`<b>3. Pricing Readiness:</b> ${val} verified`,`<b>4. Call Quality Score:</b> <strong class="${qScore>=75?'':'w'}">${qScore}/100</strong>`],out:Tb(["Quality","Key Objection"],[[qScore+"/100",obj]])},qScore>=75?"":"gold");
+  await go("ai","parse");
+  await runV("parse",{params:{Operation:"Code / JSON Extract",Target:"HubSpot + Gmail + Docs"},lines:[`Extract CRM custom fields, follow-up email copy, and quotation draft`,`Split output into 3 automated sync branches`],out:Tb(["Branches","Payload"],[["3 Actions","Validated"]])});
+
+  await Promise.all([
+    (async()=>{
+      await go("parse","crm");
+      await runV("crm",{params:{App:"HubSpot / LeadSquared",Operation:"Update Deal"},lines:[`Set deal stage: <em>Site Visit Pending</em>`,`Attach AI call transcript & key objection note`,`Assign sales representative in ${loc}`],out:Tb(["CRM","Status"],[["HubSpot","Deal Updated"]])});
+    })(),
+    (async()=>{
+      await go("parse","em");
+      await runV("em",{params:{App:"Gmail",Template:"site_visit_prep"},lines:[`Send personalized follow-up email to ${n}`,`Include written answer regarding <em>${obj}</em>`,`Attach high-res floor plan for ${config}`],out:Tb(["Email","Status"],[["Gmail","Sent"]])});
+    })(),
+    (async()=>{
+      await go("parse","doc");
+      await runV("doc",{params:{App:"Google Docs",Template:"eoi_proposal"},lines:[`Generate customized Expression of Interest (EOI) doc`,`Auto-populate unit breakdown, payment milestones, and base price (${val})`],out:Tb(["Doc","Created"],[["EOI Proposal.pdf","Ready"]])});
+    })()
+  ]);
+
+  S.n++;S.avg=(S.avg*(S.n-1)+qScore)/S.n;if(qScore>=80)S.pos++;if(isFlag)S.fl++;S.hist.push(qScore);S.xh.push(qScore>=80?1:0);trim();S.session++;
+  inboxAdd(`Call Analyzed: ${n}`,`${proj} · ${obj} · Score ${qScore}/100`,qScore>=80);
+  log(`Call for ${n} analyzed. Score: ${qScore}/100. CRM updated, follow-up sent, EOI proposal generated.`,qScore>=80?"good":"gold");
+  kp3(qScore>=80);chart();done();
+}
+function kp3(f){setK("a",S.n,nf,`+${S.session} this session`);setK("b",S.avg,n=>n.toFixed(0),"out of 100");setK("c",S.pos,nf,"high-intent buyer calls",f);setK("d",S.fl,nf,"objections addressed")}
+
 /* ---------- config ---------- */
 const DEMOS={
-d1:{tab:"Part 1: Intake & call",title:"Part 1: Lead Intake and AI Call",sub:"A lead arrives from a form or ad, is cleaned, enriched and scored. Strong leads get an AI voice call right away. Weak ones go to a nurture list.",chip:"Lead to Call",wrap:15,
- nodes:[["trig","Multi-source Intake","Webhook",10,200,"wh",1],["clean","Domain, MX & Dedupe","Code",135,200,"cd"],["apollo","Apollo Enrichment","Apollo API",260,200,"db"],["score","AI Intent Score","Claude LLM",385,200,"ai"],["iff","Score 60 or more?","If",510,200,"iff"],["call","Place AI Call","Voice agent",650,80,"ph"],["rec","Record & Transcribe","Speech-to-text",790,80,"mic"],["nurture","Nurture List","CRM",650,320,"db"]],
- edges:[["trig","clean","lead"],["clean","apollo","valid"],["apollo","score","data"],["score","iff","score"],["iff","call","call",-12],["call","rec","audio"],["iff","nurture","low",18]],
- btns:[["+ New lead","",1],["Simulate hot lead","hot"],["Simulate cold lead","cold"],["Simulate no answer","noans"]],
- k:["Leads ingested","Qualified for AI call","Calls connected","Avg lead score"],chart:"Lead score per run (gold = 80 or more)",inbox:"Call queue and nurture list",
+d1:{tab:"Part 1: Intake & AI Call",title:"Part 1: Real Estate Lead Intake & AI Call",sub:"A property buyer submits an enquiry on Housing.com, 99acres, or Meta Ads. Data is cleaned, a WhatsApp brochure is sent immediately, and an AI voice agent dials the buyer within 60 seconds.",chip:"Property Lead to Call",wrap:15,
+ nodes:[["trig","New Lead Webhook","Webhook",420,20,"wh",1],["clean","Normalize Lead","Code",420,130,"cd"],["em","Send Confirmation Email","Gmail",200,250,"ms"],["sms","Send Confirmation SMS","Twilio",200,370,"ph"],["call","AI Receptionist Calls Lead","HTTP Request",640,250,"ph"]],
+ edges:[["trig","clean","property lead"],["clean","em","brochure"],["em","sms","sms sent"],["clean","call","dial buyer",10]],
+ btns:[["+ Inbound Buyer Lead","",1],["Simulate Hot Buyer (3 BHK)","hot"],["Simulate Budget Lead (2 BHK)","cold"],["Simulate Unanswered Call","noans"]],
+ k:["Property Leads Ingested","AI Calls Placed","Calls Connected","Avg Buyer Intent Score"],chart:"Buyer intent score (gold = 80+ Hot)",inbox:"Active property buyers queue",
  init:()=>({leads:1462,qual:877,conn:614,avg:61,hist:[72,48,88,65,34,79,91,58],xh:[0,0,1,0,0,0,1,0],ib:[],q:0,session:0}),kp:()=>kp1(0),run:run1},
-d2:{tab:"Part 2: Post-call routing",title:"Part 2: Post-Call Routing",sub:"The call has ended. AI classifies the outcome and the flow routes it: book a demo and alert the SDR, schedule a callback, send an SMS, or move to nurture. The CRM is updated every time.",chip:"Call Outcome Router",wrap:15,
- nodes:[["trig","Call Ended","Webhook",10,190,"wh",1],["cls","AI Classify Outcome","Claude LLM",135,190,"ai"],["sw","Route by Outcome","Switch",260,190,"sw"],["book","Book Demo","Calendar",420,10,"ck"],["alert","Alert SDR","Slack",560,10,"bl"],["retry","Schedule Callback","Wait",420,130,"tm"],["sms","Send SMS Follow-up","SMS mock",420,250,"ms"],["nurt","Move to Nurture","CRM",420,370,"db"],["crm","Update CRM","HubSpot",720,190,"pr"]],
- edges:[["trig","cls"],["cls","sw"],["sw","book","demo",-40],["sw","retry","callback",-14],["sw","sms","no answer",14],["sw","nurt","not interested",40],["book","alert"],["alert","crm"],["retry","crm"],["sms","crm"],["nurt","crm"]],
- btns:[["+ Process call result","",1],["Simulate interested lead","interested"],["Simulate callback request","callback"],["Simulate no answer","noanswer"],["Simulate not interested","notint"]],
- k:["Calls routed","Demos booked","Callbacks scheduled","Nurture and SMS"],chart:"Call duration in seconds (gold = interested)",inbox:"Demos and callbacks",
- init:()=>({routed:861,demo:112,cb:96,nur:188,sms:140,hist:[210,45,25,180,55,230,30,160],xh:[1,0,0,1,0,1,0,1],ib:[],q:0,session:0}),kp:()=>kp2(0),run:run2},
-d3:{tab:"Part 3: Call analysis",title:"Part 3: Call Analysis",sub:"Every recording is transcribed and analysed by AI: summary, sentiment, objections and a quality score. Calls with problems are flagged to a manager. Insights go to the dashboard and CRM.",chip:"Call Quality & Insights",wrap:15,
- nodes:[["trig","Recording Ready","Webhook",10,200,"wh",1],["tr","Transcribe","Speech-to-text",135,200,"mic"],["ai","AI Call Analysis","Claude LLM",260,200,"ai"],["qual","Quality Score","Code",385,200,"cd"],["iff","Needs Review?","If",510,200,"iff"],["flag","Alert Manager","Slack and email",650,70,"bl"],["save","Save Insights","Database",780,200,"db"],["crm","Notes to CRM","HubSpot",905,200,"pr"]],
- edges:[["trig","tr"],["tr","ai"],["ai","qual"],["qual","iff"],["iff","flag","yes",-12],["iff","save","no",18],["flag","save"],["save","crm"]],
- btns:[["+ Analyse a call","",1],["Simulate great call","great"],["Simulate flagged call","flag"]],
- k:["Calls analysed","Avg quality score","Flagged for review","Positive sentiment"],chart:"Quality score per call (gold = flagged)",inbox:"Manager review queue",
- init:()=>({n:640,avg:78,fl:23,pos:410,hist:[82,76,58,90,79,84,61,88],xh:[0,0,1,0,0,0,1,0],ib:[],q:0,session:0}),kp:()=>kp3(0),run:run3}};
+d2:{tab:"Part 2: Post-Call Routing",title:"Part 2: Post-Call Scoring & Site Visit Routing",sub:"The qualification call concludes. Claude extracts buyer budget and timeline, routes hot buyers to instant site-visit scheduling, sends 3D walkthroughs to warm prospects, and handles agent availability transfer.",chip:"Site Visit Router",wrap:15,
+ nodes:[["trig","Vapi End-of-Call Webhook","Webhook",260,20,"wh",1],["ext","Extract Call Data","Code",260,110,"cd"],["score","Claude Scores Lead","HTTP Request",260,200,"ai"],["parse","Parse Score","Code",260,290,"cd"],["sw","Route by Lead Score","Switch",260,380,"sw"],["hot","Trigger Call Analysis (Workflow 3)","HTTP Request",50,440,"ph"],["book","Book Agent Calendar","Calendar",260,440,"ck"],["cold","Add to Follow-up List","Google Sheets",470,440,"db"],["trig2","Transfer Lookup Webhook","Webhook",760,40,"wh",1],["avail","Check Agent Availability","Calendar",760,150,"ck"],["pick","Pick Agent Number","Code",760,260,"cd"],["dest","Return Transfer Destination","Respond",760,370,"ph"]],
+ edges:[["trig","ext"],["ext","score"],["score","parse"],["parse","sw"],["sw","hot","Hot (85+)",-15],["sw","book","Warm (60-84)",0],["sw","cold","Cold (<60)",15],["trig2","avail"],["avail","pick"],["pick","dest"]],
+ btns:[["+ Process Call Outcome","",1],["Simulate Hot Lead (85+)","hot"],["Simulate Warm Lead (Book Site Visit)","warm"],["Simulate Cold Lead (Follow-up)","cold"],["Simulate Live Call Transfer","transfer"]],
+ k:["Calls Evaluated","Hot Leads Fast-Tracked","Site Visits Scheduled","Nurture List"],chart:"Buyer qualification score (gold = hot lead)",inbox:"Site visits & routing queue",
+ init:()=>({routed:861,demo:112,cb:96,nur:188,sms:140,hist:[88,72,94,62,45,90,78,86],xh:[1,0,1,0,0,1,0,1],ib:[],q:0,session:0}),kp:()=>kp2(0),run:run2},
+d3:{tab:"Part 3: Call Analysis",title:"Part 3: Call Transcription & Follow-up Analysis",sub:"Every property call recording is transcribed via Whisper and analyzed by Claude: buyer sentiment, budget readiness, and objections. Automatically updates the CRM, dispatches follow-up emails, and creates proposal docs.",chip:"Buyer Call Intelligence",wrap:15,
+ nodes:[["trig","Call Analysis Webhook","Webhook",400,20,"wh",1],["iff","Has Recording?","If",400,110,"iff"],["dl","Download Call Recording","HTTP Request",230,190,"ph"],["tr","Transcribe Recording (Whisper)","HTTP Request",230,275,"mic"],["bld","Build Transcript","Code",400,350,"cd"],["ai","Claude Analyzes Transcript","HTTP Request",580,350,"ai"],["parse","Parse Analysis","Code",740,350,"cd"],["crm","Update CRM (HubSpot)","HubSpot",900,230,"pr"],["em","Send Follow-up Email","Gmail",900,345,"ms"],["doc","Create Proposal + Invoice Doc","Google Docs",900,440,"lg"]],
+ edges:[["trig","iff"],["iff","dl","yes",-15],["dl","tr"],["tr","bld"],["iff","bld","no",15],["bld","ai"],["ai","parse"],["parse","crm","deal sync"],["parse","em","follow-up"],["parse","doc","proposal doc",15]],
+ btns:[["+ Transcribe & Analyze","",1],["Simulate With Audio Recording","yes"],["Simulate Direct Audio Stream","no"],["Simulate Negotiation Call","flag"]],
+ k:["Buyer Calls Analyzed","Avg Call Quality Score","High-Intent Calls","Objections Handled"],chart:"Buyer qualification score (gold = high intent)",inbox:"Manager review & quote queue",
+ init:()=>({n:640,avg:82,fl:44,pos:410,hist:[82,76,88,90,79,94,68,88],xh:[0,0,1,1,0,1,0,1],ib:[],q:0,session:0}),kp:()=>kp3(0),run:run3}
+};
+
 function load(k){cur=k;const d=DEMOS[k];S=DEMOS[k].S=DEMOS[k].S||d.init();wrapN=d.wrap;
  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.k==k));
  $("title").textContent=d.title;$("sub").textContent=d.sub;$("chipt").textContent=d.chip;$("ctt").textContent=d.chart;$("itt").textContent=d.inbox;
