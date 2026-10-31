@@ -801,7 +801,7 @@
           </svg>
           Back to Automations
         </a>
-        <button type="button" class="btn-nav-primary" onclick="openContactModal()">Contact Us</button>
+        
       </div>
     </div>
   </header>
@@ -837,15 +837,6 @@
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
           </svg>
           Watch Live Simulation
-        </button>
-
-        <button class="btn-cta-secondary" type="button" onclick="openContactModal()">
-          Deploy This Pipeline
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
-          </svg>
         </button>
       </div>
     </div>
@@ -957,34 +948,34 @@
               <span class="row-title">B2B Data Enrichment API</span>
               <span class="row-sub">Apollo.io / Hunter.co</span>
             </td>
-            <td>Apollo.io or Hunter account API Key (Free tier or Basic plan).</td>
+            <td>Apollo.io or Hunter API Key (Free tier or Basic subscription).</td>
             <td>
-              <span class="cost-highlight">Free – $49/mo</span>
-              <span class="row-sub">Free tier includes 100 credits/mo</span>
+              <span class="cost-highlight">Free – ₹4,200/mo</span>
+              <span class="row-sub">Free tier includes 100 verified leads/mo</span>
             </td>
-            <td>Fetches verified corporate email, company size, LinkedIn, and revenue.</td>
+            <td>Fetches verified corporate email, company size, LinkedIn URL, and revenue.</td>
           </tr>
           <tr>
             <td>
               <span class="row-title">AI Language Model</span>
               <span class="row-sub">Anthropic Claude / OpenAI</span>
             </td>
-            <td>Anthropic or OpenAI API Key (Pay-as-you-go).</td>
+            <td>Anthropic Claude or OpenAI API Key (Pay-per-token credits).</td>
             <td>
-              <span class="cost-highlight">~$5 – $15/mo</span>
-              <span class="row-sub">Based on ~1,500 leads evaluated</span>
+              <span class="cost-highlight">~₹450 – ₹1,250/mo</span>
+              <span class="row-sub">Based on ~1,500 leads evaluated/mo</span>
             </td>
-            <td>Analyzes firmographics against ICP criteria and writes custom sales briefing.</td>
+            <td>Analyzes firmographics against ICP rubric and drafts custom sales brief.</td>
           </tr>
           <tr>
             <td>
               <span class="row-title">Destination CRM</span>
               <span class="row-sub">HubSpot / Salesforce / Zoho</span>
             </td>
-            <td>CRM API key or OAuth access to destination pipeline.</td>
+            <td>CRM API key or OAuth connector to your existing pipeline.</td>
             <td>
-              <span class="cost-highlight">Existing Plan</span>
-              <span class="row-sub">Zero additional CRM fees</span>
+              <span class="cost-highlight">₹0 (Existing Plan)</span>
+              <span class="row-sub">Zero additional CRM platform fees</span>
             </td>
             <td>Stores enriched contacts, pipeline stages, activity notes, and rep assignments.</td>
           </tr>
@@ -993,12 +984,12 @@
               <span class="row-title">Workflow Execution Host</span>
               <span class="row-sub">Self-Hosted or Cloud VPS</span>
             </td>
-            <td>Cloud server or n8n cloud subscription (AWS / Hetzner / DigitalOcean).</td>
+            <td>Cloud VPS server (AWS / Hetzner / DigitalOcean) or n8n Cloud.</td>
             <td>
-              <span class="cost-highlight">~$10 – $20/mo</span>
-              <span class="row-sub">Or existing private server</span>
+              <span class="cost-highlight">~₹850 – ₹1,700/mo</span>
+              <span class="row-sub">Or client's existing private cloud server</span>
             </td>
-            <td>Runs your automation 24/7 with zero data sharing outside your cloud.</td>
+            <td>Executes the automated pipeline 24/7 with zero data sharing outside your cloud.</td>
           </tr>
         </tbody>
       </table>
@@ -1025,81 +1016,36 @@
         <tbody>
           <tr>
             <td>
-              <span class="row-title">Custom Pipeline Architecture & Build</span>
-              <span class="row-sub">Full n8n implementation</span>
+              <span class="row-title">One-Time Setup & Architecture</span>
+              <span class="row-sub">Turnkey Production Pipeline</span>
             </td>
             <td>
-              End-to-end webhook intake, Apollo & Claude integration, CRM custom field mapping schema, deduplication rules, and instant Slack notifications.
+              End-to-end webhook intake, Apollo & Claude AI enrichment integration, custom ICP scoring rules, CRM field mapping schema, deduplication logic, and Slack alert routing.
             </td>
             <td>
               <span class="cost-highlight">₹59,000</span>
-              <span class="row-sub">One-time setup fee</span>
+              <span class="row-sub">One-time setup investment</span>
             </td>
             <td>
               <strong>5 Business Days</strong>
-              <span class="row-sub">Turnkey deployment</span>
+              <span class="row-sub">Full production go-live</span>
             </td>
           </tr>
           <tr>
             <td>
-              <span class="row-title">Custom ICP Scoring Prompts</span>
-              <span class="row-sub">Tailored to your business</span>
+              <span class="row-title">Additional Monthly Maintenance & Support</span>
+              <span class="row-sub">Optional Ongoing SLA</span>
             </td>
             <td>
-              Custom prompt engineering and scoring rubrics aligned with your sales team's qualification criteria (Hot/Warm/Low tier routing).
-            </td>
-            <td>
-              <span class="cost-badge-included">Included in Setup</span>
-            </td>
-            <td>
-              Collaborative sign-off with sales lead
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span class="row-title">QA Testing & Fail-Safe Safeguards</span>
-              <span class="row-sub">Zero-lead-loss guarantee</span>
-            </td>
-            <td>
-              Disposable email filtration, API rate-limiting retries, error queue buffers, and comprehensive simulated test runs.
-            </td>
-            <td>
-              <span class="cost-badge-included">Included in Setup</span>
-            </td>
-            <td>
-              Pre-launch verification
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span class="row-title">Team Handover & Runbook</span>
-              <span class="row-sub">Documentation & Video SOP</span>
-            </td>
-            <td>
-              Recorded team walkthrough, n8n JSON workflow export, architecture diagram, and credential management guide.
-            </td>
-            <td>
-              <span class="cost-badge-included">Included in Setup</span>
-            </td>
-            <td>
-              Handover session
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span class="row-title">Ongoing SLA Maintenance & Monitoring</span>
-              <span class="row-sub">Optional Monthly Support</span>
-            </td>
-            <td>
-              24/7 uptime monitoring, third-party API deprecation fixes, monthly prompt tuning, and priority incident response (< 4 hours).
+              24/7 automated pipeline uptime monitoring, third-party API deprecation updates, monthly prompt optimization, and priority engineering response (< 4 hours).
             </td>
             <td>
               <span class="cost-highlight">₹9,500/mo</span>
-              <span class="cost-badge-optional">Optional</span>
+              <span class="cost-badge-optional">Additional monthly fee</span>
             </td>
             <td>
-              Month-to-month
-              <span class="row-sub">Cancel anytime</span>
+              <strong>Ongoing SLA</strong>
+              <span class="row-sub">Month-to-month, cancel anytime</span>
             </td>
           </tr>
         </tbody>
@@ -1108,14 +1054,14 @@
 
     <!-- Bottom CTA -->
     <div class="bottom-cta">
-      <h2>Deploy This Pipeline for Your Business</h2>
-      <p>Have your sales team receiving verified, enriched leads in your CRM within 5 business days.</p>
+      <h2>Experience the Live Workflow</h2>
+      <p>Watch how inbound leads are enriched via Apollo and scored with Claude AI in real time.</p>
       <div class="bottom-cta-btns">
-        <button class="btn-cta-primary" type="button" onclick="openContactModal()">
-          Book Architecture Call
-        </button>
-        <button class="btn-cta-outline" type="button" onclick="openSimulation()">
-          Launch Live Simulation
+        <button class="btn-sim-large" type="button" onclick="openSimulation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Watch Live Simulation
         </button>
       </div>
     </div>
@@ -1230,3 +1176,4 @@
 </body>
 
 </html>
+
