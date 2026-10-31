@@ -1247,7 +1247,8 @@
     "includes": "GeM and procurement portal scraper, keyword & category intelligence filters, budget and location matching, daily scans, automated deadline alerts.",
     "needs": "Target keywords and category criteria, Google Sheets or database for lead logging, Slack, Telegram or Email for alerts.",
     "summary": "Scrapes GeM and e-procurement portals daily, filters opportunities using AI keyword matching, and delivers instant alerts with direct bid links.",
-    "hidden": true
+    "detailsUrl": "tender-hunter-details.html",
+    "hidden": false
   },
   {
     "id": "email",
@@ -1298,6 +1299,19 @@
     "needs": "WhatsApp Business Cloud API token, AI reasoning key (Claude/OpenAI), Hospital HMS or Google Calendar integration access, duty doctor roster.",
     "summary": "Triages patient enquiries to specialty departments, books available doctor consultation slots via WhatsApp, recovers missed appointments, and monitors post-discharge recovery.",
     "detailsUrl": "hospital-automation-details.html",
+    "hidden": false
+  },
+  {
+    "id": "contract",
+    "name": "AI Contract Lifecycle Automation",
+    "headline": "Review, approve, and track contracts with AI precision.",
+    "desc": "Extracts terms from inbound contracts, scores risk, manages multi-tier legal/finance/CEO approvals, sends for e-sign, and monitors renewal deadlines. Monthly maintenance: ₹14,500/mo.",
+    "setup": 149000,
+    "maintenance": 14500,
+    "includes": "Automated OCR & key-term extraction, Claude AI risk & deviation scoring, multi-tier Slack approval workflows (Legal, Finance, CEO), e-Signature webhook sync (DocuSign/SignEasy), and automated 90/60/30-day renewal deadline tracker.",
+    "needs": "e-Signature service API key (DocuSign, SignEasy, Zoho Sign), cloud storage access (Google Drive or OneDrive), Slack workspace for team approvals, legal playbook guidelines.",
+    "summary": "Automates end-to-end contract lifecycles: OCR term extraction, AI risk analysis, multi-stakeholder approval routing, e-signature dispatch, and daily renewal deadline monitoring.",
+    "detailsUrl": "contract-lifecycle-details.html",
     "hidden": false
   },
   {
@@ -1581,7 +1595,9 @@
     /* ---- Preview Simulation Paths ---- */
     const PREVIEW_URLS = {
       dashboard: "automations/dashboard_workflow_live.html",
-      tender: "automations/tender_workflow_live.html",
+      tender: "Live Workflow_ Tender _ Opportunity Hunter.html",
+      contract: "Live_Workflow__AI_Contract_Lifecycle_Automation.html",
+      "contract-lifecycle": "Live_Workflow__AI_Contract_Lifecycle_Automation.html",
       email: "automations/email_workflow_live.html",
       lead: "automations/lead_enrichment_live.html",
       invoice: "automations/invoice_bot_live.html",
@@ -1601,7 +1617,8 @@
       renewals: "automations/compliance_tracker_live.html",
       recruit: "automations/resume_screening_live.html",
       payroll: "automations/payroll_prep_live.html",
-      realestate: "automations/realestate_lead_qualifier_live.html",
+      realestate: "Live_Workflow__Lead_Call_Pipeline_3_Parts.html",
+      hospital: "Live_Workflow__Hospital_Automation_Demos.html",
       dispatch: "automations/service_job_dispatcher_live.html",
       admissions: "automations/student_admissions_live.html",
       cart: "automations/abandoned_cart_recovery_live.html",
