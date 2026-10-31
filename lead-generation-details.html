@@ -71,100 +71,10 @@
     <!-- 2. Architecture Section -->
     <div class="section-title-wrap">
       <h2 class="section-title">Automated Pipeline Architecture</h2>
-      <p class="section-sub">Visual n8n execution diagram and step-by-step logic running inside your cloud workspace.</p>
+      <p class="section-sub">Step-by-step logic executed inside n8n for every incoming prospect.</p>
     </div>
 
-    <!-- Visual Flow Diagram in n8n style -->
-    <div class="diagram-card">
-      <div class="diagram-header">
-        <span class="diagram-badge">⚡ n8n Production Workflow Logic</span>
-        <span style="font-size: 12px; color: var(--subtle); font-weight: 600;">Left-to-right execution with automated retry & routing branches</span>
-      </div>
-
-      <div class="n8n-canvas">
-        <!-- Main row -->
-        <div class="n8n-main-row">
-          <!-- Node 1 -->
-          <div class="n8n-node">
-            <div class="node-header">
-              <span class="node-icon">⚡</span>
-              <span class="node-type">Trigger</span>
-            </div>
-            <div class="node-name">Multi-source intake</div>
-            <div class="node-sub">Webhooks & Forms</div>
-          </div>
-
-          <div class="n8n-arrow">→</div>
-
-          <!-- Node 2 -->
-          <div class="n8n-node">
-            <div class="node-header">
-              <span class="node-icon">⚙️</span>
-              <span class="node-type">Validator</span>
-            </div>
-            <div class="node-name">Domain & MX check</div>
-            <div class="node-sub">+ Deduplication logic</div>
-          </div>
-
-          <div class="n8n-arrow">→</div>
-
-          <!-- Node 3 -->
-          <div class="n8n-node">
-            <div class="node-header">
-              <span class="node-icon">🔍</span>
-              <span class="node-type">Enrichment</span>
-            </div>
-            <div class="node-name">Apollo enrichment</div>
-            <div class="node-sub">Firmographics & Size</div>
-          </div>
-
-          <div class="n8n-arrow">→</div>
-
-          <!-- Node 4 -->
-          <div class="n8n-node" style="border-color: var(--accent);">
-            <div class="node-header">
-              <span class="node-icon">🤖</span>
-              <span class="node-type" style="color: var(--accent);">AI Model</span>
-            </div>
-            <div class="node-name">AI scoring</div>
-            <div class="node-sub">Claude (latest Sonnet)</div>
-          </div>
-
-          <div class="n8n-arrow">→</div>
-
-          <!-- Node 5 -->
-          <div class="n8n-node">
-            <div class="node-header">
-              <span class="node-icon">🚀</span>
-              <span class="node-type">Destination</span>
-            </div>
-            <div class="node-name">CRM & Slack alert</div>
-            <div class="node-sub">HubSpot / Salesforce</div>
-          </div>
-        </div>
-
-        <!-- Error & Nurture branches under AI Node -->
-        <div class="n8n-branches">
-          <div class="n8n-branch-node">
-            <div class="n8n-branch-title error">
-              <span>⚠️</span>
-              <span>Error Fallback</span>
-            </div>
-            <div class="n8n-branch-desc">API down → Retry 3 times → Alert engineering team on Slack</div>
-          </div>
-
-          <div class="n8n-branch-node">
-            <div class="n8n-branch-title nurture">
-              <span>📁</span>
-              <span>Low-Score Branch</span>
-            </div>
-            <div class="n8n-branch-desc">Score &lt; 50 → Route lead to automated email nurture list</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step Cards below diagram -->
+    <!-- Step Cards -->
     <div class="pipeline-grid">
       <!-- Step 1 -->
       <div class="pipeline-step">
@@ -176,7 +86,7 @@
           <div class="step-title">Multi-Source Intake</div>
           <div class="step-desc">Captures raw leads instantly from Typeform, Webflow, Meta Lead Ads, or inbound email webhooks.</div>
         </div>
-        <div class="step-node-tag">⚡ Webhook Trigger</div>
+        <div class="step-node-tag">Webhook Trigger</div>
         <div class="step-arrow-badge">→</div>
       </div>
 
@@ -190,7 +100,7 @@
           <div class="step-title">Domain, MX & Deduplication</div>
           <div class="step-desc">Extracts corporate domain, performs deduplication against existing CRM records, and verifies mailserver MX validity. Free-tier email filtering (Gmail and Yahoo filtering is optional per client).</div>
         </div>
-        <div class="step-node-tag">⚙️ Code Sanitizer</div>
+        <div class="step-node-tag">Code Sanitizer</div>
         <div class="step-arrow-badge">→</div>
       </div>
 
@@ -204,7 +114,7 @@
           <div class="step-title">Apollo B2B Enrichment</div>
           <div class="step-desc">Queries Apollo/Hunter API for company employee count, industry, annual revenue estimate, LinkedIn URL, and tech stack.</div>
         </div>
-        <div class="step-node-tag">🔍 Apollo.io API</div>
+        <div class="step-node-tag">Apollo.io API</div>
         <div class="step-arrow-badge">→</div>
       </div>
 
@@ -218,7 +128,7 @@
           <div class="step-title">AI Intent & ICP Scoring</div>
           <div class="step-desc">Claude (latest Sonnet model) evaluates lead fit against your custom ICP rubric, assigning a score (1–100) and generating an executive sales brief.</div>
         </div>
-        <div class="step-node-tag">🤖 Claude (latest Sonnet)</div>
+        <div class="step-node-tag">Claude (latest Sonnet)</div>
         <div class="step-arrow-badge">→</div>
       </div>
 
@@ -232,7 +142,7 @@
           <div class="step-title">CRM Injection & Alert</div>
           <div class="step-desc">Creates or updates contact & deal in HubSpot/Salesforce, assigns SDR owner, and alerts the team on Slack.</div>
         </div>
-        <div class="step-node-tag">🚀 HubSpot / Slack</div>
+        <div class="step-node-tag">HubSpot / Slack</div>
       </div>
     </div>
 
@@ -307,7 +217,7 @@
 
     <!-- DPDP Act Privacy Note -->
     <div class="privacy-note">
-      <span style="font-size: 16px;">🛡️</span>
+      
       <div>
         <strong>Privacy &amp; Regulatory Compliance (India DPDP Act):</strong>
         All prospect and company data is processed in strict alignment with India's Digital Personal Data Protection (DPDP) Act. The workflow runs in your own cloud. Data is sent only to the services you approve, ensuring zero unauthorized third-party leakage.
@@ -371,7 +281,7 @@
 
     <!-- Return on Investment Line -->
     <div class="roi-box">
-      <div class="roi-title">📈 Estimated Return on Investment (Example)</div>
+      <div class="roi-title">Estimated Return on Investment (Example)</div>
       <div>If your team closes even <strong>[N]</strong> extra deals per month (at an average deal value of ₹<strong>[X]</strong>), this automation pays back in <strong>[M]</strong> months.</div>
     </div>
 
