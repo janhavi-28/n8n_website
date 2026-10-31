@@ -1271,6 +1271,33 @@
     "includes": "Multi-channel lead intake (form, webhook, Sheet), field mapping, CRM destination sync, deduplication logic, automated lead scoring, up to 1,500 leads/mo.",
     "needs": "Enrichment API key in your own name (Apollo or Hunter), inbound lead sources, destination CRM or database, field mapping schema.",
     "summary": "Captures inbound leads across web forms, landing pages, and email channels, enriches company & verified contact data, scores buyer intent with AI, and routes qualified prospects directly to your CRM.",
+    "detailsUrl": "lead-generation-details.html",
+    "hidden": false
+  },
+  {
+    "id": "realestate",
+    "name": "Real Estate AI Lead & Call Pipeline",
+    "headline": "Qualify real estate buyers with instant AI voice calls in seconds.",
+    "desc": "Captures property enquiries from Meta Ads & portals, qualifies budget & 2/3 BHK preference via instant conversational AI voice call, and schedules site visits. Monthly maintenance: ₹14,500/mo.",
+    "setup": 149000,
+    "maintenance": 14500,
+    "includes": "Multi-portal lead intake (Meta, Housing.com, 99acres), instant conversational AI voice call qualification, WhatsApp brochure delivery, automated site visit booking, LeadSquared/HubSpot CRM sync.",
+    "needs": "Virtual phone number / Twilio or Exotel credits, speech AI key, LeadSquared or CRM webhook, property brochures and floor plan PDFs.",
+    "summary": "Captures property buyer leads from ads & portals, initiates an instant conversational AI phone call to qualify budget & BHK preferences, and books site visits directly into your CRM.",
+    "detailsUrl": "real-estate-lead-call-details.html",
+    "hidden": false
+  },
+  {
+    "id": "hospital",
+    "name": "Hospital Automation & Patient Care Pipeline",
+    "headline": "Automate patient bookings, no-show recovery and discharge care.",
+    "desc": "Intelligent healthcare workflow: AI symptom triage to correct clinical department, live doctor slot booking, automated hourly no-show recovery, and 3-day post-op check-in. Monthly maintenance: ₹14,500/mo.",
+    "setup": 129000,
+    "maintenance": 14500,
+    "includes": "Patient inquiry intake, AI clinical department triage, live doctor calendar booking, automated WhatsApp confirmation, hourly no-show recovery engine, and 3-day post-discharge feedback triage.",
+    "needs": "WhatsApp Business Cloud API token, AI reasoning key (Claude/OpenAI), Hospital HMS or Google Calendar integration access, duty doctor roster.",
+    "summary": "Triages patient enquiries to specialty departments, books available doctor consultation slots via WhatsApp, recovers missed appointments, and monitors post-discharge recovery.",
+    "detailsUrl": "hospital-automation-details.html",
     "hidden": false
   },
   {
@@ -1782,7 +1809,7 @@
     <td><button type="button" class="name" aria-describedby="tip" data-desc="${esc(a.desc)}">${esc(a.name)}</button></td>
     <td class="list">${esc(a.summary || a.includes)}</td>
     <td><div class="actions">
-      <a href="lead-generation-details.html" target="_blank" class="btn sim" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">Details ↗</a>
+      <a href="${a.detailsUrl || 'lead-generation-details.html'}" target="_blank" class="btn sim" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">Details ↗</a>
     </div></td>
   </tr>`).join("");
 

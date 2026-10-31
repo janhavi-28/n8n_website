@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hospital Automation & Patient Care Pipeline - Architecture & Pricing | Aivatika</title>
+  <meta name="description"
+    content="Production-grade Hospital Patient Lead Intake, Doctor Slot Booking, Hourly No-Show Recovery, and Discharge Follow-up pipeline in n8n. Architecture, prerequisites, costs, and deployment pricing.">
+  <style>:root{--bg:#f8fafc;--surface:#ffffff;--surface-secondary:#f1f5f9;--text:#0f172a;--muted:#475569;--subtle:#64748b;--line:#e2e8f0;--accent:#f2563f;--accent-hover:#dc3e26;--accent-soft:#fff0ed;--accent-border:#fecdd3;--live:#059669;--live-bg:#e6f7f0;--warning-bg:#fffbeb;--warning-border:#fef3c7;--warning-text:#b45309;--card-shadow:0 4px 20px -2px rgba(15,23,42,.06),0 2px 6px -1px rgba(15,23,42,.04);--font:'Plus Jakarta Sans',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}@media (prefers-color-scheme:dark){:root{--bg:#0b0f17;--surface:#131b2b;--surface-secondary:#1a2438;--text:#f1f5f9;--muted:#94a3b8;--subtle:#64748b;--line:#1e293b;--accent-soft:rgba(242,86,63,0.16);--accent-border:rgba(242,86,63,0.35);--live-bg:rgba(5,150,105,0.2);--live:#34d399;--warning-bg:rgba(180,83,9,0.15);--warning-border:rgba(180,83,9,0.3);--warning-text:#fbbf24;--card-shadow:0 4px 24px -2px rgba(0,0,0,.45)}}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font);background-color:var(--bg);color:var(--text);line-height:1.55;padding-bottom:60px;-webkit-font-smoothing:antialiased}a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}header{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}.nav-inner{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:800;font-size:1.15rem;letter-spacing:-.02em}.brand-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff7a63);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}.nav-actions{display:flex;align-items:center;gap:12px}.btn-nav-back{font-family:inherit;display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s ease}.btn-nav-back:hover{background:var(--surface-secondary);color:var(--text);border-color:var(--subtle)}.container{max-width:1180px;margin:0 auto;padding:0 20px}.hero-section{padding:48px 0 36px;text-align:center;max-width:860px;margin:0 auto}.hero-headline{font-size:clamp(2rem,4vw,2.85rem);font-weight:800;letter-spacing:-.03em;line-height:1.18;color:var(--text);margin-bottom:16px}.hero-subheading{font-size:1.1rem;color:var(--muted);line-height:1.6;margin-bottom:28px}.hero-buttons{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:32px}.btn-primary{font-family:inherit;display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-weight:700;font-size:.95rem;padding:13px 26px;border-radius:999px;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(242,86,63,.35);transition:all .15s ease;text-decoration:none}.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 6px 18px rgba(242,86,63,.45)}.btn-outline{font-family:inherit;display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text);font-weight:700;font-size:.95rem;padding:13px 24px;border-radius:999px;border:1px solid var(--line);cursor:pointer;transition:all .15s ease;text-decoration:none}.btn-outline:hover{background:var(--surface-secondary);border-color:var(--subtle)}.hero-stats{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--line)}.proof-stat{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted)}.proof-stat-dot{width:7px;height:7px;border-radius:50%;background:var(--live)}.section-title-wrap{margin:44px 0 20px}.section-title{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;color:var(--text)}.section-sub{font-size:.92rem;color:var(--muted);margin-top:4px}.diagram-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 20px;box-shadow:var(--card-shadow);margin-bottom:28px;overflow-x:auto}.diagram-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:1px dashed var(--line);flex-wrap:wrap;gap:10px}.diagram-badge{display:inline-flex;align-items:center;gap:6px;background:var(--live-bg);color:var(--live);font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}.n8n-canvas{min-width:820px;display:flex;flex-direction:column;gap:22px;padding:10px 4px}.n8n-main-row{display:flex;align-items:center;justify-content:space-between;position:relative}.n8n-node{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:152px;box-shadow:0 2px 8px rgba(15,23,42,.05);position:relative;transition:transform .15s ease,border-color .15s ease}.n8n-node:hover{transform:translateY(-2px);border-color:var(--accent)}.node-header{display:flex;align-items:center;gap:7px;margin-bottom:6px}.node-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--surface-secondary)}.node-type{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--subtle)}.node-name{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.3}.node-sub{font-size:11px;color:var(--muted);margin-top:2px}.n8n-arrow{color:var(--accent);font-weight:800;font-size:16px;user-select:none;display:flex;align-items:center;justify-content:center}.n8n-branches{display:flex;gap:16px;margin-left:512px}.n8n-branch-node{background:var(--surface-secondary);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;width:160px;font-size:11.5px}.n8n-branch-title{font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:5px}.n8n-branch-title.error{color:#ef4444}.n8n-branch-title.nurture{color:var(--warning-text)}.n8n-branch-desc{color:var(--muted);font-size:10.5px;line-height:1.35}.pipeline-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch}@media (max-width:900px){.pipeline-grid{grid-template-columns:1fr}}.pipeline-step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 16px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;justify-content:space-between;position:relative}.step-num{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.step-num span:first-child{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.06em;text-transform:uppercase}.step-time{font-size:11px;font-weight:600;color:var(--subtle);background:var(--surface-secondary);padding:2px 7px;border-radius:999px}.step-title{font-size:.96rem;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}.step-desc{font-size:12.5px;color:var(--muted);line-height:1.45;margin-bottom:12px}.step-node-tag{font-size:11px;font-weight:700;color:var(--muted);background:var(--surface-secondary);border-radius:6px;padding:5px 8px;display:inline-flex;align-items:center;gap:5px;width:fit-content}.step-arrow-badge{display:flex;align-items:center;justify-content:center;margin-top:10px;color:var(--accent);font-weight:700}.sample-output-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:var(--card-shadow);margin-bottom:32px}.sample-badge-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px}.sample-badge{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 10px;border-radius:999px}.sample-grid{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:stretch}@media (max-width:768px){.sample-grid{grid-template-columns:1fr}}.lead-meta-panel{background:var(--surface-secondary);border-radius:12px;padding:16px;font-size:13px}.lead-name{font-size:1.05rem;font-weight:800;color:var(--text)}.lead-role{font-size:12px;color:var(--muted);margin-bottom:14px}.meta-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.meta-row:last-child{border-bottom:none}.meta-label{color:var(--subtle);font-size:12px}.meta-val{font-weight:600;color:var(--text);font-size:12px;text-align:right}.lead-score-pill{display:inline-flex;align-items:center;gap:6px;background:var(--live-bg);color:var(--live);font-weight:800;font-size:12px;padding:3px 8px;border-radius:6px}.ai-brief-panel{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;justify-content:space-between}.ai-brief-header{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--subtle);margin-bottom:10px;display:flex;align-items:center;gap:6px}.ai-brief-lines{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.45}.ai-brief-lines li{padding-left:14px;position:relative;color:var(--text)}.ai-brief-lines li::before{content:"•";color:var(--accent);position:absolute;left:0;font-weight:bold}.table-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow-x:auto;box-shadow:var(--card-shadow);margin-bottom:24px}.data-table{width:100%;border-collapse:collapse;text-align:left;font-size:13.5px;min-width:680px}.data-table thead th{background:var(--surface-secondary);padding:14px 18px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--subtle);border-bottom:1px solid var(--line)}.data-table tbody td{padding:16px 18px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--text)}.data-table tbody tr:last-child td{border-bottom:none}.row-title{font-weight:700;display:block;color:var(--text)}.row-sub{font-size:12px;color:var(--muted);display:block;margin-top:3px}.cost-highlight{font-weight:800;color:var(--accent);font-size:14.5px}.cost-badge-optional{display:inline-block;font-size:11px;font-weight:700;color:var(--subtle);background:var(--surface-secondary);padding:2px 7px;border-radius:999px;margin-top:3px}.privacy-note{display:flex;align-items:flex-start;gap:10px;background:var(--surface-secondary);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:28px}.roi-box{background:var(--warning-bg);border:1px solid var(--warning-border);border-radius:12px;padding:16px 18px;font-size:13px;color:var(--warning-text);line-height:1.5;margin-top:14px;margin-bottom:24px}.roi-title{font-weight:800;font-size:13.5px;margin-bottom:4px}.final-cta-section{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:40px 24px;text-align:center;margin-top:48px;box-shadow:var(--card-shadow)}.final-cta-section h2{font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;color:var(--text)}.final-cta-section p{color:var(--muted);font-size:1rem;max-width:620px;margin:0 auto 24px}.final-cta-actions{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}.contact-placeholders{font-size:13px;color:var(--subtle);display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}.contact-link{color:var(--accent);text-decoration:none;font-weight:600}.contact-link:hover{text-decoration:underline}.sim-modal,.contact-modal{display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;padding:16px}.sim-modal.is-open,.contact-modal.is-open{display:flex}.sim-modal-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.65);backdrop-filter:blur(4px)}.sim-modal-dialog{position:relative;background:var(--surface);border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,.35);width:100%;max-width:1100px;height:90vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line)}.sim-modal-header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}.sim-modal-title{font-weight:700;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px}.sim-modal-actions{display:flex;align-items:center;gap:10px}.sim-modal-btn{font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line);background:transparent;padding:5px 10px;border-radius:6px;text-decoration:none;cursor:pointer}.sim-modal-btn:hover{background:var(--surface-secondary);color:var(--text)}.sim-modal-close{background:transparent;border:none;cursor:pointer;color:var(--subtle);display:flex;align-items:center;justify-content:center;padding:4px;border-radius:6px}.sim-modal-close:hover{color:var(--text);background:var(--surface-secondary)}.sim-modal-body{flex:1;background:#0b0f17;position:relative}.sim-modal-body iframe{width:100%;height:100%;border:none;display:block}.contact-dialog{position:relative;background:var(--surface);border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,.35);width:100%;max-width:440px;padding:28px 24px;border:1px solid var(--line)}.contact-dialog h3{font-size:1.25rem;font-weight:800;margin-bottom:6px;color:var(--text)}.contact-dialog p{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.45}.form-group{margin-bottom:14px}.form-group label{display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px}.form-group input{width:100%;padding:10px 12px;font-size:13.5px;border:1px solid var(--line);border-radius:8px;font-family:inherit;background:var(--surface);color:var(--text)}.btn-submit{width:100%;padding:12px;background:var(--accent);color:#fff;font-weight:700;font-size:.95rem;border:none;border-radius:8px;cursor:pointer;margin-top:8px}.btn-submit:hover{background:var(--accent-hover)}</style>
+</head>
+
+<body>
+
+  <!-- Sticky Header -->
+  <header>
+    <div class="nav-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-logo">Ai</span>
+        <span>Aivatika</span>
+      </a>
+      <div class="nav-actions">
+        <a href="index.html" class="btn-nav-back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Automations
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 1. Hero Section -->
+    <section class="hero-section">
+      <h1 class="hero-headline">Automate patient bookings, no-show recovery and discharge care.</h1>
+      <div class="hero-buttons">
+        <button class="btn-primary" type="button" onclick="openSimulation()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Watch Live Simulation
+        </button>
+        <button class="btn-outline" type="button" onclick="openContactModal()">
+          Contact Us
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="proof-stat">
+          <span class="proof-stat-dot"></span>
+          <span>5-day go-live</span>
+        </div>
+        <div class="proof-stat">
+          <span class="proof-stat-dot"></span>
+          <span>24/7 monitoring</span>
+        </div>
+        <div class="proof-stat">
+          <span class="proof-stat-dot"></span>
+          <span>Works with Hospital HMS, WhatsApp, Sheets</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Architecture Section -->
+    <div class="section-title-wrap">
+      <h2 class="section-title">Automated Pipeline Architecture</h2>
+      <p class="section-sub">Step-by-step logic executed inside n8n for every incoming patient enquiry and consultation.</p>
+    </div>
+
+    <!-- Step Cards -->
+    <div class="pipeline-grid">
+      <!-- Step 1 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 01</span>
+            <span class="step-time">typical 0.1s</span>
+          </div>
+          <div class="step-title">Patient Intake & Triage Webhook</div>
+          <div class="step-desc">Captures patient appointment enquiries across hospital website forms, WhatsApp bot, Google Maps listing, and health portals.</div>
+        </div>
+        <div class="step-node-tag">Webhook Trigger</div>
+        <div class="step-arrow-badge">→</div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 02</span>
+            <span class="step-time">typical 0.4s</span>
+          </div>
+          <div class="step-title">Clinical Department Matching</div>
+          <div class="step-desc">Claude AI analyzes patient reported symptoms and automatically routes the enquiry to the right specialty department (Cardiology, Ortho, etc.).</div>
+        </div>
+        <div class="step-node-tag">Claude (latest Sonnet)</div>
+        <div class="step-arrow-badge">→</div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 03</span>
+            <span class="step-time">typical 0.6s</span>
+          </div>
+          <div class="step-title">Live Doctor Slot Booking & Confirmation</div>
+          <div class="step-desc">Queries hospital HMS for live doctor schedule, reserves the earliest available slot, updates database, and sends WhatsApp confirmation.</div>
+        </div>
+        <div class="step-node-tag">Hospital HMS / WhatsApp</div>
+        <div class="step-arrow-badge">→</div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 04</span>
+            <span class="step-time">typical 0.5s</span>
+          </div>
+          <div class="step-title">Hourly No-Show Recovery Engine</div>
+          <div class="step-desc">Hourly cron detects missed appointments, triggers proactive WhatsApp re-engagement with one-tap slot rescheduling link.</div>
+        </div>
+        <div class="step-node-tag">No-Show Recovery</div>
+        <div class="step-arrow-badge">→</div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="pipeline-step">
+        <div>
+          <div class="step-num">
+            <span>Step 05</span>
+            <span class="step-time">typical 0.6s</span>
+          </div>
+          <div class="step-title">Post-Discharge Care & Review Triage</div>
+          <div class="step-desc">Automated 3-day post-op check-in; AI gauges patient recovery sentiment, invites happy patients to Google Reviews, and flags complications to duty medical officers.</div>
+        </div>
+        <div class="step-node-tag">Patient Care Engine</div>
+      </div>
+    </div>
+
+    <!-- 3. Cost and Pricing Sections -->
+    <div class="section-title-wrap">
+      <h2 class="section-title">Client Prerequisites &amp; Third-Party Operating Costs</h2>
+      <p class="section-sub">Required subscriptions and external accounts billed directly to your hospital at actual cost.</p>
+    </div>
+
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 28%;">Component / Tool</th>
+            <th style="width: 28%;">What You Provide</th>
+            <th style="width: 22%;">Estimated Running Cost</th>
+            <th style="width: 22%;">Role in Pipeline</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <span class="row-title">WhatsApp Business Cloud API</span>
+              <span class="row-sub">Meta Cloud API / Gupshup / Wati</span>
+            </td>
+            <td>Verified WhatsApp Business Account &amp; Meta Developer API token.</td>
+            <td>
+              <span class="cost-highlight">~₹1,200 – ₹2,800/mo</span>
+              <span class="row-sub">Based on message conversation volume</span>
+            </td>
+            <td>Dispatches booking confirmations, reminders, and post-discharge check-ins.</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">AI Reasoning Model</span>
+              <span class="row-sub">Claude (latest Sonnet model) / OpenAI</span>
+            </td>
+            <td>Anthropic Claude or OpenAI API Key (Pay-per-token credits).</td>
+            <td>
+              <span class="cost-highlight">~₹600 – ₹1,800/mo</span>
+              <span class="row-sub">Based on symptom triage &amp; feedback analysis</span>
+            </td>
+            <td>Analyzes clinical symptoms, department routing, and patient recovery replies.</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Hospital HMS / Database</span>
+              <span class="row-sub">Custom HMS / PostgreSQL / Google Sheets</span>
+            </td>
+            <td>Hospital database connector or calendar webhook API.</td>
+            <td>
+              <span class="cost-highlight">₹0 (Existing System)</span>
+              <span class="row-sub">Zero additional software fees</span>
+            </td>
+            <td>Stores patient records, doctor on-duty rosters, and live consultation slots.</td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Workflow Execution Host</span>
+              <span class="row-sub">Self-Hosted or Cloud VPS</span>
+            </td>
+            <td>Cloud VPS server (AWS / Hetzner / DigitalOcean) or n8n Cloud.</td>
+            <td>
+              <span class="cost-highlight">~₹850 – ₹1,700/mo</span>
+              <span class="row-sub">Or hospital's private secure on-prem server</span>
+            </td>
+            <td>runs in your own cloud. Data is sent only to the services you approve.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Aivatika Implementation Pricing -->
+    <div class="section-title-wrap">
+      <h2 class="section-title">Aivatika Engineering &amp; Implementation Pricing</h2>
+      <p class="section-sub">Transparent, flat-rate pricing for production deployment, custom logic, and SLA support.</p>
+    </div>
+
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 30%;">Deliverable</th>
+            <th style="width: 36%;">Scope &amp; Specifications</th>
+            <th style="width: 18%;">Investment</th>
+            <th style="width: 16%;">Timeline &amp; SLA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <span class="row-title">One-Time Setup &amp; Architecture</span>
+              <span class="row-sub">Turnkey Hospital Automation Pipeline</span>
+            </td>
+            <td>
+              Patient appointment booking, AI clinical triage matching, HMS/calendar sync, automated hourly no-show recovery, and 3-day post-discharge feedback engine.
+            </td>
+            <td>
+              <span class="cost-highlight">₹1,29,000</span>
+              <span class="row-sub">One-time setup investment</span>
+            </td>
+            <td>
+              <strong>7 Business Days</strong>
+              <span class="row-sub">Timeline starts once API keys and HMS access are provided.</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="row-title">Additional Monthly Maintenance &amp; Support</span>
+              <span class="row-sub">Optional Ongoing SLA</span>
+            </td>
+            <td>
+              24/7 hospital workflow uptime monitoring, WhatsApp template approvals &amp; compliance, doctor roster updates, and priority emergency response (&lt; 2 hours).
+            </td>
+            <td>
+              <span class="cost-highlight">₹14,500/mo</span>
+              <span class="cost-badge-optional">Additional monthly fee</span>
+            </td>
+            <td>
+              <strong>Ongoing SLA</strong>
+              <span class="row-sub">Month-to-month, cancel anytime</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Final CTA Section -->
+    <section class="final-cta-section">
+      <h2>Ready to streamline hospital patient operations?</h2>
+      <p>Have your hospital running automated bookings, no-show recovery, and discharge care within 7 business days.</p>
+      <div class="final-cta-actions">
+        <button class="btn-primary" type="button" onclick="openContactModal()">
+          Contact Us
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Live Simulation Modal -->
+  <div id="sim-modal" class="sim-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="sim-modal-backdrop" onclick="closeSimulation()"></div>
+    <div class="sim-modal-dialog">
+      <div class="sim-modal-header">
+        <div class="sim-modal-title">
+          <span>Hospital Automation &amp; Patient Care Pipeline</span>
+          <span style="background: var(--live-bg); color: var(--live); font-size: 11px; padding: 2px 8px; border-radius: 999px;">LIVE DEMO</span>
+        </div>
+        <div class="sim-modal-actions">
+          <a href="Live_Workflow__Hospital_Automation_Demos.html" target="_blank" rel="noopener noreferrer" class="sim-modal-btn">
+            Open in New Tab ↗
+          </a>
+          <button class="sim-modal-close" onclick="closeSimulation()" aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="sim-modal-body">
+        <iframe id="sim-iframe" src="" title="Live workflow simulation"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contact-modal" class="contact-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="sim-modal-backdrop" onclick="closeContactModal()"></div>
+    <div class="contact-dialog">
+      <h3>Contact Us</h3>
+      <p>Leave your details and an automation engineer will contact you within one business day.</p>
+      <form id="contact-form" onsubmit="submitForm(event)">
+        <div class="form-group">
+          <label for="c-name">Your Name</label>
+          <input type="text" id="c-name" placeholder="Dr. Rajesh Nair" required>
+        </div>
+        <div class="form-group">
+          <label for="c-biz">Hospital / Clinic Name</label>
+          <input type="text" id="c-biz" placeholder="Apex Multispeciality Hospital" required>
+        </div>
+        <div class="form-group">
+          <label for="c-phone">Phone Number (WhatsApp)</label>
+          <input type="tel" id="c-phone" placeholder="+91 98765 43210" required>
+        </div>
+        <button type="submit" class="btn-submit">Submit Request →</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const simModal = document.getElementById('sim-modal');
+    const simIframe = document.getElementById('sim-iframe');
+    const contactModal = document.getElementById('contact-modal');
+
+    function openSimulation() {
+      simIframe.src = 'Live_Workflow__Hospital_Automation_Demos.html';
+      simModal.classList.add('is-open');
+      simModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSimulation() {
+      simModal.classList.remove('is-open');
+      simModal.setAttribute('aria-hidden', 'true');
+      simIframe.src = '';
+      document.body.style.overflow = '';
+    }
+
+    function openContactModal() {
+      contactModal.classList.add('is-open');
+      contactModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeContactModal() {
+      contactModal.classList.remove('is-open');
+      contactModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function submitForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('c-name').value.trim();
+      const biz = document.getElementById('c-biz').value.trim();
+      const phone = document.getElementById('c-phone').value.trim();
+
+      const subject = encodeURIComponent(`Hospital Patient Automation Inquiry - ${biz}`);
+      const mailBody = encodeURIComponent(
+        `Hi Aivatika Team,\n\nI am interested in deploying the Hospital Automation & Patient Care Pipeline.\n\nContact Details:\n- Name: ${name}\n- Hospital/Clinic: ${biz}\n- Phone: ${phone}\n\nPlease reach out for next steps!\n\nThanks,\n${name}`
+      );
+
+      window.open(`mailto:contact@aivatika.com?subject=${subject}&body=${mailBody}`, '_self');
+      closeContactModal();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeSimulation();
+        closeContactModal();
+      }
+    });
+  </script>
+</body>
+
+</html>
