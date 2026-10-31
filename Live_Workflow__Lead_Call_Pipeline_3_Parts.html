@@ -59,7 +59,7 @@ li.gold{color:var(--gold)}li.bad{color:var(--bad)}li.good{color:var(--good)}
 <h2 id="title" style="font-size:18px;color:var(--text);text-transform:none;letter-spacing:-.01em;margin:4px 0 2px"></h2>
 <p class="sub" id="sub" style="margin-top:0"></p>
 <div class="bar"><span id="bt" style="display:contents"></span><button id="play">Pause</button><button id="det">Node details: On</button></div>
-<div class="cvw"><div class="cv"><div class="chip"><span id="chipt"></span> <b>● Active</b></div><svg id="w" viewBox="0 0 990 500" role="img" aria-label="n8n style lead pipeline workflow"></svg></div><div class="ndv" id="ndv"></div></div>
+<div class="cvw"><div class="cv"><div class="chip"><span id="chipt"></span> <b>● Active</b></div><svg id="w" viewBox="0 0 1060 500" role="img" aria-label="n8n style lead pipeline workflow"></svg></div><div class="ndv" id="ndv"></div></div>
 <div class="card inb" id="inbox" style="display:none"><h2><span id="itt"></span> <span class="cnt" id="icnt">0</span></h2><div id="ibl"></div></div>
 <div class="kpis" id="kpis"></div>
 <div class="two"><div class="card"><h2 id="ctt"></h2><svg class="bars" id="ch" viewBox="0 0 340 130"></svg></div><div class="card"><h2>Activity log</h2><ul id="log"></ul></div></div>
@@ -135,7 +135,7 @@ const L=[
 const dur=s=>Math.floor(s/60)+"m "+String(s%60).padStart(2,"0")+"s";
 const trim=()=>{if(S.hist.length>8){S.hist.shift();S.xh.shift()}};
 
-/* ---------- Part 1: Lead Intake + AI Call ---------- */
+/* ---------- Part 1: Lead Intake + AI Call (Horizontal Layout) ---------- */
 async function run1(kind){
   if(running){pending.push(kind);return}running=true;reset();
   const [n,proj,config,loc,val,sc]=rnd(L);
@@ -170,7 +170,7 @@ async function run1(kind){
 }
 function kp1(f){setK("a",S.leads,nf,`+${S.session} this session`);setK("b",S.conn,nf,"calls connected",f);setK("c",(S.conn/S.leads*100),pf,"connection rate");setK("d",S.avg,n=>n.toFixed(0),"out of 100")}
 
-/* ---------- Part 2: Post-Call Scoring + Routing ---------- */
+/* ---------- Part 2: Post-Call Scoring + Routing (Horizontal Layout) ---------- */
 async function run2(kind){
   if(running){pending.push(kind);return}running=true;reset();
   const [n,proj,config,loc,val,sc]=rnd(L);
@@ -231,7 +231,7 @@ async function run2(kind){
 }
 function kp2(f){setK("a",S.routed,nf,`+${S.session} this session`);setK("b",S.demo,nf,"hot leads fast-tracked",f);setK("c",S.cb,nf,"site visits booked");setK("d",S.nur,nf,"nurture queue")}
 
-/* ---------- Part 3: Call Transcription + Analysis + Follow-up ---------- */
+/* ---------- Part 3: Call Transcription + Analysis + Follow-up (Horizontal Layout) ---------- */
 async function run3(kind){
   if(running){pending.push(kind);return}running=true;reset();
   const [n,proj,config,loc,val]=rnd(L);
@@ -285,23 +285,82 @@ async function run3(kind){
 }
 function kp3(f){setK("a",S.n,nf,`+${S.session} this session`);setK("b",S.avg,n=>n.toFixed(0),"out of 100");setK("c",S.pos,nf,"high-intent buyer calls",f);setK("d",S.fl,nf,"objections addressed")}
 
-/* ---------- config ---------- */
+/* ---------- config: CLEAN HORIZONTAL LAYOUTS ---------- */
 const DEMOS={
 d1:{tab:"Part 1: Intake & AI Call",title:"Part 1: Real Estate Lead Intake & AI Call",sub:"A property buyer submits an enquiry on Housing.com, 99acres, or Meta Ads. Data is cleaned, a WhatsApp brochure is sent immediately, and an AI voice agent dials the buyer within 60 seconds.",chip:"Property Lead to Call",wrap:15,
- nodes:[["trig","New Lead Webhook","Webhook",420,20,"wh",1],["clean","Normalize Lead","Code",420,130,"cd"],["em","Send Confirmation Email","Gmail",200,250,"ms"],["sms","Send Confirmation SMS","Twilio",200,370,"ph"],["call","AI Receptionist Calls Lead","HTTP Request",640,250,"ph"]],
- edges:[["trig","clean","property lead"],["clean","em","brochure"],["em","sms","sms sent"],["clean","call","dial buyer",10]],
+ nodes:[
+   ["trig","New Lead Webhook","Webhook",60,200,"wh",1],
+   ["clean","Normalize Lead","Code",260,200,"cd"],
+   ["em","Send Confirmation Email","Gmail",520,110,"ms"],
+   ["sms","Send Confirmation SMS","Twilio",780,110,"ph"],
+   ["call","AI Receptionist Calls Lead","HTTP Request",650,290,"ph"]
+ ],
+ edges:[
+   ["trig","clean","property lead"],
+   ["clean","em","brochure"],
+   ["em","sms","sms sent"],
+   ["clean","call","dial buyer",10]
+ ],
  btns:[["+ Inbound Buyer Lead","",1],["Simulate Hot Buyer (3 BHK)","hot"],["Simulate Budget Lead (2 BHK)","cold"],["Simulate Unanswered Call","noans"]],
  k:["Property Leads Ingested","AI Calls Placed","Calls Connected","Avg Buyer Intent Score"],chart:"Buyer intent score (gold = 80+ Hot)",inbox:"Active property buyers queue",
  init:()=>({leads:1462,qual:877,conn:614,avg:61,hist:[72,48,88,65,34,79,91,58],xh:[0,0,1,0,0,0,1,0],ib:[],q:0,session:0}),kp:()=>kp1(0),run:run1},
+
 d2:{tab:"Part 2: Post-Call Routing",title:"Part 2: Post-Call Scoring & Site Visit Routing",sub:"The qualification call concludes. Claude extracts buyer budget and timeline, routes hot buyers to instant site-visit scheduling, sends 3D walkthroughs to warm prospects, and handles agent availability transfer.",chip:"Site Visit Router",wrap:15,
- nodes:[["trig","Vapi End-of-Call Webhook","Webhook",260,20,"wh",1],["ext","Extract Call Data","Code",260,110,"cd"],["score","Claude Scores Lead","HTTP Request",260,200,"ai"],["parse","Parse Score","Code",260,290,"cd"],["sw","Route by Lead Score","Switch",260,380,"sw"],["hot","Trigger Call Analysis (Workflow 3)","HTTP Request",50,440,"ph"],["book","Book Agent Calendar","Calendar",260,440,"ck"],["cold","Add to Follow-up List","Google Sheets",470,440,"db"],["trig2","Transfer Lookup Webhook","Webhook",760,40,"wh",1],["avail","Check Agent Availability","Calendar",760,150,"ck"],["pick","Pick Agent Number","Code",760,260,"cd"],["dest","Return Transfer Destination","Respond",760,370,"ph"]],
- edges:[["trig","ext"],["ext","score"],["score","parse"],["parse","sw"],["sw","hot","Hot (85+)",-15],["sw","book","Warm (60-84)",0],["sw","cold","Cold (<60)",15],["trig2","avail"],["avail","pick"],["pick","dest"]],
+ nodes:[
+   ["trig","Vapi End-of-Call Webhook","Webhook",50,90,"wh",1],
+   ["ext","Extract Call Data","Code",210,90,"cd"],
+   ["score","Claude Scores Lead","HTTP Request",370,90,"ai"],
+   ["parse","Parse Score","Code",530,90,"cd"],
+   ["sw","Route by Lead Score","Switch",680,90,"sw"],
+   ["hot","Trigger Call Analysis (W3)","HTTP Request",850,20,"ph"],
+   ["book","Book Agent Calendar","Calendar",850,90,"ck"],
+   ["cold","Add to Follow-up List","Google Sheets",850,165,"db"],
+   ["trig2","Transfer Lookup Webhook","Webhook",80,340,"wh",1],
+   ["avail","Check Agent Availability","Calendar",330,340,"ck"],
+   ["pick","Pick Agent Number","Code",580,340,"cd"],
+   ["dest","Return Transfer Destination","Respond",830,340,"ph"]
+ ],
+ edges:[
+   ["trig","ext"],
+   ["ext","score"],
+   ["score","parse"],
+   ["parse","sw"],
+   ["sw","hot","Hot (85+)",-10],
+   ["sw","book","Warm (60-84)",0],
+   ["sw","cold","Cold (<60)",10],
+   ["trig2","avail"],
+   ["avail","pick"],
+   ["pick","dest"]
+ ],
  btns:[["+ Process Call Outcome","",1],["Simulate Hot Lead (85+)","hot"],["Simulate Warm Lead (Book Site Visit)","warm"],["Simulate Cold Lead (Follow-up)","cold"],["Simulate Live Call Transfer","transfer"]],
  k:["Calls Evaluated","Hot Leads Fast-Tracked","Site Visits Scheduled","Nurture List"],chart:"Buyer qualification score (gold = hot lead)",inbox:"Site visits & routing queue",
  init:()=>({routed:861,demo:112,cb:96,nur:188,sms:140,hist:[88,72,94,62,45,90,78,86],xh:[1,0,1,0,0,1,0,1],ib:[],q:0,session:0}),kp:()=>kp2(0),run:run2},
+
 d3:{tab:"Part 3: Call Analysis",title:"Part 3: Call Transcription & Follow-up Analysis",sub:"Every property call recording is transcribed via Whisper and analyzed by Claude: buyer sentiment, budget readiness, and objections. Automatically updates the CRM, dispatches follow-up emails, and creates proposal docs.",chip:"Buyer Call Intelligence",wrap:15,
- nodes:[["trig","Call Analysis Webhook","Webhook",400,20,"wh",1],["iff","Has Recording?","If",400,110,"iff"],["dl","Download Call Recording","HTTP Request",230,190,"ph"],["tr","Transcribe Recording (Whisper)","HTTP Request",230,275,"mic"],["bld","Build Transcript","Code",400,350,"cd"],["ai","Claude Analyzes Transcript","HTTP Request",580,350,"ai"],["parse","Parse Analysis","Code",740,350,"cd"],["crm","Update CRM (HubSpot)","HubSpot",900,230,"pr"],["em","Send Follow-up Email","Gmail",900,345,"ms"],["doc","Create Proposal + Invoice Doc","Google Docs",900,440,"lg"]],
- edges:[["trig","iff"],["iff","dl","yes",-15],["dl","tr"],["tr","bld"],["iff","bld","no",15],["bld","ai"],["ai","parse"],["parse","crm","deal sync"],["parse","em","follow-up"],["parse","doc","proposal doc",15]],
+ nodes:[
+   ["trig","Call Analysis Webhook","Webhook",40,200,"wh",1],
+   ["iff","Has Recording?","If",170,200,"iff"],
+   ["dl","Download Recording","HTTP Request",300,90,"ph"],
+   ["tr","Transcribe (Whisper)","HTTP Request",440,90,"mic"],
+   ["bld","Build Transcript","Code",570,200,"cd"],
+   ["ai","Claude Analyzes Transcript","HTTP Request",700,200,"ai"],
+   ["parse","Parse Analysis","Code",820,200,"cd"],
+   ["crm","Update CRM","HubSpot",940,85,"pr"],
+   ["em","Send Follow-up Email","Gmail",940,200,"ms"],
+   ["doc","Create Proposal Doc","Google Docs",940,315,"lg"]
+ ],
+ edges:[
+   ["trig","iff"],
+   ["iff","dl","yes",-12],
+   ["dl","tr"],
+   ["tr","bld"],
+   ["iff","bld","no",12],
+   ["bld","ai"],
+   ["ai","parse"],
+   ["parse","crm","deal sync"],
+   ["parse","em","follow-up"],
+   ["parse","doc","proposal doc",12]
+ ],
  btns:[["+ Transcribe & Analyze","",1],["Simulate With Audio Recording","yes"],["Simulate Direct Audio Stream","no"],["Simulate Negotiation Call","flag"]],
  k:["Buyer Calls Analyzed","Avg Call Quality Score","High-Intent Calls","Objections Handled"],chart:"Buyer qualification score (gold = high intent)",inbox:"Manager review & quote queue",
  init:()=>({n:640,avg:82,fl:44,pos:410,hist:[82,76,88,90,79,94,68,88],xh:[0,0,1,1,0,1,0,1],ib:[],q:0,session:0}),kp:()=>kp3(0),run:run3}
