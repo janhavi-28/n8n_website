@@ -1,395 +1,196 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Live Workflow: Payment Recovery & Accounts Receivable Chaser</title>
-  <style>
-    :root {
-      --bg: #f3f5fb; --card: rgba(255, 255, 255, .82); --text: #0f172a; --mut: #64748b; --line: #dde3f0;
-      --accent: #059669; --accent-dark: #047857; --good: #059669; --bad: #e11d48; --badbg: #ffe9ee; --gold: #d97706;
-      --canvas: #f7f8fb; --dot: #d3d8e4; --nb: #fff; --nl: #c5cad8; --edge: #9aa1b5; --coral: #ff6d5a;
-      --ok: #059669; color-scheme: light; box-sizing: border-box;
-      padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --bg: #070b16; --card: rgba(20, 28, 50, .72); --text: #eef2ff; --mut: #94a3c4; --line: rgba(148, 163, 210, .22);
-        --accent: #34d399; --good: #34d399; --bad: #fb7185; --badbg: rgba(244, 63, 94, .14); --gold: #fbbf24;
-        --canvas: #14161f; --dot: #2c3040; --nb: #262938; --nl: #454a5e; --edge: #6b7390; color-scheme: dark;
-      }
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; color: var(--text); font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: radial-gradient(900px 480px at 12% -8%, rgba(5, 150, 105, .18), transparent),
-                  radial-gradient(700px 420px at 100% 0, rgba(217, 119, 6, .12), transparent), var(--bg);
-      background-attachment: fixed; min-height: 100vh;
-    }
-    main { max-width: 1040px; margin: 0 auto; padding: 26px 14px 30px; }
-    .top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    h1 {
-      font-size: 28px; margin: 0; font-weight: 800; letter-spacing: -.035em;
-      background: linear-gradient(90deg, var(--text) 30%, #059669, #d97706);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .live {
-      font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: var(--good);
-      border: 1px solid var(--good); padding: 4px 11px; border-radius: 999px; display: inline-flex; gap: 7px; align-items: center;
-    }
-    .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--good); animation: pu 1.4s infinite; }
-    @keyframes pu { 50% { opacity: .25; transform: scale(1.6); } }
-    p.sub { margin: 6px 0 16px; color: var(--mut); font-size: 14px; }
-    .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-    button {
-      font: inherit; font-weight: 600; padding: 10px 18px; border-radius: 999px;
-      border: 1px solid var(--line); background: var(--card); color: var(--text);
-      cursor: pointer; transition: transform .15s;
-    }
-    button:active { transform: scale(.96); }
-    button.p {
-      background: linear-gradient(135deg, #059669, #047857); border: 0; color: #fff;
-      box-shadow: 0 10px 24px -10px #059669;
-    }
-    .card {
-      background: var(--card); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-      border: 1px solid var(--line); border-radius: 20px; padding: 18px;
-      box-shadow: 0 18px 40px -20px rgba(15, 23, 42, .35);
-    }
-    .cvw { position: relative; }
-    .cv {
-      position: relative; border-radius: 20px; border: 1px solid var(--line); overflow-x: auto;
-      background-color: var(--canvas); background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
-      background-size: 22px 22px;
-    }
-    .cv svg { min-width: 960px; width: 100%; display: block; }
-    .chip {
-      position: sticky; left: 12px; top: 12px; display: inline-flex; gap: 10px; align-items: center;
-      margin: 12px; padding: 6px 12px; border-radius: 10px; background: var(--nb);
-      border: 1px solid var(--nl); font-size: 12px; font-weight: 600; z-index: 2;
-    }
-    .chip b { color: var(--ok); font-weight: 600; }
-    .nd .b { fill: var(--nb); stroke: var(--nl); stroke-width: 1.5; transition: stroke .25s; }
-    .nd text { fill: var(--text); font-size: 12px; font-weight: 600; text-anchor: middle; }
-    .nd .s { fill: var(--mut); font-size: 10px; font-weight: 400; }
-    .nd.run .b {
-      stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 4;
-      animation: d .6s linear infinite; filter: drop-shadow(0 0 6px var(--accent));
-    }
-    .nd.ok .b { stroke: var(--ok); stroke-width: 2; }
-    .nd.gold .b { stroke: var(--gold); stroke-width: 2; filter: drop-shadow(0 0 6px var(--gold)); }
-    .bg { display: none; }
-    .nd.ok .bg { display: block; }
-    .bg circle { fill: var(--ok); }
-    .ed { fill: none; stroke: var(--edge); stroke-width: 1.8; transition: stroke .3s; }
-    .ed.ok { stroke: var(--ok); }
-    @keyframes d { to { stroke-dashoffset: -10; } }
-    .mk { fill: var(--edge); }
-    .pt { fill: var(--nb); stroke: var(--edge); stroke-width: 1.5; }
-    .il { fill: var(--ok); font-size: 10px; font-weight: 600; opacity: 0; transition: .3s; }
-    .il.show { opacity: 1; }
-    .pk { fill: var(--accent); filter: drop-shadow(0 0 7px var(--accent)); }
-    .pk.gold { fill: var(--gold); filter: drop-shadow(0 0 8px var(--gold)); }
-    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
-    .k { position: relative; overflow: hidden; }
-    .k::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, #059669, #d97706); }
-    .k .l { color: var(--mut); text-transform: uppercase; letter-spacing: .07em; font-size: 11px; font-weight: 600; }
-    .k .v { font-size: 28px; font-weight: 800; letter-spacing: -.035em; margin: 4px 0; font-variant-numeric: tabular-nums; }
-    .k .d { font-size: 12px; color: var(--good); }
-    .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
-    h2 { font-size: 11.5px; margin: 0 0 8px; color: var(--mut); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
-    ul { list-style: none; margin: 0; padding: 0; font-size: 13px; }
-    li { padding: 6px 0; border-bottom: 1px solid var(--line); }
-    li:last-child { border: 0; }
-    li b { color: var(--mut); font-weight: 500; margin-right: 6px; }
-    li.good { color: var(--good); }
-    li.gold { color: var(--gold); }
-    li.bad { color: var(--bad); }
-    .bars rect { fill: #059669; opacity: .5; transform-box: fill-box; transform-origin: bottom; }
-    .bars rect.new { opacity: 1; animation: g .6s ease-out; filter: drop-shadow(0 0 6px #059669); }
-    @keyframes g { from { transform: scaleY(0); } }
-    .bars text { fill: var(--mut); font-size: 10px; text-anchor: middle; }
-    .ndv {
-      position: absolute; left: 50%; top: 50%; width: min(600px, 94%); max-height: 96%; overflow: hidden;
-      transform: translate(-50%, -46%) scale(.94); opacity: 0; pointer-events: none;
-      transition: opacity .25s, transform .25s; background: var(--nb); border: 1px solid var(--nl);
-      border-radius: 16px; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .5); z-index: 5;
-    }
-    .ndv.open { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-    .nh { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--nl); }
-    .nh svg { width: 32px; height: 32px; flex: none; }
-    .nh b { display: block; font-size: 15px; }
-    .nh small { color: var(--mut); font-size: 11px; }
-    .pill {
-      margin-left: auto; padding: 3px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;
-      border: 1px solid var(--accent); color: var(--accent);
-    }
-    .pill.ok { border-color: var(--ok); color: var(--ok); }
-    .nb { padding: 12px 16px; display: grid; gap: 10px; max-height: 360px; overflow-y: auto; font-size: 12.5px; }
-    .nb h4 { margin: 0 0 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--mut); }
-    .pm { display: flex; flex-wrap: wrap; gap: 6px; }
-    .pm span { font-size: 11.5px; padding: 3px 9px; border-radius: 8px; background: rgba(5, 150, 105, .12); }
-    .pm span b { color: var(--mut); font-weight: 600; margin-right: 5px; }
-    .ln {
-      font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace; padding: 6px 10px; border-left: 3px solid #059669;
-      background: rgba(5, 150, 105, .06); border-radius: 0 8px 8px 0;
-    }
-    .ln em { font-style: normal; font-weight: 700; color: #047857; }
-    .ndv { display: none !important; }
-</style>
-</head>
-<body>
-<main>
-  <div class="top">
-    <h1>Live Workflow: Payment Recovery & AR Chaser</h1>
-    <span class="live"><i></i>LIVE SIMULATION</span>
-  </div>
-  <p class="sub">Autonomous accounts receivable recovery engine in n8n. Ingests aging balance sheets from Zoho Books/Tally, triggers tiered WhatsApp & email payment reminders with 1-tap UPI links, and automatically reconciles Razorpay payouts.</p>
-  
-  <div class="bar">
-    <button class="p" id="rec">+ Run Daily Overdue Check</button>
-    <button id="escalate">Simulate 30-Day Escalation</button>
-    <button id="pay">Simulate Instant UPI Settlement</button>
-    <button id="toggle">Pause</button>
-    </div>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Live Workflow: Payment Recovery and AR Chaser</title>
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f3f5fb;--card:rgba(255,255,255,.82);--text:#0f172a;--mut:#64748b;--line:#dde3f0;--accent:#059669;--good:#059669;--bad:#e11d48;--badbg:#ffe9ee;--gold:#d97706;--canvas:#f7f8fb;--dot:#d3d8e4;--nb:#fff;--nl:#c5cad8;--edge:#9aa1b5;--coral:#d97706;--ok:#2fae6b;color-scheme:light;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070b16;--card:rgba(20,28,50,.72);--text:#eef2ff;--mut:#94a3c4;--line:rgba(148,163,210,.22);--accent:#34d399;--good:#34d399;--bad:#fb7185;--badbg:rgba(244,63,94,.14);--gold:#fbbf24;--canvas:#14161f;--dot:#2c3040;--nb:#262938;--nl:#454a5e;--edge:#6b7390;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#070b16;--card:rgba(20,28,50,.72);--text:#eef2ff;--mut:#94a3c4;--line:rgba(148,163,210,.22);--accent:#34d399;--good:#34d399;--bad:#fb7185;--badbg:rgba(244,63,94,.14);--gold:#fbbf24;--canvas:#14161f;--dot:#2c3040;--nb:#262938;--nl:#454a5e;--edge:#6b7390;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(900px 480px at 12% -8%,rgba(5,150,105,.16),transparent),radial-gradient(700px 420px at 100% 0,rgba(79,70,229,.12),transparent),var(--bg);background-attachment:fixed;min-height:100vh}
+main{max-width:1040px;margin:0 auto;padding:26px 14px 30px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:28px;margin:0;font-weight:800;letter-spacing:-.035em;background:linear-gradient(90deg,var(--text) 40%,var(--coral));-webkit-background-clip:text;background-clip:text;color:transparent}
+.live{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--good);border:1px solid var(--good);padding:4px 11px;border-radius:999px;display:inline-flex;gap:7px;align-items:center}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--good);animation:pu 1.4s infinite}@keyframes pu{50%{opacity:.25;transform:scale(1.6)}}
+p.sub{margin:6px 0 16px;color:var(--mut);font-size:14px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+button{font:inherit;font-weight:600;padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;transition:transform .15s}
+button:active{transform:scale(.96)}button.p{background:linear-gradient(135deg,#059669,#047857);border:0;color:#fff;box-shadow:0 10px 24px -10px #059669}
+.card{background:var(--card);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 18px 40px -20px rgba(15,23,42,.35)}
+.cv{position:relative;border-radius:20px;border:1px solid var(--line);overflow-x:auto;background-color:var(--canvas);background-image:radial-gradient(var(--dot) 1.2px,transparent 1.2px);background-size:22px 22px}
+.cv svg{min-width:860px;width:100%;display:block}
+.chip{position:sticky;left:12px;top:12px;display:inline-flex;gap:10px;align-items:center;margin:12px;padding:6px 12px;border-radius:10px;background:var(--nb);border:1px solid var(--nl);font-size:12px;font-weight:600;z-index:2}.chip b{color:var(--ok);font-weight:600}
+.nd .b{fill:var(--nb);stroke:var(--nl);stroke-width:1.5;transition:stroke .25s}
+.nd text{fill:var(--text);font-size:12px;font-weight:600;text-anchor:middle}.nd .s{fill:var(--mut);font-size:10px;font-weight:400}
+.nd.run .b{stroke:var(--coral);stroke-width:2;stroke-dasharray:6 4;animation:d .6s linear infinite;filter:drop-shadow(0 0 6px var(--coral))}
+.nd.ok .b{stroke:var(--ok);stroke-width:2}.nd.gold .b{stroke:var(--gold);stroke-width:2;filter:drop-shadow(0 0 6px var(--gold))}
+.bg{display:none}.nd.ok .bg{display:block}.bg circle{fill:var(--ok)}
+.ed{fill:none;stroke:var(--edge);stroke-width:1.8;transition:stroke .3s}.ed.ok{stroke:var(--ok)}@keyframes d{to{stroke-dashoffset:-10}}
+.mk{fill:var(--edge)}.pt{fill:var(--nb);stroke:var(--edge);stroke-width:1.5}
+.il{fill:var(--ok);font-size:10px;font-weight:600;opacity:0;transition:.3s}.il.show{opacity:1}.pl{fill:var(--mut);font-size:9.5px}
+.pk{fill:var(--coral);filter:drop-shadow(0 0 7px var(--coral))}.pk.gold{fill:var(--gold);filter:drop-shadow(0 0 8px var(--gold))}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.k{position:relative;overflow:hidden}.k::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--coral),#d97706)}
+.k .l{color:var(--mut);text-transform:uppercase;letter-spacing:.07em;font-size:11px;font-weight:600}.k .v{font-size:28px;font-weight:800;letter-spacing:-.035em;margin:4px 0;font-variant-numeric:tabular-nums}.k .d{font-size:12px;color:var(--good)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+h2{font-size:11.5px;margin:0 0 8px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+ul{list-style:none;margin:0;padding:0;font-size:13px}li{padding:6px 0;border-bottom:1px solid var(--line)}li:last-child{border:0}li b{color:var(--mut);font-weight:500;margin-right:6px}
+.bars rect{fill:var(--coral);opacity:.5;transform-box:fill-box;transform-origin:bottom}.bars rect.new{opacity:1;animation:g .6s ease-out;filter:drop-shadow(0 0 6px var(--coral))}@keyframes g{from{transform:scaleY(0)}}.bars text{fill:var(--mut);font-size:10px;text-anchor:middle}
 
-  <div class="cvw">
-    <div class="cv">
-      <div class="chip">Cash Flow Recovery Engine <b>● Active</b></div>
-      <svg id="w" viewBox="0 0 960 440" role="img" aria-label="Payment Recovery workflow"></svg>
-    </div>
-    <div class="ndv" id="ndv"></div>
-  </div>
+.cvw{position:relative}.cv svg{transition:opacity .25s}.cv.dim svg{opacity:.25}
+.ndv{position:absolute;left:50%;top:50%;width:min(620px,94%);max-height:96%;overflow:hidden;transform:translate(-50%,-46%) scale(.94);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;background:var(--nb);border:1px solid var(--nl);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);z-index:5}
+.ndv.open{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.nh{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--nl)}.nh svg{width:32px;height:32px;flex:none}.nh b{display:block;font-size:15px}.nh small{color:var(--mut);font-size:11px}
+.pill{margin-left:auto;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--coral);color:var(--coral)}.pill.ok{border-color:var(--ok);color:var(--ok)}
+.nb{padding:12px 16px;display:grid;gap:12px;max-height:380px;overflow-y:auto}.nb h4{margin:0 0 6px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+.pm{display:flex;flex-wrap:wrap;gap:6px}.pm span{font-size:11.5px;padding:3px 9px;border-radius:8px;background:rgba(5,150,105,.12)}.pm span b{color:var(--mut);font-weight:600;margin-right:5px}
+.ln{font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;padding:6px 10px;border-left:3px solid var(--coral);margin-bottom:4px;opacity:0;transform:translateX(-8px);animation:cr .35s forwards;background:rgba(5,150,105,.07);border-radius:0 8px 8px 0}.ln em{font-style:normal;font-weight:700;color:var(--coral)}.ln em.w{color:var(--bad)}
+@keyframes cr{to{opacity:1;transform:none}}
+.ot table{width:100%;border-collapse:collapse;font-size:11.5px}.ot th{text-align:left;color:var(--mut);font-weight:600;padding:3px 6px;border-bottom:1px solid var(--nl)}.ot td{padding:3px 6px}.ot p{margin:6px 0 0;font-size:11.5px;color:var(--ok);font-weight:700}
+.em{border:1px solid var(--nl);border-radius:12px;overflow:hidden;font-size:12px}.em .eh2{padding:8px 12px;background:rgba(127,127,127,.08);line-height:1.7}.em .eh2 b{display:inline-block;width:64px;color:var(--mut);font-weight:600}.em .eb{padding:10px 12px;line-height:1.6}.dl{display:flex;gap:14px;padding:8px 12px;border-top:1px solid var(--nl);font-size:11px;font-weight:700;color:var(--ok)}
+.lane{fill:var(--mut);font-size:11px;font-weight:700;letter-spacing:.06em}.sep{stroke:var(--nl);stroke-dasharray:5 6;stroke-width:1.2}
+.k.warn::before{background:var(--gold)}
 
-  <div class="kpis" id="kpis">
-    <div class="card k" id="krec"><div class="l">Recovered Cash</div><div class="v">-</div><div class="d">This month via automated reminders</div></div>
-    <div class="card k" id="kdays"><div class="l">Avg DSO (Days Sales)</div><div class="v">-</div><div class="d">Down from 44 days</div></div>
-    <div class="card k" id="krate"><div class="l">Recovery Success</div><div class="v">-</div><div class="d">Zero awkward phone calls</div></div>
-    <div class="card k" id="kauto"><div class="l">Zero-Touch Reconciled</div><div class="v">-</div><div class="d">Auto-updated in Zoho / Tally</div></div>
-  </div>
-
-  <div class="two">
-    <div class="card"><h2>Daily cash recovered (₹k)</h2><svg class="bars" id="ch" viewBox="0 0 340 130"></svg></div>
-    <div class="card"><h2>Collections Activity Stream</h2><ul id="log"></ul></div>
-  </div>
+.sep2{stroke:var(--nl);stroke-dasharray:5 6;stroke-width:1.2}
+</style></head><body><main>
+<div class="top"><h1>Payment Recovery Chaser</h1><span class="live"><i></i>LIVE SIMULATION</span></div>
+<p class="sub">Two flows, as they would be built in n8n. Flow 1 chases overdue invoices every morning, politely at first and with an owner’s approval before anything formal. Flow 2 is a separate webhook flow: cash is counted, matched and reconciled only when Razorpay says a payment has really arrived.</p>
+<div class="bar"><button class="p" id="b1">+ Run daily chase</button><button id="b2">Firm case (15–30 days)</button><button id="b3">30+ day escalation</button><button id="b4">Client pays in full</button><button id="b5">Client pays part</button><button id="b6">Unknown payment</button><button id="play">Pause auto-run</button><button id="det">Node details: On</button></div>
+<div class="cvw"><div class="cv"><div class="chip">Cash flow recovery engine <b>● Active</b></div><svg id="w" viewBox="0 -24 980 695" role="img" aria-label="Two-lane payment recovery workflow"></svg></div><div class="ndv" id="ndv"></div></div>
+<div class="kpis" id="kpis"></div>
+<div class="two"><div class="card"><h2>Cash recovered per day (₹ thousand)</h2><svg class="bars" id="ch" viewBox="0 0 340 130"></svg></div><div class="card"><h2>Collections activity</h2><ul id="log"></ul></div></div>
 </main>
-
 <script>
-const NS="http://www.w3.org/2000/svg", $ = id => document.getElementById(id);
-const el = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e; };
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const st = (c, w = 2) => `stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
-const fmt = n => "₹" + Math.round(n).toLocaleString("en-IN");
-
-const svg = $("w"), defs = el("defs", {}, svg);
-el("path", { d: "M0 0L8 4L0 8z", class: "mk" }, el("marker", { id: "ar", markerWidth: 8, markerHeight: 8, refX: 7, refY: 4, orient: "auto" }, defs));
-const gE = el("g", {}, svg), gN = el("g", {}, svg), gP = el("g", {}, svg);
-
-const IC_CLOCK = '<circle cx="12" cy="12" r="9" '+st("#6b7280",1.8)+'/><path d="M12 7v5l3.5 2" '+st("#6b7280",2)+'/>';
-const IC_ERP = '<rect x="3" y="3" width="18" height="18" rx="3" fill="#0284c7"/><text x="12" y="15" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">ZOHO</text>';
-const IC_TIER = '<path d="M4 12h6M10 12l6-6M10 12l6 6" '+st("#8b5cf6",2)+'/><circle cx="18" cy="6" r="2.5" fill="#8b5cf6"/><circle cx="18" cy="18" r="2.5" fill="#8b5cf6"/>';
-const IC_WA = '<path d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.16-1.32C8.56 21.52 10.23 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="#25d366"/><path d="M16.4 14.3c-.25-.13-1.46-.72-1.68-.8-.23-.08-.39-.13-.56.13-.16.25-.64.8-.78.96-.15.16-.29.18-.54.06-.25-.13-1.05-.39-2-1.24-.74-.66-1.24-1.48-1.39-1.73-.14-.25-.02-.38.11-.5.11-.11.25-.29.38-.43.12-.15.16-.25.25-.42.08-.16.04-.31-.02-.43-.06-.13-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.66.31-.23.25-.87.85-.87 2.08 0 1.23.89 2.42 1.02 2.59.13.16 1.76 2.69 4.27 3.77.6.26 1.06.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.46-.6 1.67-1.18.2-.57.2-1.07.14-1.18-.06-.11-.22-.18-.47-.3z" fill="#fff"/>';
-const IC_NOTICE = '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="#ef4444"/>';
-const IC_PAY = '<rect x="2" y="5" width="20" height="14" rx="2" fill="#059669"/><line x1="2" y1="10" x2="22" y2="10" stroke="#fff" stroke-width="2"/>';
-const IC_REC = '<path d="M9 11l3 3L22 4" '+st("#059669",2)+'/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" '+st("#059669")+'>';
-
-const NODES = [
-  ["cron", "Daily 9:00 AM", "Schedule Trigger", 30, 180, IC_CLOCK, 1],
-  ["erp", "Overdue Invoices", "Zoho / Tally", 180, 180, IC_ERP],
-  ["tier", "Aging Tier Filter", "Switch", 340, 180, IC_TIER],
-  ["soft", "UPI WhatsApp Nudge", "WhatsApp Cloud API", 500, 90, IC_WA],
-  ["firm", "Escalation Notice", "Send Email", 500, 270, IC_NOTICE],
-  ["pay", "Payment Webhook", "Webhook Trigger", 680, 180, IC_PAY],
-  ["rec", "Reconcile Invoice", "ERP Ledger", 840, 180, IC_REC]
-];
-
-const D = {};
-function wrap(s){ if(s.length<=16)return[s]; const w=s.split(" "),l=[""]; w.forEach(x=>{ const c=l[l.length-1]; if((c+" "+x).trim().length<=16)l[l.length-1]=(c+" "+x).trim(); else l.push(x); }); return l; }
-
-NODES.forEach(([id, name, sub, x, y, ic, tr]) => {
-  const g = el("g", { class: "nd" }, gN);
-  el("path", { class: "b", d: tr ? `M${x+32} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+32}a32 32 0 0 1 0-64z` : `M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z` }, g);
-  el("g", { transform: `translate(${x+16},${y+16}) scale(1.33)` }, g).innerHTML = ic;
-  const L = wrap(name);
-  L.forEach((t, i) => el("text", { x: x+32, y: y+80+i*13 }, g).textContent = t);
-  el("text", { x: x+32, y: y+80+L.length*13, class: "s" }, g).textContent = sub;
-  const b = el("g", { class: "bg" }, g);
-  el("circle", { cx: x+64, cy: y+4, r: 9 }, b);
-  el("path", { d: `M${x+59.5} ${y+4}l3.2 3.2 6-6.2`, fill: "none", stroke: "#fff", "stroke-width": 2, "stroke-linecap": "round" }, b);
-  D[id] = { g, x, y };
-});
-
-const out = id => [D[id].x + 64, D[id].y + 32], inn = id => [D[id].x, D[id].y + 32];
-const EDG = [];
-function edge(a, b, lab){
-  const [x1, y1] = a, [x2, y2] = b, dx = Math.max(35, (x2 - x1) / 2);
-  const p = el("path", { class: "ed", d: `M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`, "marker-end": "url(#ar)" }, gE);
-  const t = lab ? el("text", { x: x1 + 10, y: y1 - 8, class: "il" }, gE) : null;
-  if(t) t.textContent = lab;
-  EDG.push({ p, t });
-  return EDG.length - 1;
-}
-
-const e1 = edge(out("cron"), inn("erp"), "check aging");
-const e2 = edge(out("erp"), inn("tier"), "14 overdue invoices");
-const e3 = edge(out("tier"), inn("soft"), "Overdue 1-14 days");
-const e4 = edge(out("tier"), inn("firm"), "Overdue >30 days");
-const e5 = edge(out("soft"), inn("pay"), "UPI payment link click");
-const e6 = edge(out("firm"), inn("pay"), "wire settlement");
-const e7 = edge(out("pay"), inn("rec"), "auto-settled");
-
-function fly(i, cls, ms){
-  return new Promise(res => {
-    const p = EDG[i].p, L = p.getTotalLength(), c = el("circle", { r: 6, class: "pk " + (cls || "") }, gP), t0 = performance.now();
-    (function f(t){
-      const k = Math.min(1, (t - t0) / ms);
-      const ease = k < 0.5 ? 2 * k * k : -1 + (4 - 2 * k) * k;
-      const q = p.getPointAtLength(L * ease);
-      c.setAttribute("cx", q.x);
-      c.setAttribute("cy", q.y);
-      k < 1 ? requestAnimationFrame(f) : (c.remove(), res());
-    })(t0);
-  });
-}
-
-async function go(i, cls, ms = 500){
-  await fly(i, cls, ms);
-  EDG[i].p.classList.add("ok");
-  EDG[i].t && EDG[i].t.classList.add("show");
-}
-
-async function run(id, ms, cls){
-  const c = D[id].g.classList;
-  c.add("run");
-  if(cls) c.add(cls);
-  await sleep(ms);
-  c.remove("run");
-  c.add("ok");
-}
-
-function reset(){
-  Object.values(D).forEach(n => n.g.setAttribute("class", "nd"));
-  EDG.forEach(e => { e.p.classList.remove("ok"); e.t && e.t.classList.remove("show"); });
-}
-
-const S = { rec: 1845000, days: 6.2, rate: 91.4, auto: 94.8, hist: [120, 185, 240, 195, 310, 280, 360, 420] };
-const shown = {};
-function setK(id, val, f, delta){
-  const c = $("k" + id), v = c.querySelector(".v"), from = shown[id] ?? val, t0 = performance.now();
-  shown[id] = val;
-  (function a(t){
-    const k = Math.min(1, (t - t0) / 700);
-    v.textContent = f(from + (val - from) * k);
-    k < 1 && requestAnimationFrame(a);
-  })(t0);
-  if(c.querySelector(".d")) c.querySelector(".d").textContent = delta || "\u00a0";
-}
-
-function chart(){
-  const m = Math.max(...S.hist), g = $("ch"); g.innerHTML = "";
-  S.hist.forEach((v, i) => {
-    const h = (v / m) * 90, x = 10 + i * 41;
-    el("rect", { x, y: 104 - h, width: 28, height: h, rx: 4, class: i === S.hist.length - 1 ? "new" : "" }, g);
-    el("text", { x: x + 14, y: 98 - h }, g).textContent = v;
-    el("text", { x: x + 14, y: 120 }, g).textContent = "D" + (i + 1);
-  });
-}
-
-function log(m, c){
-  const li = document.createElement("li");
-  if(c) li.className = c;
-  li.innerHTML = `<b>${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</b> ${m}`;
-  const u = $("log"); u.prepend(li);
-  while(u.children.length > 8) u.lastChild.remove();
-}
-
-let paused = false, running = false, detail = true;
-
-const ndv = $("ndv");
-async function view(){ return; }
-
-async function cycle(type = "rec"){
-  if(running || paused) return;
-  running = true;
-  reset();
-
-  const isEscalate = type === "escalate", isInstant = type === "pay";
-  const invNum = "INV-" + Math.floor(4000 + Math.random() * 5000);
-  const client = isEscalate ? "Zenith Retail Corp" : "Apex Global Solutions";
-  const amt = isEscalate ? 145000 : 48500;
-
-  log(`Trigger fired: Scanning unpaid invoices in Zoho Books aging report...`, "good");
-  await run("cron", 400);
-  await go(e1);
-
-  await run("erp", 550);
-  if(detail) await view("Zoho Books Aging Scanner", "ERP Connector Node", { Status: "Unpaid", MinOverdue: "1 Day" }, [
-    `Found invoice <b>#${invNum}</b> for <em>${client}</em>`,
-    `Total Overdue: <b>${fmt(amt)}</b> | Days Overdue: <em>${isEscalate ? "32 Days" : "5 Days"}</em>`,
-    `Contact: <em>accounts@${client.toLowerCase().replace(/ /g,"")}.in</em> (+91-98xxxxxx)`
-  ]);
-  await go(e2);
-
-  await run("tier", 500);
-
-  if(isEscalate){
-    await go(e4, "gold");
-    await run("firm", 650, "gold");
-    if(detail) await view("Formal Escalation & Founder Alert", "Overdue >30 Days", { PenaltyInterest: "18% p.a.", Action: "Hold Services" }, [
-      "Generated formal Letter of Demand PDF with statement of accounts",
-      "Pushed urgent notification to Founder's WhatsApp & Slack executive channel",
-      "Triggered automated call request via voice AI"
-    ]);
-    log(`30+ Day Overdue: Formal demand letter dispatched to ${client} (${fmt(amt)})`, "gold");
-    await go(e6, "gold");
-  } else {
-    await go(e3);
-    await run("soft", 650);
-    if(detail) await view("Polite WhatsApp 1-Tap UPI", "Payment Link Dispatcher", { Provider: "Razorpay Smart Links", Expiry: "48 Hours" }, [
-      "Generated dynamic instant UPI / NetBanking payment URL",
-      "Dispatched WhatsApp message with 1-tap 'Pay Now via UPI' button",
-      "Client opened payment link within 4 minutes"
-    ]);
-    log(`Polite reminder with 1-tap UPI link sent on WhatsApp to ${client} (${fmt(amt)})`, "good");
-    await go(e5);
-  }
-
-  await run("pay", 600);
-  log(`Razorpay Webhook: <b>${fmt(amt)}</b> received via UPI (UTR #889102482)!`, "good");
-  await go(e7);
-
-  await run("rec", 500);
-  log(`Invoice #${invNum} marked 'PAID' in Zoho Books. Receipt emailed to client.`, "good");
-
-  S.rec += amt;
-  S.hist[S.hist.length - 1] += Math.round(amt / 1000);
-
-  setK("rec", S.rec, fmt, "+₹" + Math.round(amt/1000) + "k just recovered");
-  setK("days", S.days, n => n.toFixed(1) + " days", "Down from 44 days");
-  setK("rate", S.rate, n => n.toFixed(1) + "%", "Zero awkward phone calls");
-  setK("auto", S.auto, n => n.toFixed(1) + "%", "Auto-updated in Zoho / Tally");
-  chart();
-
-  await sleep(1500);
-  reset();
-  running = false;
-}
-
-setK("rec", S.rec, fmt, "+₹48k today");
-setK("days", S.days, n => n.toFixed(1) + " days", "Down from 44 days");
-setK("rate", S.rate, n => n.toFixed(1) + "%", "Zero awkward phone calls");
-setK("auto", S.auto, n => n.toFixed(1) + "%", "Auto-updated in Zoho / Tally");
-chart();
-log("Payment Recovery Chaser ready. Click '+ Run Daily Overdue Check' to test.", "good");
-
-$("rec").onclick = () => cycle("rec");
-$("escalate").onclick = () => cycle("escalate");
-$("pay").onclick = () => cycle("pay");
-$("toggle").onclick = function(){ paused = !paused; this.textContent = paused ? "Resume" : "Pause"; };
-$("det").onclick = function(){ detail = !detail; this.textContent = "Node details: " + (detail ? "On" : "Off"); };
-
-setInterval(() => { if(!paused && !running) cycle(Math.random() > 0.7 ? "escalate" : "rec"); }, 9500);
-</script>
-</body>
-</html>
-
+const NS="http://www.w3.org/2000/svg",$=i=>document.getElementById(i);
+const el=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)),rnd=n=>Math.floor(Math.random()*n),nf=n=>Math.round(n).toLocaleString("en-IN"),fmt=n=>"\u20b9"+nf(n);
+const st=(c,w=2)=>`stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+const SW=c=>`<path d="M3 12h5M8 12l9-6M8 12l9 6" ${st(c)}/><circle cx="19" cy="6" r="2" fill="${c}"/><circle cx="19" cy="18" r="2" fill="${c}"/>`;
+const IC={
+cron:`<circle cx="12" cy="12" r="9" ${st("#6b7280")}/><path d="M12 7v5l3 2" ${st("#6b7280")}/>`,
+erp:'<rect x="3" y="3" width="18" height="18" rx="3" fill="#0284c7"/><path d="M7 8h10M7 12h10M7 16h6" '+st("#fff",1.8)+'/>',
+skip:'<path d="M3 4h18l-7 8v7l-4 2v-9z" fill="#0ea5e9"/>',
+group:'<rect x="3" y="4" width="8" height="8" rx="2" fill="#8b5cf6"/><rect x="13" y="4" width="8" height="8" rx="2" fill="#8b5cf6" opacity=".6"/><rect x="3" y="14" width="18" height="6" rx="2" fill="#8b5cf6" opacity=".85"/>',
+safe:SW("#2fae6b"),
+tier:SW("#8b5cf6"),
+soft:'<path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3C8.6 21.5 10.2 22 12 22c5.5 0 10-4.5 10-10S17.5 2 12 2z" fill="#25d366"/><path d="M8 12.500l2.5 2.5 5-5.5" '+st("#fff",1.8)+'/>',
+firm:'<rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="#d97706"/><path d="M3 7.500l9 6.5 9-6.5" '+st("#fff",1.8)+'/>',
+esc:'<path d="M10.3 3.900L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.900a2 2 0 0 0-3.4 0z" fill="#ef4444"/><path d="M12 9v4M12 17h.01" '+st("#fff",2)+'/>',
+log:'<rect x="3" y="3" width="18" height="18" rx="2" fill="#0f9d58"/><path d="M3 9h18M9 3v18" stroke="#fff" stroke-width="1.5"/>',
+hook:`<circle cx="12" cy="12" r="3" fill="#2fae6b"/><path d="M5 12a7 7 0 0 1 14 0M2 12a10 10 0 0 1 20 0" ${st("#2fae6b")}/>`,
+ver:`<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#0ea5e9"/><path d="M8.5 12l2.5 2.5 4.5-5" ${st("#fff")}/>`,
+match:`<circle cx="9" cy="9" r="6" ${st("#0284c7")}/><path d="M13.5 13.500L20 20" ${st("#0284c7")}/>`,
+full:SW("#2fae6b"),
+paid:'<circle cx="12" cy="12" r="10" fill="#059669"/><path d="M7 12.500l3.2 3.200L17 9" '+st("#fff",2)+'/>',
+part:'<circle cx="12" cy="12" r="10" fill="#d97706"/><path d="M12 12V2a10 10 0 0 1 10 10z" fill="#fff" opacity=".85"/>',
+review:'<rect x="3" y="3" width="18" height="18" rx="4" fill="#e11d48"/><path d="M12 8v5M12 16h.01" '+st("#fff",2.2)+'/>'};
+const defN=[["cron","Daily 9:30 AM","Schedule Trigger",15,120],["erp","Get Overdue Invoices","Zoho Books",115,120],["skip","Skip Disputed + Promised","Filter",215,120],["group","Group by Client","Code",315,120],["safe","Safe to Message?","If",415,120],["tier","Aging Tier","Switch",515,120],["soft","WhatsApp Nudge","WhatsApp Cloud API",630,0],["firm","Firm Email + Call","Email + Task",630,120],["esc","Owner Approval + Notice","Slack + PDF",630,240],["log","Log Reminder","Zoho + Sheets",760,120],
+["hook","Payment Webhook","Webhook Trigger",15,470],["ver","Verify + Dedupe","Code",115,470],["match","Match Invoice","Zoho Books",215,470],["full","Full Amount?","If",335,430],["review","Manual Review","Slack + Sheet",335,550],["paid","Mark Paid + Receipt","Zoho + WhatsApp",455,390],["part","Record Part Payment","Zoho Books",455,500]];
+const LN=[defN.slice(0,10),defN.slice(10)].map(a=>a.map(n=>n[0]));
+const svg=$("w"),defs=el("defs",{},svg);
+el("path",{d:"M0 0L8 4L0 8z",class:"mk"},el("marker",{id:"ar",markerWidth:8,markerHeight:8,refX:7,refY:4,orient:"auto"},defs));
+el("text",{x:15,y:-4,class:"lane"},svg).textContent="1  DAILY CHASE  (starts every morning)";
+el("line",{x1:0,y1:372,x2:980,y2:372,class:"sep"},svg);
+el("text",{x:15,y:398,class:"lane"},svg).textContent="2  PAYMENT RECEIVED  (separate flow, starts on a Razorpay event)";
+const gE=el("g",{},svg),gN=el("g",{},svg),gP=el("g",{},svg),D={};
+function wrap(s){if(s.length<=14)return[s];const w=s.split(" "),l=[""];w.forEach(x=>{const c=l[l.length-1];if((c+" "+x).trim().length<=14)l[l.length-1]=(c+" "+x).trim();else l.push(x)});return l}
+defN.forEach(([id,name,sub,x,y])=>{const g=el("g",{class:"nd"},gN),tr=id=="cron"||id=="hook";
+ el("path",{class:"b",d:tr?`M${x+32} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+32}a32 32 0 0 1 0-64z`:`M${x+12} ${y}H${x+52}a12 12 0 0 1 12 12V${y+52}a12 12 0 0 1-12 12H${x+12}a12 12 0 0 1-12-12V${y+12}a12 12 0 0 1 12-12z`},g);
+ el("g",{transform:`translate(${x+16},${y+16}) scale(1.33)`},g).innerHTML=IC[id];
+ const L=wrap(name);L.forEach((t,i)=>el("text",{x:x+32,y:y+80+i*13},g).textContent=t);el("text",{x:x+32,y:y+80+L.length*13,class:"s"},g).textContent=sub;
+ const b=el("g",{class:"bg"},g);el("circle",{cx:x+64,cy:y+4,r:9},b);el("path",{d:`M${x+59.5} ${y+4}l3.2 3.2 6-6.2`,fill:"none",stroke:"#fff","stroke-width":2,"stroke-linecap":"round"},b);
+ D[id]={g,x,y}});
+const out=id=>[D[id].x+64,D[id].y+32],inn=id=>[D[id].x,D[id].y+32],EDG=[];
+function edge(a,b){const[x1,y1]=a,[x2,y2]=b,dx=Math.max(18,(x2-x1)/2);
+ const p=el("path",{class:"ed",d:`M${x1} ${y1}C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`,"marker-end":"url(#ar)"},gE);
+ const t=el("text",{x:(x1+x2)/2,y:(y1+y2)/2-8,class:"il","text-anchor":"middle"},gE);EDG.push({p,t});return EDG.length-1}
+const E=[["cron","erp"],["erp","skip"],["skip","group"],["group","safe"],["safe","tier"],["tier","soft"],["tier","firm"],["tier","esc"],["soft","log"],["firm","log"],["esc","log"],["hook","ver"],["ver","match"],["match","full"],["match","review"],["full","paid"],["full","part"]].map(([a,b])=>edge(out(a),inn(b)));
+const EL=[[0,10],[11,16]];
+function fly(i,ms){return new Promise(res=>{const p=EDG[i].p,Ln=p.getTotalLength(),c=el("circle",{r:6,class:"pk"},gP),t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/ms),q=p.getPointAtLength(Ln*k);c.setAttribute("cx",q.x);c.setAttribute("cy",q.y);k<1?requestAnimationFrame(f):(c.remove(),res())})(t0)})}
+async function go(i,txt,ms=450){await fly(i,ms);const e=EDG[i];e.p.classList.add("ok");e.t.textContent=txt==null?"":txt;e.t.classList.add("show")}
+function reset(l){const ls=l==null?[0,1]:[l];ls.forEach(k=>{LN[k].forEach(id=>D[id].g.setAttribute("class","nd"));for(let i=EL[k][0];i<=EL[k][1];i++){EDG[i].p.classList.remove("ok");EDG[i].t.classList.remove("show")}})}
+const Pm=o=>Object.entries(o).map(([k,v])=>`<span><b>${k}</b>${v}</span>`).join("");
+const Tb=(f,r,c)=>`<table><tr>${f.map(x=>`<th>${x}</th>`).join("")}</tr>${r.map(a=>`<tr>${a.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</table>${c?`<p>${c}</p>`:""}`;
+let detail=true,playing=true,running=false;const pending=[],ndv=$("ndv"),cvEl=document.querySelector(".cv");
+async function view(id,sp){const n=defN.find(d=>d[0]==id);
+ ndv.innerHTML=`<div class="nh"><svg viewBox="0 0 24 24">${IC[id]}</svg><div><b>${n[1]}</b><small>${n[2]} node</small></div><span class="pill" id="pl">Running...</span></div><div class="nb"><div><h4>Parameters</h4><div class="pm">${Pm(sp.params)}</div></div><div><h4>What happens inside</h4><div id="lns"></div></div><div class="ot" id="oo" style="display:none"><h4>Output</h4>${sp.out}</div></div>`;
+ cvEl.classList.add("dim");ndv.classList.add("open");await sleep(450);
+ const Ls=$("lns");for(const h of sp.lines){const d=document.createElement("div");d.className="ln";d.innerHTML=h;Ls.appendChild(d);await sleep(400)}
+ $("oo").style.display="block";const p=$("pl");p.textContent="Success";p.className="pill ok";await sleep(1100);
+ ndv.classList.remove("open");cvEl.classList.remove("dim");await sleep(300)}
+async function runV(id,sp){const c=D[id].g.classList;c.add("run");if(detail)await view(id,sp);else await sleep(500);c.remove("run");c.add("ok")}
+function logItem(t,b="INFO"){const li=document.createElement("li");li.innerHTML=`<b>${new Date().toLocaleTimeString()}</b> [${b}] ${t}`;const u=$("log");u.prepend(li);while(u.children.length>7)u.lastChild.remove()}
+// every number comes from these counters
+const S={rec:1845000,ar:5200000,sales:8400000,chased:210,paidCh:192,pay:260,auto:246,hist:[120,185,240,195,310,280,360,420],last:null,n:4000};
+const KD=["Recovered cash","DSO (days to collect)","Chased invoices paid","Zero-touch reconciled"];
+KD.forEach((l,i)=>{const d=document.createElement("div");d.className="card k";d.id="k"+i;d.innerHTML=`<div class="l">${l}</div><div class="v">-</div><div class="d">&nbsp;</div>`;$("kpis").appendChild(d)});
+const shown={};
+function setK(i,val,f,sub){const c=$("k"+i),v=c.querySelector(".v"),from=shown[i]??val,t0=performance.now();shown[i]=val;(function a(t){const k=Math.min(1,(t-t0)/600);v.textContent=f(from+(val-from)*k);k<1&&requestAnimationFrame(a)})(t0);c.querySelector(".d").textContent=sub}
+function kpis(){setK(0,S.rec,fmt,nf(S.pay)+" payments this month");setK(1,S.ar/S.sales*30,n=>n.toFixed(1)+" days",fmt(S.ar)+" still outstanding");setK(2,S.paidCh/S.chased*100,n=>n.toFixed(1)+"%",`${S.paidCh} of ${S.chased} chased invoices`);setK(3,S.auto/S.pay*100,n=>n.toFixed(1)+"%",(S.pay-S.auto)+" sent to manual review")}
+function chart(){const m=Math.max(...S.hist),g=$("ch");g.innerHTML="";S.hist.forEach((v,i)=>{const h=v/m*80,x=10+i*41;el("rect",{x,y:100-h,width:28,height:h,rx:4,class:i==S.hist.length-1?"new":""},g);el("text",{x:x+14,y:95-h},g).textContent=v;el("text",{x:x+14,y:118},g).textContent=i==S.hist.length-1?"today":"-"+(S.hist.length-1-i)})}
+const CASES={
+soft:{client:"Apex Global Solutions",days:5,amt:48500,tier:"soft",contact:"Priya Nair",channel:"WhatsApp",touches:1},
+firm:{client:"Meridian Traders",days:22,amt:92000,tier:"firm",contact:"Vikram Shah",channel:"Email + WhatsApp",touches:2},
+esc:{client:"Zenith Retail Corp",days:32,amt:145000,tier:"esc",contact:"Anil Mehta",channel:"Formal notice",touches:3}};
+// ---- Flow 1: daily chase ----
+async function chase(kind){
+ reset(0);const C=CASES[kind],inv="INV-"+(++S.n),nInv=1+rnd(3),total=C.amt+(nInv-1)*(12000+rnd(9000)),now=new Date();
+ const all=12+rnd(5),dis=1+rnd(2),prom=1+rnd(2),rec=1+rnd(3),left=all-dis-prom-rec,clients=Math.max(2,left-2);
+ logItem(`Daily chase started. Checking overdue invoices in Zoho Books`,"CHASE");
+ await runV("cron",{params:{Schedule:"Mon\u2013Sat, 9:30",Skips:"Sundays + holidays"},lines:["Clock reaches 9:30 on a working day","The chase starts","Sundays and holidays are skipped, so nobody is chased then"],out:Tb(["time"],[[now.toLocaleString("en-IN")]],"1 item")});
+ await go(E[0],"start");
+ await runV("erp",{params:{Status:"overdue",Sort:"oldest first"},lines:["Ask Zoho Books for every invoice past its due date",`Found <em>${all} overdue invoices</em>`,`Includes ${inv} for <em>${C.client}</em>: ${fmt(C.amt)}, ${C.days} days overdue`],out:Tb(["invoice","client","days","amount"],[[inv,C.client,C.days,fmt(C.amt)],["INV-"+(S.n-9),"Delta Foods",3,fmt(21000)]],all+" invoices")});
+ await go(E[1],all+" overdue");
+ await runV("skip",{params:{Drop:"disputed, promised date, chased in last 3 days"},lines:[`${all} invoices \u2212 ${dis} disputed \u2212 ${prom} with a promised payment date \u2212 ${rec} chased in the last 3 days`,`= <em>${left} invoices to chase</em>`,"Why: chasing a client who disputes the invoice, or who promised a date, damages the relationship"],out:Tb(["start","disputed","promised","recent","to chase"],[[all,dis,prom,rec,left]])});
+ await go(E[2],left);
+ await runV("group",{params:{Group:"client email",Rule:"one message per client"},lines:[`${left} invoices belong to <em>${clients} clients</em>`,`<em>${C.client}</em> has ${nInv} overdue invoice${nInv>1?"s":""}, total <em>${fmt(total)}</em>`,"One message per client, so nobody gets 3 separate reminders"],out:Tb(["client","invoices","total"],[[C.client,nInv,fmt(total)]],clients+" messages to send")});
+ await go(E[3],clients+" clients");
+ const hh=now.getHours()>=9&&now.getHours()<19?now.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"10:05";
+ await runV("safe",{params:{Checks:"opt-in, send window, touch limit"},lines:[`WhatsApp opt-in: <em>yes</em> (given when ${C.client} signed up)`,`Time ${hh} is inside the 9:00\u201319:00 window`,`Touches so far: <em>${C.touches} of 4</em> (maximum), last one 3+ days ago`,"<em>TRUE</em>: allowed to send now"],out:Tb(["opt-in","time window","touches"],[["yes","ok",C.touches+" / 4"]])});
+ await go(E[4],"ok");
+ await runV("tier",{params:{Field:"days overdue"},lines:[`days overdue = <em>${C.days}</em>`,"1\u201314 days: friendly WhatsApp | 15\u201330 days: firm email + call task | over 30: owner approval + formal notice",`<em>${C.tier=="soft"?"1\u201314: friendly":C.tier=="firm"?"15\u201330: firm":"over 30: formal"}</em> tier chosen`],out:Tb(["goes to"],[[C.tier=="soft"?"WhatsApp Nudge":C.tier=="firm"?"Firm Email + Call":"Owner Approval + Notice"]])});
+ const ei={soft:5,firm:6,esc:7}[C.tier],link="pay.example.in/r/"+inv.toLowerCase();
+ await go(E[ei],C.tier);
+ if(C.tier=="soft"){await runV("soft",{params:{Message:"approved template",Button:"Pay now (UPI)",Link:"expires in 48 h"},lines:["Create a Razorpay payment link for the exact amount, with the invoice number saved inside the link (needed to match the payment later)","Send the WhatsApp message using an <em>approved template</em> (WhatsApp requires this for business messages)","The message has a Pay now button and a STOP option","WhatsApp replies <em>delivered</em>"],out:`<div class="em"><div class="eh2"><b>To</b>${C.contact} (WhatsApp)<br><b>Invoice</b>${inv}</div><div class="eb">Hi ${C.contact.split(" ")[0]}, a gentle reminder: invoice ${inv} for ${fmt(total)} was due ${C.days} days ago. Pay in one tap: ${link}<br><small>Reply STOP to stop reminders.</small></div><div class="dl"><span>\u2713 Delivered</span></div></div>`});await go(E[8],"sent")}
+ else if(C.tier=="firm"){await runV("firm",{params:{Email:"to accounts, cc the owner",Task:"call in 2 days"},lines:["Send a firm but polite email with the statement of account attached","Also send the WhatsApp reminder with the pay link","Create a call task for the account manager, due in 2 days","No threats: the tone stays professional"],out:`<div class="em"><div class="eh2"><b>To</b>accounts@${C.client.toLowerCase().replace(/ /g,"")}.example<br><b>Subject</b>Overdue: ${nInv} invoice${nInv>1?"s":""}, ${fmt(total)}</div><div class="eb">Dear ${C.contact.split(" ")[0]}, these invoices are now ${C.days} days overdue. The statement is attached and you can pay here: ${link}. Please reply with a payment date.</div><div class="dl"><span>\u2713 Email sent</span><span>\u2713 Call task created</span></div></div>`});await go(E[9],"sent")}
+ else{const interest=Math.random()<.7;await runV("esc",{params:{Approval:"Slack buttons",Document:"Formal notice PDF"},lines:[`Check the contract: interest clause <em>${interest?"18% a year is allowed":"none, so no interest is added"}</em>`,"Generate the formal notice PDF with the statement of account"+(interest?" and the interest worked out":""),"Send it to the owner on Slack with <em>Approve / Edit / Hold</em>","The owner clicks <em>Approve</em>: nothing formal goes out without a person","Then email the notice to the client\u2019s finance contact"],out:`<div class="em"><div class="eh2"><b>Channel</b>#collections (owner)<br><b>Client</b>${C.client}</div><div class="eb">Formal notice ready for ${fmt(total)}, ${C.days} days overdue.<br>[Approve] [Edit] [Hold]</div><div class="dl"><span>\u2713 Approved by owner</span><span>\u2713 Notice emailed</span></div></div>`});await go(E[10],"sent")}
+ await runV("log",{params:{Zoho:"add a note",Sheet:"Chase Log"},lines:["Add a note on the invoice: date, channel and tier",`Touch count: ${C.touches} \u2192 <em>${C.touches+1}</em>`,"Next chase date: in 3 days (earlier if the client replies)","Stop conditions: payment received, dispute raised, or 4 touches"],out:Tb(["invoice","tier","touch","next chase"],[[inv,C.tier,C.touches+1,"in 3 days"]])});
+ S.chased+=nInv;S.last={inv,client:C.client,amt:total,bal:total};kpis();
+ logItem(`${C.client}: ${nInv} invoice${nInv>1?"s":""} (${fmt(total)}) chased by ${C.channel}. No cash counted yet`,"CHASED");
+ await sleep(1200);
+ if(kind!="esc"&&Math.random()<.7)await pay([ "full","full","part","none"][rnd(4)])}
+// ---- Flow 2: payment received ----
+async function pay(kind){
+ reset(1);const lc=S.last||{inv:"INV-3999",client:"Apex Global Solutions",amt:48500,bal:48500},un=kind=="none",part=kind=="part";
+ const paid=un?25000:part?Math.round(lc.bal*0.5/100)*100:lc.bal,payId="pay_"+Math.random().toString(36).slice(2,10),utr="UTR"+(100000000+rnd(899999999));
+ logItem(`Razorpay: ${fmt(paid)} received (${payId})`,"PAYMENT");
+ await runV("hook",{params:{Method:"POST",Path:"/razorpay-payments",Event:"payment.captured"},lines:["Razorpay calls this URL when a payment is captured",`Payload: <em>{id:${payId}, amount:${fmt(paid)}, notes:${un?"{}":"{invoice:"+lc.inv+"}"}}</em>`,"The payment arrived by UPI, after the client opened the link"],out:Tb(["field","value"],[["payment",payId],["amount",fmt(paid)],["invoice in notes",un?"missing":lc.inv]],"1 item")});
+ await go(E[11],"event");
+ await runV("ver",{params:{Check:"HMAC signature",Dedupe:"payment id"},lines:["Work out the HMAC of the body with the webhook secret","Signature matches: <em>valid</em> (a fake request would be dropped)","Look up the payment id in the list of processed payments: <em>new</em>, not a repeat","Razorpay can send the same event twice, so repeats are ignored"],out:Tb(["signature","duplicate?"],[["valid","no"]])});
+ await go(E[12],"valid");
+ await runV("match",{params:{Search:"invoice number in the payment notes",Fallback:"amount + client email"},lines:un?["The notes have no invoice number","Fallback: search by amount and email: <em class=\"w\">no single match</em>","Do not guess where money goes"]:[`Notes contain invoice <em>${lc.inv}</em>`,`Found in Zoho Books: ${lc.client}, balance <em>${fmt(lc.bal)}</em>`],out:un?Tb(["result"],[["no match"]]):Tb(["invoice","client","balance"],[[lc.inv,lc.client,fmt(lc.bal)]])});
+ S.pay++;
+ if(un){await go(E[14],"no match");
+  await runV("review",{params:{Queue:"accounts team",Notify:"Slack"},lines:["The payment has no invoice number and no single match","Put it in the manual review queue instead of guessing","Slack message to accounts with the payment details","An accountant matches it by hand, so it is <em class=\"w\">not</em> zero-touch"],out:Tb(["payment","amount","status"],[[payId,fmt(paid),"needs a person"]],"1 item in the queue")});
+  S.rec+=paid;S.hist[S.hist.length-1]+=Math.round(paid/1000);kpis();chart();logItem(`${fmt(paid)} could not be matched: sent to manual review`,"REVIEW");await sleep(1200);return}
+ await go(E[13],"matched");
+ const bal=lc.bal-paid;
+ await runV("full",{params:{Condition:"paid \u2265 balance"},lines:[`paid ${fmt(paid)} vs balance ${fmt(lc.bal)}`,part?`<em class="w">FALSE</em>: part payment, ${fmt(bal)} is still due`:"<em>TRUE</em>: paid in full"],out:Tb(["paid","balance","result"],[[fmt(paid),fmt(lc.bal),part?"partial":"full"]])});
+ S.auto++;S.rec+=paid;S.ar-=paid;S.hist[S.hist.length-1]+=Math.round(paid/1000);
+ if(!part){await go(E[15],"full");
+  await runV("paid",{params:{Action:"Record payment + mark paid",Receipt:"email + WhatsApp"},lines:[`Record ${fmt(paid)} in Zoho Books with the bank reference <em>${utr}</em>`,"Invoice status \u2192 <em>Paid</em>","Razorpay\u2019s fee is booked as an expense (the bank receives the amount minus the fee)","Send the receipt and stop all reminders for this invoice"],out:`<div class="em"><div class="eh2"><b>To</b>${lc.client}<br><b>Receipt</b>${utr}</div><div class="eb">Thank you. We received ${fmt(paid)} for invoice ${lc.inv}. Status: Paid.</div><div class="dl"><span>\u2713 Zoho updated</span><span>\u2713 Receipt sent</span></div></div>`});
+  S.paidCh++;S.last=null;kpis();chart();logItem(`${lc.inv} paid in full (${fmt(paid)}). Zoho updated, reminders stopped`,"PAID")}
+ else{await go(E[16],"part");
+  await runV("part",{params:{Action:"Record part payment",Status:"Partially paid"},lines:[`Record ${fmt(paid)} as a part payment (${utr})`,`Invoice status \u2192 <em>Partially paid</em>, balance <em>${fmt(bal)}</em>`,"Reminders continue for the balance only, with a new pay link","Send a thank-you message with the remaining balance"],out:Tb(["paid","balance","status"],[[fmt(paid),fmt(bal),"Partially paid"]],"Zoho updated")});
+  S.last={...lc,bal};kpis();chart();logItem(`${lc.inv}: ${fmt(paid)} part payment, ${fmt(bal)} still due and still chased`,"PART-PAID")}
+ await sleep(1200)}
+async function pump(){if(running)return;running=true;while(pending.length){try{await pending.shift()()}catch(e){console.error(e)}}running=false}
+const q=f=>{pending.push(f);pump()};
+$("b1").onclick=()=>q(()=>chase("soft"));$("b2").onclick=()=>q(()=>chase("firm"));$("b3").onclick=()=>q(()=>chase("esc"));
+$("b4").onclick=()=>q(()=>pay("full"));$("b5").onclick=()=>q(()=>pay("part"));$("b6").onclick=()=>q(()=>pay("none"));
+$("play").onclick=e=>{playing=!playing;e.target.textContent=playing?"Pause auto-run":"Resume auto-run"};
+$("det").onclick=e=>{detail=!detail;e.target.textContent="Node details: "+(detail?"On":"Off")};
+kpis();chart();logItem("Ready. Press Run daily chase, then a payment button. Money counts only when a payment arrives");
+(async()=>{await sleep(1200);q(()=>chase("soft"));while(true){await sleep(90000);if(playing&&!running)q(()=>chase(["soft","firm","esc"][rnd(3)]))}})();
+</script></body></html>
