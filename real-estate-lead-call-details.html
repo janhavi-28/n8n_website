@@ -548,11 +548,14 @@
     }
 
     function sendBackgroundLead(payload) {
+      const endpoint = getFormSubmitEndpoint();
       const formData = {
-        ...payload,
-        _subject: payload._subject || ('New Lead - ' + (payload['Company Name'] || payload['Name'] || 'Aivatika')),
+        email: payload.email || 'inquiry@aivatika.com',
+        _replyto: payload.email || 'inquiry@aivatika.com',
         _captcha: 'false',
-        _template: 'table'
+        _template: 'table',
+        _subject: payload._subject || ('New Lead - ' + (payload['Company Name'] || payload['Name'] || 'Aivatika')),
+        ...payload
       };
 
       // 1. Hidden iframe form submit (instant, reliable background delivery)
@@ -568,7 +571,7 @@
 
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = 'https://formsubmit.co/' + getFormSubmitEndpoint();
+        form.action = 'https://formsubmit.co/' + endpoint;
         form.target = 'hidden_email_iframe';
         form.style.display = 'none';
 
@@ -588,19 +591,6 @@
       } catch (e) {
         console.warn('Iframe dispatch issue:', e);
       }
-
-      // 2. Non-blocking AJAX attempt with short timeout
-      try {
-        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        const timeoutId = controller ? setTimeout(() => controller.abort(), 600) : null;
-        fetch('https://formsubmit.co/ajax/' + getFormSubmitEndpoint(), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify(formData),
-          signal: controller ? controller.signal : undefined
-        }).catch(() => null);
-        if (timeoutId) clearTimeout(timeoutId);
-      } catch (err) {}
     }
 
 

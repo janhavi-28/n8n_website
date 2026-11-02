@@ -2454,10 +2454,12 @@
     function sendBackgroundLead(payload) {
       const endpoint = getFormSubmitEndpoint();
       const formData = {
-        ...payload,
-        _subject: payload._subject || ('New Lead - ' + (payload['Company Name'] || payload['Name'] || 'Aivatika')),
+        email: payload.email || 'inquiry@aivatika.com',
+        _replyto: payload.email || 'inquiry@aivatika.com',
         _captcha: 'false',
-        _template: 'table'
+        _template: 'table',
+        _subject: payload._subject || ('New Lead - ' + (payload['Company Name'] || payload['Name'] || 'Aivatika')),
+        ...payload
       };
 
       // 1. Hidden iframe form submit (instant, reliable background delivery)
@@ -2493,15 +2495,6 @@
       } catch (e) {
         console.warn('Iframe dispatch issue:', e);
       }
-
-      // 2. Non-blocking AJAX attempt
-      try {
-        fetch('https://formsubmit.co/ajax/' + endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify(formData)
-        }).catch(() => null);
-      } catch (err) {}
     }
 
         function handleContactSubmit(e) {
