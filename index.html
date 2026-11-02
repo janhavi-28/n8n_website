@@ -2306,17 +2306,26 @@
 
       contactSelect.value = targetId;
 
+      const modal = document.getElementById('contact-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
       document.getElementById('contact-form').style.display = 'block';
-      document.getElementById('contact-success').style.display = 'none';
+      const cs = document.getElementById('contact-success');
+      if (cs) cs.style.display = 'none';
 
-      contactModal.classList.add('is-open');
-      contactModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
 
     function closeContactModal() {
-      contactModal.classList.remove('is-open');
-      contactModal.setAttribute('aria-hidden', 'true');
+      const modal = document.getElementById('contact-modal');
+      if (modal) {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        modal.style.display = 'none';
+      }
       document.body.style.overflow = '';
     }
 
@@ -2488,23 +2497,16 @@
         'Automation Requested': autoObj.name
       });
 
-      document.getElementById('contact-form').style.display = 'none';
-      const successCard = document.getElementById('contact-success');
-      successCard.style.display = 'block';
-      document.getElementById('success-summary').textContent =
-        'Thank you, ' + name + '! We have received your request for "' + autoObj.name + '".';
-
-      // Automatically return back to the page after 1.2 seconds
+      // Immediately return back to the page after 600ms
       setTimeout(() => {
         closeContactModal();
         document.getElementById('contact-form').reset();
-        document.getElementById('contact-form').style.display = 'block';
-        successCard.style.display = 'none';
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalHtml;
         }
-      }, 1200);
+        showToast('Request Received! Our automation team will reach out within one business day.');
+      }, 600);
     }
     
 
@@ -2625,20 +2627,29 @@
       const topicInput = document.getElementById('cal-topic');
       if (topicInput) topicInput.value = autoName;
 
-      scheduleModal.classList.add('is-open');
-      scheduleModal.setAttribute('aria-hidden', 'false');
+      const modal = document.getElementById('schedule-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
       document.body.style.overflow = 'hidden';
 
       document.getElementById('calBookingForm').style.display = 'block';
-      document.getElementById('calSuccessScreen').style.display = 'none';
+      const successScreen = document.getElementById('calSuccessScreen');
+      if (successScreen) successScreen.style.display = 'none';
       clearSlotError();
 
       renderCalendarGrid();
     }
 
     function closeScheduleModal() {
-      scheduleModal.classList.remove('is-open');
-      scheduleModal.setAttribute('aria-hidden', 'true');
+      const modal = document.getElementById('schedule-modal');
+      if (modal) {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        modal.style.display = 'none';
+      }
       document.body.style.overflow = '';
       clearSlotError();
     }
@@ -2812,22 +2823,16 @@
         'Automation Requirement': topic
       });
 
-      document.getElementById('calBookingForm').style.display = 'none';
-      const successScreen = document.getElementById('calSuccessScreen');
-      successScreen.style.display = 'block';
-      document.getElementById('calSuccessSummary').textContent =
-        'Thank you, ' + name + '! Your one-hour session on ' + dateStr + ' at ' + calSelectedSlot + ' is registered. We will send the meeting link to ' + phone + '.';
-
+      // Immediately return back to the page after 600ms
       setTimeout(() => {
         closeScheduleModal();
         document.getElementById('calBookingForm').reset();
-        document.getElementById('calBookingForm').style.display = 'block';
-        successScreen.style.display = 'none';
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
         }
-      }, 1200);
+        showToast('Consultation Booked! We have sent meeting details to ' + phone + '.');
+      }, 600);
     }
 
     /* Initialize Simulation Controller on ready */

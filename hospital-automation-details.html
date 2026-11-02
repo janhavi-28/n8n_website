@@ -424,19 +424,45 @@
       const cs = document.getElementById('contact-success');
       if (cf) cf.style.display = 'block';
       if (cs) cs.style.display = 'none';
-      contactModal.classList.add('is-open');
-      contactModal.setAttribute('aria-hidden', 'false');
+      const modal = document.getElementById('contact-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
       document.body.style.overflow = 'hidden';
     }
 
     function closeContactModal() {
-      contactModal.classList.remove('is-open');
-      contactModal.setAttribute('aria-hidden', 'true');
+      const modal = document.getElementById('contact-modal');
+      if (modal) {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        modal.style.display = 'none';
+      }
       document.body.style.overflow = '';
     }
 
     
     
+    
+    function showToast(message) {
+      let toast = document.getElementById('aivatika-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'aivatika-toast';
+        toast.style.cssText = 'position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(30px); background: #0f172a; color: #ffffff; padding: 13px 22px; border-radius: 999px; font-size: 13.5px; font-weight: 700; box-shadow: 0 12px 32px rgba(0,0,0,0.35); z-index: 99999; display: flex; align-items: center; gap: 8px; opacity: 0; transition: all .25s ease; border: 1px solid rgba(255,255,255,0.15); pointer-events: none; font-family: var(--font, sans-serif);';
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = '<span>' + message + '</span>';
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(30px)';
+      }, 4500);
+    }
+
     /* ==========================================================================
        Lead Email & Phone Validation Controller
        ========================================================================== */
@@ -584,25 +610,16 @@
         'Automation Requested': automation
       });
 
-      document.getElementById('contact-form').style.display = 'none';
-      const successCard = document.getElementById('contact-success');
-      if (successCard) successCard.style.display = 'block';
-      const successSummary = document.getElementById('success-summary');
-      if (successSummary) {
-        successSummary.textContent = 'Thank you, ' + name + '! We have received your inquiry for ' + automation + '.';
-      }
-
-      // Automatically return back to the detail page after 1.2 seconds
+      // Immediately return back to the page after 600ms
       setTimeout(() => {
         closeContactModal();
         document.getElementById('contact-form').reset();
-        document.getElementById('contact-form').style.display = 'block';
-        if (successCard) successCard.style.display = 'none';
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
         }
-      }, 1200);
+        showToast('Request Received! Our automation team will reach out within one business day.');
+      }, 600);
     }
     
 
