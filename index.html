@@ -244,6 +244,383 @@
     }
 
     
+    
+    /* Schedule a Call Calendar Modal */
+    .schedule-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s, visibility .25s;
+      padding: 16px;
+    }
+
+    .schedule-modal.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .schedule-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 13, 22, .85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .schedule-modal-dialog {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, .45);
+      padding: 28px 24px;
+      transform: scale(.96);
+      transition: transform .25s;
+    }
+
+    .schedule-modal.is-open .schedule-modal-dialog {
+      transform: scale(1);
+    }
+
+    .schedule-modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .schedule-modal-close:hover {
+      background: var(--surface-secondary);
+      color: var(--text);
+      border-color: var(--subtle);
+    }
+
+    .cal-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-right: 36px;
+      flex-wrap: wrap;
+    }
+
+    .cal-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -.02em;
+      margin-bottom: 4px;
+    }
+
+    .cal-sub {
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .btn-cal-refresh {
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 7px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+
+    .btn-cal-refresh:hover {
+      background: var(--surface-secondary);
+      border-color: var(--subtle);
+    }
+
+    /* Inner Calendar Card */
+    .cal-card {
+      background: var(--surface-secondary);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px 18px;
+      margin-bottom: 20px;
+    }
+
+    .cal-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .cal-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .cal-card-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cal-range-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .cal-nav-arrows {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cal-nav-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all .15s;
+    }
+
+    .cal-nav-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .cal-nav-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    /* Weekday Headers */
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--subtle);
+      margin-bottom: 10px;
+    }
+
+    /* Day Grid */
+    .cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .cal-day-cell {
+      aspect-ratio: 1;
+      min-height: 44px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all .15s ease;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .cal-day-cell small {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--subtle);
+      text-transform: uppercase;
+      margin-top: -2px;
+    }
+
+    .cal-day-cell:hover:not(.disabled) {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .cal-day-cell.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .cal-day-cell.active small {
+      color: rgba(255, 255, 255, .85);
+    }
+
+    .cal-day-cell.disabled {
+      background: transparent;
+      border-color: transparent;
+      color: var(--subtle);
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    /* Time Slots Section */
+    .cal-slots-section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+
+    .cal-slots-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--subtle);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cal-slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+    }
+
+    .cal-slot-btn {
+      font-family: inherit;
+      padding: 9px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      background: var(--surface-secondary);
+      border: 1px solid var(--line);
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s ease;
+      text-align: center;
+    }
+
+    .cal-slot-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .cal-slot-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Status row */
+    .cal-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.4;
+      padding-top: 10px;
+      border-top: 1px dashed var(--line);
+      flex-wrap: wrap;
+    }
+
+    .btn-cal-tryagain {
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .15s;
+    }
+
+    .btn-cal-tryagain:hover {
+      background: var(--surface-secondary);
+      border-color: var(--subtle);
+    }
+
+    /* Booking Confirmation Form */
+    .cal-booking-form {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px 18px;
+      background: var(--surface);
+    }
+
+    .cal-selected-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .btn-confirm-booking {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: .95rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(242, 86, 63, .35);
+      transition: all .15s ease;
+      margin-top: 10px;
+    }
+
+    .btn-confirm-booking:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(242, 86, 63, .45);
+    }
+
     /* Custom Automation Patch */
     .custom-auto-patch {
       position: sticky;
@@ -1091,7 +1468,7 @@
           <div class="custom-auto-title">For any customised automation</div>
           <div class="custom-auto-sub">Need any customised automation, contact our team.</div>
         </div>
-        <button type="button" class="btn-schedule-call" onclick="openContactModal('custom')">
+        <button type="button" class="btn-schedule-call" onclick="openScheduleModal('Custom AI Automation / Bespoke System')">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -1122,7 +1499,7 @@
             contact@aivatika.com
           </a>
 
-          <button type="button" class="contact-btn" onclick="openContactModal()">
+          <button type="button" class="contact-btn" onclick="openScheduleModal('General Consultation')">
             Book a Call
           </button>
         </div>
@@ -1168,6 +1545,123 @@
         </div>
         <iframe id="sim-modal-iframe" title="Workflow simulation runner"
           sandbox="allow-scripts allow-same-origin"></iframe>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Schedule a Call Calendar Modal -->
+  <div id="schedule-modal" class="schedule-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="schedule-modal-backdrop" onclick="closeScheduleModal()"></div>
+    <div class="schedule-modal-dialog">
+      <button class="schedule-modal-close" onclick="closeScheduleModal()" aria-label="Close modal" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Calendar Header Matching Screenshot -->
+      <div class="cal-header-row">
+        <div>
+          <h2 class="cal-title">Choose an available time</h2>
+          <p class="cal-sub">These one-hour sessions are checked against the private AIvatika booking calendar.</p>
+        </div>
+        <button type="button" class="btn-cal-refresh" onclick="refreshCalendar()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+          </svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+
+      <!-- Calendar Card Matching Screenshot -->
+      <div class="cal-card">
+        <div class="cal-card-head">
+          <div class="cal-card-title">Available dates</div>
+          <div class="cal-card-nav">
+            <span class="cal-range-label" id="calRangeLabel">Next 30 days</span>
+            <div class="cal-nav-arrows">
+              <button type="button" class="cal-nav-btn" id="calPrevBtn" onclick="navCal(-1)" aria-label="Previous dates">‹</button>
+              <button type="button" class="cal-nav-btn" id="calNextBtn" onclick="navCal(1)" aria-label="Next dates">›</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-weekdays">
+          <div>Sun</div>
+          <div>Mon</div>
+          <div>Tue</div>
+          <div>Wed</div>
+          <div>Thu</div>
+          <div>Fri</div>
+          <div>Sat</div>
+        </div>
+
+        <div class="cal-days-grid" id="calDaysGrid">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- 1-Hour Time Slots -->
+        <div class="cal-slots-section" id="calSlotsSection">
+          <div class="cal-slots-title">
+            <span id="calSelectedDateLabel">Select an available date above</span>
+            <span style="color: var(--accent); font-weight: 700;">1-Hour Slots</span>
+          </div>
+          <div class="cal-slots-grid" id="calSlotsGrid">
+            <!-- Populated on date click -->
+          </div>
+        </div>
+
+        <!-- Bottom Status Line Matching Screenshot -->
+        <div class="cal-status-row">
+          <span>Live availability is checked against the private AIvatika booking calendar. Please select an available slot or email contact@aivatika.com.</span>
+          <button type="button" class="btn-cal-tryagain" onclick="refreshCalendar()">Try again</button>
+        </div>
+      </div>
+
+      <!-- Booking Form Details -->
+      <form id="calBookingForm" class="cal-booking-form" onsubmit="submitCalendarBooking(event)">
+        <div class="cal-selected-pill" id="calSelectedSlotPill">
+          <span>📅</span>
+          <span id="calSlotSummaryText">Select a date and time slot above</span>
+        </div>
+
+        <div class="form-group">
+          <label for="cal-name" class="form-label">YOUR NAME *</label>
+          <input type="text" id="cal-name" class="form-input" placeholder="Priya Sharma" required>
+        </div>
+
+        <div class="form-group">
+          <label for="cal-biz" class="form-label">COMPANY NAME *</label>
+          <input type="text" id="cal-biz" class="form-input" placeholder="Sunrise Diagnostics" required>
+        </div>
+
+        <div class="form-group">
+          <label for="cal-phone" class="form-label">PHONE NUMBER (WHATSAPP) *</label>
+          <input type="tel" id="cal-phone" class="form-input" placeholder="+91 80504 73346" required>
+        </div>
+
+        <div class="form-group">
+          <label for="cal-topic" class="form-label">AUTOMATION REQUIREMENT</label>
+          <input type="text" id="cal-topic" class="form-input" value="Custom AI Automation / Bespoke System" required>
+        </div>
+
+        <button type="submit" class="btn-confirm-booking" id="calSubmitBtn">
+          Confirm &amp; Schedule Call →
+        </button>
+      </form>
+
+      <!-- Success Screen -->
+      <div id="calSuccessScreen" class="contact-success" style="display:none; padding: 28px 16px;">
+        <div class="success-icon">✓</div>
+        <h3>One-Hour Call Confirmed!</h3>
+        <p id="calSuccessSummary">Thank you! Your consultation has been scheduled. An automation architect will connect with you at your chosen time.</p>
+        <div class="success-actions" style="margin-top: 18px;">
+          <button type="button" class="btn-secondary" onclick="closeScheduleModal()">Done</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1938,6 +2432,166 @@
     document.addEventListener("click", e => { if (!e.target.closest(".name")) hideTip(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape") hideTip(); });
     window.addEventListener("scroll", hideTip, true);
+
+    
+    /* ==========================================================================
+       Schedule a Call - Interactive Calendar Controller
+       ========================================================================== */
+    const scheduleModal = document.getElementById('schedule-modal');
+    let calCurrentWindow = 0; // offset in 14-day chunks
+    let calSelectedDate = null;
+    let calSelectedSlot = '02:00 PM – 03:00 PM';
+
+    const TIME_SLOTS = [
+      '10:00 AM – 11:00 AM',
+      '11:30 AM – 12:30 PM',
+      '02:00 PM – 03:00 PM',
+      '04:00 PM – 05:00 PM',
+      '05:30 PM – 06:30 PM'
+    ];
+
+    function openScheduleModal(autoName = 'Custom AI Automation / Bespoke System') {
+      const topicInput = document.getElementById('cal-topic');
+      if (topicInput) topicInput.value = autoName;
+
+      scheduleModal.classList.add('is-open');
+      scheduleModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+
+      document.getElementById('calBookingForm').style.display = 'block';
+      document.getElementById('calSuccessScreen').style.display = 'none';
+
+      renderCalendarGrid();
+    }
+
+    function closeScheduleModal() {
+      scheduleModal.classList.remove('is-open');
+      scheduleModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function navCal(delta) {
+      calCurrentWindow = Math.max(0, Math.min(2, calCurrentWindow + delta));
+      renderCalendarGrid();
+    }
+
+    function refreshCalendar() {
+      calCurrentWindow = 0;
+      calSelectedDate = null;
+      renderCalendarGrid();
+    }
+
+    function renderCalendarGrid() {
+      const grid = document.getElementById('calDaysGrid');
+      const rangeLabel = document.getElementById('calRangeLabel');
+      const prevBtn = document.getElementById('calPrevBtn');
+      const nextBtn = document.getElementById('calNextBtn');
+      if (!grid) return;
+
+      grid.innerHTML = '';
+      prevBtn.disabled = calCurrentWindow === 0;
+      nextBtn.disabled = calCurrentWindow === 2;
+
+      const today = new Date();
+      // Start window from today + (calCurrentWindow * 14)
+      const startDate = new Date(today);
+      startDate.setDate(today.getDate() + (calCurrentWindow * 14));
+
+      // Calculate days in window (14 days = 2 calendar weeks aligned to Sunday)
+      const startDayOfWeek = startDate.getDay();
+      const firstSun = new Date(startDate);
+      firstSun.setDate(startDate.getDate() - startDayOfWeek);
+
+      const endDate = new Date(firstSun);
+      endDate.setDate(firstSun.getDate() + 13);
+
+      rangeLabel.textContent = `${firstSun.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+
+      for (let i = 0; i < 14; i++) {
+        const d = new Date(firstSun);
+        d.setDate(firstSun.getDate() + i);
+
+        const isPast = d < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const isSun = d.getDay() === 0;
+        const isAvailable = !isPast && !isSun;
+
+        const cell = document.createElement('div');
+        cell.className = 'cal-day-cell' + (isAvailable ? '' : ' disabled');
+
+        const dayNum = d.getDate();
+        const monthShort = d.toLocaleDateString('en-US', { month: 'short' });
+
+        cell.innerHTML = `<span>${dayNum}</span><small>${monthShort}</small>`;
+
+        if (isAvailable) {
+          // If no date selected yet, default to first available
+          if (!calSelectedDate) {
+            calSelectedDate = new Date(d);
+          }
+
+          if (calSelectedDate && d.toDateString() === calSelectedDate.toDateString()) {
+            cell.classList.add('active');
+          }
+
+          cell.onclick = () => {
+            calSelectedDate = new Date(d);
+            renderCalendarGrid();
+          };
+        }
+
+        grid.appendChild(cell);
+      }
+
+      renderTimeSlots();
+    }
+
+    function renderTimeSlots() {
+      const slotsGrid = document.getElementById('calSlotsGrid');
+      const dateLabel = document.getElementById('calSelectedDateLabel');
+      const pillSummary = document.getElementById('calSlotSummaryText');
+      if (!slotsGrid || !calSelectedDate) return;
+
+      const dateStr = calSelectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      dateLabel.textContent = `Available Time Slots for ${dateStr}`;
+
+      slotsGrid.innerHTML = '';
+      TIME_SLOTS.forEach(slot => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'cal-slot-btn' + (slot === calSelectedSlot ? ' active' : '');
+        btn.textContent = slot;
+        btn.onclick = () => {
+          calSelectedSlot = slot;
+          renderTimeSlots();
+        };
+        slotsGrid.appendChild(btn);
+      });
+
+      pillSummary.textContent = `Selected: ${dateStr} · ${calSelectedSlot} (1 Hour)`;
+    }
+
+    function submitCalendarBooking(e) {
+      e.preventDefault();
+      const name = document.getElementById('cal-name').value.trim();
+      const biz = document.getElementById('cal-biz').value.trim();
+      const phone = document.getElementById('cal-phone').value.trim();
+      const topic = document.getElementById('cal-topic').value.trim();
+
+      const dateStr = calSelectedDate ? calSelectedDate.toLocaleDateString('en-US', { weekday: 'full', year: 'numeric', month: 'long', day: 'numeric' }) : 'Next Available Date';
+
+      const subject = encodeURIComponent(`Scheduled Call: ${dateStr} at ${calSelectedSlot} - ${biz}`);
+      const mailBody = encodeURIComponent(
+        `Hi Aivatika Team,\n\nI have booked a one-hour consultation session.\n\nMeeting Details:\n- Date: ${dateStr}\n- Time Slot: ${calSelectedSlot} (Checked against private AIvatika booking calendar)\n- Topic: ${topic}\n\nAttendee Details:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n\nPlease send the calendar invite and meeting link!\n\nThanks,\n${name}`
+      );
+
+      document.getElementById('calBookingForm').style.display = 'none';
+      const successScreen = document.getElementById('calSuccessScreen');
+      successScreen.style.display = 'block';
+      document.getElementById('calSuccessSummary').textContent =
+        `Thank you, ${name}! Your one-hour session on ${dateStr} at ${calSelectedSlot} is registered. We will send the meeting link to ${phone}.`;
+
+      window.open(`mailto:contact@aivatika.com?subject=${subject}&body=${mailBody}`, '_self');
+    }
 
     /* Initialize Simulation Controller on ready */
     Modal.init();
