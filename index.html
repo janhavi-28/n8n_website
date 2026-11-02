@@ -2285,8 +2285,9 @@
     const contactModal = document.getElementById('contact-modal');
     const contactSelect = document.getElementById('c-auto');
 
-    // Populate select options
-    AUTOMATIONS.forEach(a => {
+    // Populate select options - ONLY 5 active automations + Custom
+    contactSelect.innerHTML = '';
+    AUTOMATIONS.filter(a => !a.hidden).forEach(a => {
       const opt = document.createElement('option');
       opt.value = a.id;
       opt.textContent = `${a.name} (Setup: ₹${a.setup.toLocaleString('en-IN')})`;
@@ -2563,7 +2564,7 @@
     const scheduleModal = document.getElementById('schedule-modal');
     let calCurrentWindow = 0; // offset in 14-day chunks
     let calSelectedDate = null;
-    let calSelectedSlot = '02:00 PM – 03:00 PM';
+    let calSelectedSlot = null;
 
     const TIME_SLOTS = [
       '10:00 AM – 11:00 AM',
@@ -2572,6 +2573,53 @@
       '04:00 PM – 05:00 PM',
       '05:30 PM – 06:30 PM'
     ];
+
+    function getSlotStartMinutes(slotStr) {
+      if (!slotStr) return 0;
+      const match = slotStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+      if (!match) return 0;
+      let hours = parseInt(match[1], 10);
+      const minutes = parseInt(match[2], 10);
+      const ampm = match[3].toUpperCase();
+      if (ampm === 'PM' && hours < 12) hours += 12;
+      if (ampm === 'AM' && hours === 12) hours = 0;
+      return hours * 60 + minutes;
+    }
+
+    function isSlotInPast(slotStr, date) {
+      if (!date || !slotStr) return false;
+      const now = new Date();
+      const selDateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const todayOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      if (selDateOnly < todayOnly) return true;
+      if (selDateOnly > todayOnly) return false;
+
+      // Date is TODAY: compare slot start time with current time
+      const slotMins = getSlotStartMinutes(slotStr);
+      const nowMins = now.getHours() * 60 + now.getMinutes();
+      return slotMins <= nowMins;
+    }
+
+    function showSlotError(msg) {
+      let err = document.getElementById('cal-slot-error');
+      if (!err) {
+        err = document.createElement('div');
+        err.id = 'cal-slot-error';
+        err.style.cssText = 'color: #ef4444; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-top: 10px; text-align: center;';
+        const slotsGrid = document.getElementById('calSlotsGrid');
+        if (slotsGrid && slotsGrid.parentNode) {
+          slotsGrid.parentNode.insertBefore(err, slotsGrid.nextSibling);
+        }
+      }
+      err.textContent = msg;
+      err.style.display = 'block';
+    }
+
+    function clearSlotError() {
+      const err = document.getElementById('cal-slot-error');
+      if (err) err.style.display = 'none';
+    }
 
     function openScheduleModal(autoName = 'Custom AI Automation / Bespoke System') {
       const topicInput = document.getElementById('cal-topic');
@@ -2583,6 +2631,7 @@
 
       document.getElementById('calBookingForm').style.display = 'block';
       document.getElementById('calSuccessScreen').style.display = 'none';
+      clearSlotError();
 
       renderCalendarGrid();
     }
@@ -2591,6 +2640,7 @@
       scheduleModal.classList.remove('is-open');
       scheduleModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      clearSlotError();
     }
 
     function navCal(delta) {
@@ -2601,6 +2651,7 @@
     function refreshCalendar() {
       calCurrentWindow = 0;
       calSelectedDate = null;
+      calSelectedSlot = null;
       renderCalendarGrid();
     }
 
@@ -2616,11 +2667,9 @@
       nextBtn.disabled = calCurrentWindow === 2;
 
       const today = new Date();
-      // Start window from today + (calCurrentWindow * 14)
       const startDate = new Date(today);
       startDate.setDate(today.getDate() + (calCurrentWindow * 14));
 
-      // Calculate days in window (14 days = 2 calendar weeks aligned to Sunday)
       const startDayOfWeek = startDate.getDay();
       const firstSun = new Date(startDate);
       firstSun.setDate(startDate.getDate() - startDayOfWeek);
@@ -2647,7 +2696,6 @@
         cell.innerHTML = `<span>${dayNum}</span><small>${monthShort}</small>`;
 
         if (isAvailable) {
-          // If no date selected yet, default to first available
           if (!calSelectedDate) {
             calSelectedDate = new Date(d);
           }
@@ -2678,25 +2726,67 @@
       dateLabel.textContent = `Available Time Slots for ${dateStr}`;
 
       slotsGrid.innerHTML = '';
+      clearSlotError();
+
+      let firstValidSlot = null;
+      let availableCount = 0;
+
       TIME_SLOTS.forEach(slot => {
+        const isPast = isSlotInPast(slot, calSelectedDate);
+        if (!isPast) {
+          availableCount++;
+          if (!firstValidSlot) firstValidSlot = slot;
+        }
+
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'cal-slot-btn' + (slot === calSelectedSlot ? ' active' : '');
-        btn.textContent = slot;
-        btn.onclick = () => {
-          calSelectedSlot = slot;
-          renderTimeSlots();
-        };
+
+        if (isPast) {
+          btn.className = 'cal-slot-btn disabled-past';
+          btn.style.cssText = 'opacity: 0.38; cursor: not-allowed; text-decoration: line-through; background: var(--surface-secondary); color: var(--subtle); border-style: dashed;';
+          btn.title = 'This slot has already passed for today';
+          btn.textContent = slot + ' (Passed)';
+          btn.onclick = () => {
+            showSlotError('This slot has already passed today. Please choose an upcoming time.');
+          };
+        } else {
+          btn.className = 'cal-slot-btn' + (slot === calSelectedSlot ? ' active' : '');
+          btn.textContent = slot;
+          btn.onclick = () => {
+            clearSlotError();
+            calSelectedSlot = slot;
+            renderTimeSlots();
+          };
+        }
+
         slotsGrid.appendChild(btn);
       });
 
-      pillSummary.textContent = `Selected: ${dateStr} · ${calSelectedSlot} (1 Hour)`;
+      // Auto-select first valid upcoming slot if current selection is invalid or in past
+      if (!calSelectedSlot || isSlotInPast(calSelectedSlot, calSelectedDate)) {
+        calSelectedSlot = firstValidSlot;
+      }
+
+      if (availableCount === 0) {
+        calSelectedSlot = null;
+        pillSummary.textContent = `All consultation slots for ${dateStr} have ended.`;
+        showSlotError('All consultation slots for today have ended. Please choose an upcoming date above.');
+      } else {
+        pillSummary.textContent = `Selected: ${dateStr} · ${calSelectedSlot} (1 Hour)`;
+      }
     }
 
-            function submitCalendarBooking(e) {
+    function submitCalendarBooking(e) {
       e.preventDefault();
+      clearSlotError();
+
       const phoneInput = document.getElementById('cal-phone');
       if (!validatePhoneNumber(phoneInput)) return;
+
+      if (!calSelectedSlot || isSlotInPast(calSelectedSlot, calSelectedDate)) {
+        showSlotError('Invalid time: This slot has already passed. Please choose a valid upcoming time.');
+        return;
+      }
 
       const submitBtn = document.getElementById('calSubmitBtn');
       const originalText = submitBtn ? submitBtn.textContent : '';
@@ -2726,9 +2816,8 @@
       const successScreen = document.getElementById('calSuccessScreen');
       successScreen.style.display = 'block';
       document.getElementById('calSuccessSummary').textContent =
-        'Thank you, ' + name + '! Your session is registered for ' + dateStr + ' at ' + calSelectedSlot + '.';
+        'Thank you, ' + name + '! Your one-hour session on ' + dateStr + ' at ' + calSelectedSlot + ' is registered. We will send the meeting link to ' + phone + '.';
 
-      // Automatically return back to the page after 1.2 seconds
       setTimeout(() => {
         closeScheduleModal();
         document.getElementById('calBookingForm').reset();
