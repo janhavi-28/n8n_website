@@ -2352,9 +2352,35 @@
     /* ==========================================================================
        Lead Email & Phone Validation Controller
        ========================================================================== */
+    
+    function getFormSubmitEndpoint() {
+      if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        return '5152e22e0dde030452bcf0a9d0a494d7';
+      }
+      return 'janhavikolekar33@gmail.com';
+    }
+
     const FORMSUBMIT_TOKEN = '5152e22e0dde030452bcf0a9d0a494d7';
 
-        function getISTTimestamp() {
+        
+    function showToast(message) {
+      let toast = document.getElementById('aivatika-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'aivatika-toast';
+        toast.style.cssText = 'position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(30px); background: #0f172a; color: #ffffff; padding: 13px 22px; border-radius: 999px; font-size: 13.5px; font-weight: 700; box-shadow: 0 12px 32px rgba(0,0,0,0.35); z-index: 99999; display: flex; align-items: center; gap: 8px; opacity: 0; transition: all .25s ease; border: 1px solid rgba(255,255,255,0.15); pointer-events: none; font-family: var(--font, sans-serif);';
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = '<span>' + message + '</span>';
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(30px)';
+      }, 4500);
+    }
+
+    function getISTTimestamp() {
       return new Date().toLocaleString('en-IN', {
         timeZone: 'Asia/Kolkata',
         weekday: 'short',
@@ -2446,7 +2472,7 @@
 
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = 'https://formsubmit.co/' + FORMSUBMIT_TOKEN;
+        form.action = 'https://formsubmit.co/' + getFormSubmitEndpoint();
         form.target = 'hidden_email_iframe';
         form.style.display = 'none';
 
@@ -2471,7 +2497,7 @@
       try {
         const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
         const timeoutId = controller ? setTimeout(() => controller.abort(), 600) : null;
-        fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_TOKEN, {
+        fetch('https://formsubmit.co/ajax/' + getFormSubmitEndpoint(), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify(formData),
@@ -2484,15 +2510,12 @@
 
         function handleContactSubmit(e) {
       e.preventDefault();
+
       const phoneInput = document.getElementById('c-phone');
       if (!validatePhoneNumber(phoneInput)) return;
 
-      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const submitBtn = document.getElementById('c-submit-btn');
       const originalHtml = submitBtn ? submitBtn.innerHTML : '';
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span>Submitted</span>';
-      }
 
       const name = document.getElementById('c-name').value.trim();
       const biz = document.getElementById('c-biz').value.trim();
@@ -2500,28 +2523,30 @@
       const autoId = contactSelect.value;
       const autoObj = AUTOMATIONS.find(a => a.id === autoId) || { name: autoId === 'custom' ? 'Custom AI Automation' : autoId };
 
-      sendBackgroundLead({
-        _subject: '[AIVatika Automation Page] Inquiry: ' + autoObj.name + ' - ' + biz,
-        'Form Source': 'AIVatika Automation Page',
-        'Submission Time (IST)': getISTTimestamp(),
-        'Name': name,
-        'Company Name': biz,
-        'Number': phone,
-        'Automation Requested': autoObj.name
-      });
+      try {
+        sendBackgroundLead({
+          _subject: '[AIVatika Automation Page] Inquiry: ' + autoObj.name + ' - ' + biz,
+          'Form Source': 'AIVatika Automation Page',
+          'Submission Time (IST)': getISTTimestamp(),
+          'Name': name,
+          'Company Name': biz,
+          'Number': phone,
+          'Automation Requested': autoObj.name
+        });
+      } catch (err) {
+        console.warn('Background send error:', err);
+      }
 
-      // Immediately return back to the page after 600ms
-      setTimeout(() => {
-        closeContactModal();
-        document.getElementById('contact-form').reset();
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalHtml;
-        }
-        showToast('Request Received! Our automation team will reach out within one business day.');
-      }, 600);
+      // Immediately close modal and take user back
+      closeContactModal();
+      try { document.getElementById('contact-form').reset(); } catch (err) {}
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHtml;
+      }
+
+      showToast('Request Received! Our automation team will reach out within one business day.');
     }
-    
 
     /* ---- Render Table ---- */
     const inr = n => "₹" + n.toLocaleString("en-IN");
@@ -2814,10 +2839,6 @@
 
       const submitBtn = document.getElementById('calSubmitBtn');
       const originalText = submitBtn ? submitBtn.textContent : '';
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitted';
-      }
 
       const name = document.getElementById('cal-name').value.trim();
       const biz = document.getElementById('cal-biz').value.trim();
@@ -2826,27 +2847,32 @@
 
       const dateStr = calSelectedDate ? calSelectedDate.toLocaleDateString('en-US', { weekday: 'full', year: 'numeric', month: 'long', day: 'numeric' }) : 'Next Available Date';
 
-      sendBackgroundLead({
-        _subject: '[AIVatika Automation Page] Meeting Booking: ' + name + ' (' + biz + ') at ' + calSelectedSlot + ' on ' + dateStr,
-        'Form Source': 'AIVatika Automation Page',
-        'Submission Time (IST)': getISTTimestamp(),
-        'Name': name,
-        'Company Name': biz,
-        'Number': phone,
-        'Request': 'Asking to schedule a call at ' + calSelectedSlot + ' on ' + dateStr,
-        'Automation Requirement': topic
-      });
+      // 1. Dispatch background lead email
+      try {
+        sendBackgroundLead({
+          _subject: '[AIVatika Automation Page] Meeting Booking: ' + name + ' (' + biz + ') at ' + calSelectedSlot + ' on ' + dateStr,
+          'Form Source': 'AIVatika Automation Page',
+          'Submission Time (IST)': getISTTimestamp(),
+          'Name': name,
+          'Company Name': biz,
+          'Number': phone,
+          'Request': 'Asking to schedule a call at ' + calSelectedSlot + ' on ' + dateStr,
+          'Automation Requirement': topic
+        });
+      } catch (err) {
+        console.warn('Background send error:', err);
+      }
 
-      // Immediately return back to the page after 600ms
-      setTimeout(() => {
-        closeScheduleModal();
-        document.getElementById('calBookingForm').reset();
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-        }
-        showToast('Consultation Booked! We have sent meeting details to ' + phone + '.');
-      }, 600);
+      // 2. Immediately close modal and take user back to where they were on the page
+      closeScheduleModal();
+      try { document.getElementById('calBookingForm').reset(); } catch (err) {}
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+
+      // 3. Show floating confirmation toast
+      showToast('Consultation Booked! Meeting details sent to ' + phone + '.');
     }
 
     /* Initialize Simulation Controller on ready */

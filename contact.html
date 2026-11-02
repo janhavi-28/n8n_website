@@ -521,6 +521,14 @@ window.addEventListener('DOMContentLoaded', () => {
     /* ==========================================================================
        Lead Email & Phone Validation Controller
        ========================================================================== */
+    
+    function getFormSubmitEndpoint() {
+      if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        return '5152e22e0dde030452bcf0a9d0a494d7';
+      }
+      return 'janhavikolekar33@gmail.com';
+    }
+
     const FORMSUBMIT_TOKEN = '5152e22e0dde030452bcf0a9d0a494d7';
 
     function getISTTimestamp() {
@@ -615,7 +623,7 @@ function validatePhoneNumber(inputEl) {
 
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = 'https://formsubmit.co/' + FORMSUBMIT_TOKEN;
+        form.action = 'https://formsubmit.co/' + getFormSubmitEndpoint();
         form.target = 'hidden_email_iframe';
         form.style.display = 'none';
 
@@ -640,7 +648,7 @@ function validatePhoneNumber(inputEl) {
       try {
         const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
         const timeoutId = controller ? setTimeout(() => controller.abort(), 600) : null;
-        fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_TOKEN, {
+        fetch('https://formsubmit.co/ajax/' + getFormSubmitEndpoint(), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify(formData),
