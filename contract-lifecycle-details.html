@@ -86,9 +86,7 @@
           </svg>
           Watch Live Simulation
         </button>
-        <button class="btn-outline" type="button" onclick="openContactModal()">
-          Contact Us
-        </button>
+        <a href="contact.html?auto=AI%20Contract%20Lifecycle%20Automation" class="btn-outline">Contact</a>
       </div>
       <div class="hero-stats">
         <div class="proof-stat">
@@ -322,9 +320,7 @@
       <h2>Ready to automate contract reviews on auto-pilot?</h2>
       <p>Have your legal and executive team reviewing, scoring, and routing contracts with AI in 7 business days.</p>
       <div class="final-cta-actions">
-        <button class="btn-primary" type="button" onclick="openContactModal()">
-          Contact Us
-        </button>
+        <a href="contact.html?auto=AI%20Contract%20Lifecycle%20Automation" class="btn-primary">Contact</a>
       </div>
     </section>
 
@@ -420,17 +416,7 @@
     }
 
     function openContactModal() {
-      const cf = document.getElementById('contact-form');
-      const cs = document.getElementById('contact-success');
-      if (cf) cf.style.display = 'block';
-      if (cs) cs.style.display = 'none';
-      const modal = document.getElementById('contact-modal');
-      if (modal) {
-        modal.style.display = 'flex';
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
-      }
-      document.body.style.overflow = 'hidden';
+      window.location.href = 'contact.html?auto=AI%20Contract%20Lifecycle%20Automation';
     }
 
     function closeContactModal() {

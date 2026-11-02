@@ -188,6 +188,17 @@ body {
   margin-bottom: 28px;
 }
 
+.call-schedule-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 520px) {
+  .call-schedule-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
 .form-group {
   margin-bottom: 20px;
 }
@@ -378,7 +389,7 @@ body {
     <!-- LEFT SIDE: Simple Form (Name, Company Name, Automation Type, Phone Number) -->
     <section class="form-side">
       <h1 class="form-title">Get in touch.</h1>
-      <p class="form-sub">Tell us a little about your business and we'll reply within one business day.</p>
+      <p class="form-sub">Tell us a little about your business or schedule a consultation call.</p>
 
       <form id="contact-form" onsubmit="handleFormSubmit(event)">
         <!-- 1. Name -->
@@ -406,10 +417,34 @@ body {
           </select>
         </div>
 
-        <!-- 4. Phone Number -->
+                <!-- 4. Phone Number -->
         <div class="form-group">
-          <label for="c-phone" class="form-label">PHONE NUMBER *</label>
+          <label for="c-phone" class="form-label">PHONE NUMBER (WHATSAPP) *</label>
           <input type="tel" id="c-phone" class="form-input" placeholder="+91 80504 73346" required>
+        </div>
+
+        <!-- 5. Schedule a Call (Optional) -->
+        <div class="form-group">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <label class="form-label" style="margin-bottom: 0;">SCHEDULE A CALL (OPTIONAL)</label>
+            <span style="font-size: 0.72rem; color: var(--subtle); font-weight: 700;">Pick Date &amp; Time Slot</span>
+          </div>
+          <div class="call-schedule-grid">
+            <div>
+              <input type="date" id="c-date" class="form-input" aria-label="Preferred consultation date">
+            </div>
+            <div>
+              <select id="c-slot" class="form-select" aria-label="Preferred consultation slot">
+                <option value="" selected>Anytime / Earliest Available</option>
+                <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                <option value="11:30 AM - 12:30 PM">11:30 AM - 12:30 PM</option>
+                <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+                <option value="03:30 PM - 04:30 PM">03:30 PM - 04:30 PM</option>
+                <option value="05:30 PM - 06:30 PM">05:30 PM - 06:30 PM</option>
+                <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <!-- Submit Button -->
@@ -426,7 +461,10 @@ body {
       <div id="success-card" class="success-card" style="display:none;">
         <div class="success-icon">✓</div>
         <h3 class="success-title">Request Received!</h3>
-        <p class="success-desc">Thank you! Our automation team will reach out to you within one business day.</p>
+        <p class="success-desc">Thank you! Your inquiry and consultation request have been received. Our automation team will reach out to you within one business day.</p>
+        <div style="margin-top: 24px;">
+          <a href="index.html" class="btn-submit" style="text-decoration: none; display: inline-flex; width: auto; padding: 12px 28px; margin: 0 auto;">Back to Automations</a>
+        </div>
       </div>
     </section>
 
@@ -485,6 +523,14 @@ body {
 // Check query param (e.g. ?auto=whatsapp or ?auto=invoice)
 window.addEventListener('DOMContentLoaded', () => {
   bindPhoneInputValidation(document.getElementById('c-phone'));
+  const dateInput = document.getElementById('c-date');
+  if (dateInput) {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    dateInput.min = `${yyyy}-${mm}-${dd}`;
+  }
   const params = new URLSearchParams(window.location.search);
   const autoParam = params.get('auto');
   if (autoParam) {
@@ -683,27 +729,30 @@ function handleFormSubmit(e) {
   const biz = document.getElementById('c-biz').value.trim();
   const auto = document.getElementById('c-auto').value;
   const phone = phoneInput.value.trim();
+  const dateVal = document.getElementById('c-date') ? document.getElementById('c-date').value : '';
+  const slotVal = document.getElementById('c-slot') ? document.getElementById('c-slot').value : '';
+
+  const scheduleInfo = (dateVal || slotVal)
+    ? ((dateVal ? dateVal : 'Upcoming date') + (slotVal ? ' (' + slotVal + ' IST)' : ''))
+    : 'Reach out anytime / Earliest available';
+
+  const subjectLine = (dateVal || slotVal)
+    ? ('[AIVatika] Consultation Booking: ' + name + ' (' + biz + ') on ' + (dateVal || 'Upcoming day') + (slotVal ? ' at ' + slotVal : ''))
+    : ('[AIVatika] Inquiry: ' + auto + ' - ' + biz);
 
   sendBackgroundLead({
-    _subject: '[AIVatika Automation Page] Inquiry: ' + auto + ' - ' + biz,
-    'Form Source': 'AIVatika Automation Page',
+    _subject: subjectLine,
+    'Form Source': 'AIVatika Contact & Schedule Page',
     'Submission Time (IST)': getISTTimestamp(),
     'Name': name,
     'Company Name': biz,
     'Number': phone,
-    'Automation Requested': auto
+    'Automation Requested': auto,
+    'Schedule Call Preference': scheduleInfo
   });
 
   document.getElementById('contact-form').style.display = 'none';
   document.getElementById('success-card').style.display = 'block';
-
-  setTimeout(() => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.href = 'index.html';
-    }
-  }, 1000);
 }
 
 

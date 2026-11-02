@@ -86,9 +86,7 @@
           </svg>
           Watch Live Simulation
         </button>
-        <button class="btn-outline" type="button" onclick="openContactModal()">
-          Contact Us
-        </button>
+        <a href="contact.html?auto=Hospital%20Automation%20%26%20Patient%20Care%20Pipeline" class="btn-outline">Contact</a>
       </div>
       <div class="hero-stats">
         <div class="proof-stat">
@@ -322,9 +320,7 @@
       <h2>Ready to streamline hospital patient operations?</h2>
       <p>Have your hospital running automated bookings, no-show recovery, and discharge care within 7 business days.</p>
       <div class="final-cta-actions">
-        <button class="btn-primary" type="button" onclick="openContactModal()">
-          Contact Us
-        </button>
+        <a href="contact.html?auto=Hospital%20Automation%20%26%20Patient%20Care%20Pipeline" class="btn-primary">Contact</a>
       </div>
     </section>
 
@@ -420,17 +416,7 @@
     }
 
     function openContactModal() {
-      const cf = document.getElementById('contact-form');
-      const cs = document.getElementById('contact-success');
-      if (cf) cf.style.display = 'block';
-      if (cs) cs.style.display = 'none';
-      const modal = document.getElementById('contact-modal');
-      if (modal) {
-        modal.style.display = 'flex';
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
-      }
-      document.body.style.overflow = 'hidden';
+      window.location.href = 'contact.html?auto=Hospital%20Automation%20%26%20Patient%20Care%20Pipeline';
     }
 
     function closeContactModal() {
