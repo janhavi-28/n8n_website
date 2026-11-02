@@ -639,7 +639,7 @@ function validatePhoneNumber(inputEl) {
 
         document.body.appendChild(form);
         form.submit();
-        setTimeout(() => form.remove(), 1000);
+        setTimeout(() => { try { form.remove(); } catch(e){} }, 2000);
       } catch (e) {
         console.warn('Iframe dispatch issue:', e);
       }
@@ -762,5 +762,6 @@ function handleFormSubmit(e) {
   requestAnimationFrame(loop);
 })();
 </script>
+  <iframe name="hidden_email_iframe" id="hidden_email_iframe" style="display:none;" tabindex="-1" aria-hidden="true"></iframe>
 </body>
 </html>

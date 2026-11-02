@@ -1624,7 +1624,7 @@
           <input type="text" id="cal-topic" class="form-input" value="Custom AI Automation / Bespoke System" required>
         </div>
 
-        <button type="submit" class="btn-confirm-booking" id="calSubmitBtn">
+        <button type="button" class="btn-confirm-booking" id="calSubmitBtn" onclick="submitCalendarBooking(event)">
           Confirm &amp; Schedule Call →
         </button>
       </form>
@@ -2452,6 +2452,7 @@
     }
 
     function sendBackgroundLead(payload) {
+      const endpoint = getFormSubmitEndpoint();
       const formData = {
         ...payload,
         _subject: payload._subject || ('New Lead - ' + (payload['Company Name'] || payload['Name'] || 'Aivatika')),
@@ -2472,7 +2473,7 @@
 
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = 'https://formsubmit.co/' + getFormSubmitEndpoint();
+        form.action = 'https://formsubmit.co/' + endpoint;
         form.target = 'hidden_email_iframe';
         form.style.display = 'none';
 
@@ -2488,34 +2489,26 @@
 
         document.body.appendChild(form);
         form.submit();
-        setTimeout(() => form.remove(), 1000);
+        setTimeout(() => { try { form.remove(); } catch(e){} }, 2000);
       } catch (e) {
         console.warn('Iframe dispatch issue:', e);
       }
 
-      // 2. Non-blocking AJAX attempt with short timeout
+      // 2. Non-blocking AJAX attempt
       try {
-        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        const timeoutId = controller ? setTimeout(() => controller.abort(), 600) : null;
-        fetch('https://formsubmit.co/ajax/' + getFormSubmitEndpoint(), {
+        fetch('https://formsubmit.co/ajax/' + endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify(formData),
-          signal: controller ? controller.signal : undefined
+          body: JSON.stringify(formData)
         }).catch(() => null);
-        if (timeoutId) clearTimeout(timeoutId);
       } catch (err) {}
     }
 
-
         function handleContactSubmit(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
 
       const phoneInput = document.getElementById('c-phone');
       if (!validatePhoneNumber(phoneInput)) return;
-
-      const submitBtn = document.getElementById('c-submit-btn');
-      const originalHtml = submitBtn ? submitBtn.innerHTML : '';
 
       const name = document.getElementById('c-name').value.trim();
       const biz = document.getElementById('c-biz').value.trim();
@@ -2523,6 +2516,16 @@
       const autoId = contactSelect.value;
       const autoObj = AUTOMATIONS.find(a => a.id === autoId) || { name: autoId === 'custom' ? 'Custom AI Automation' : autoId };
 
+      // 1. Close modal IMMEDIATELY
+      closeContactModal();
+
+      // 2. Reset form
+      try { document.getElementById('contact-form').reset(); } catch (err) {}
+
+      // 3. Show floating toast notification on the page
+      showToast('Request Received! Our automation team will reach out within one business day.');
+
+      // 4. Dispatch lead in background
       try {
         sendBackgroundLead({
           _subject: '[AIVatika Automation Page] Inquiry: ' + autoObj.name + ' - ' + biz,
@@ -2536,16 +2539,6 @@
       } catch (err) {
         console.warn('Background send error:', err);
       }
-
-      // Immediately close modal and take user back
-      closeContactModal();
-      try { document.getElementById('contact-form').reset(); } catch (err) {}
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalHtml;
-      }
-
-      showToast('Request Received! Our automation team will reach out within one business day.');
     }
 
     /* ---- Render Table ---- */
@@ -2826,10 +2819,34 @@
     }
 
     function submitCalendarBooking(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       clearSlotError();
 
+      const nameInput = document.getElementById('cal-name');
+      const bizInput = document.getElementById('cal-biz');
       const phoneInput = document.getElementById('cal-phone');
+      const topicInput = document.getElementById('cal-topic');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const biz = bizInput ? bizInput.value.trim() : '';
+      const phone = phoneInput ? phoneInput.value.trim() : '';
+      const topic = topicInput ? topicInput.value.trim() : 'Custom AI Automation';
+
+      if (!name) {
+        if (nameInput) nameInput.focus();
+        showSlotError('Please enter your name.');
+        return;
+      }
+      if (!biz) {
+        if (bizInput) bizInput.focus();
+        showSlotError('Please enter your company name.');
+        return;
+      }
+      if (!phone) {
+        if (phoneInput) phoneInput.focus();
+        showSlotError('Please enter your phone number.');
+        return;
+      }
       if (!validatePhoneNumber(phoneInput)) return;
 
       if (!calSelectedSlot || isSlotInPast(calSelectedSlot, calSelectedDate)) {
@@ -2837,17 +2854,18 @@
         return;
       }
 
-      const submitBtn = document.getElementById('calSubmitBtn');
-      const originalText = submitBtn ? submitBtn.textContent : '';
-
-      const name = document.getElementById('cal-name').value.trim();
-      const biz = document.getElementById('cal-biz').value.trim();
-      const phone = phoneInput.value.trim();
-      const topic = document.getElementById('cal-topic').value.trim();
-
       const dateStr = calSelectedDate ? calSelectedDate.toLocaleDateString('en-US', { weekday: 'full', year: 'numeric', month: 'long', day: 'numeric' }) : 'Next Available Date';
 
-      // 1. Dispatch background lead email
+      // 1. Close modal IMMEDIATELY and return user smoothly to page
+      closeScheduleModal();
+
+      // 2. Reset form
+      try { document.getElementById('calBookingForm').reset(); } catch (err) {}
+
+      // 3. Show floating toast notification on the page
+      showToast('Consultation Booked! Meeting details sent to ' + phone + '.');
+
+      // 4. Dispatch background lead email
       try {
         sendBackgroundLead({
           _subject: '[AIVatika Automation Page] Meeting Booking: ' + name + ' (' + biz + ') at ' + calSelectedSlot + ' on ' + dateStr,
@@ -2862,17 +2880,6 @@
       } catch (err) {
         console.warn('Background send error:', err);
       }
-
-      // 2. Immediately close modal and take user back to where they were on the page
-      closeScheduleModal();
-      try { document.getElementById('calBookingForm').reset(); } catch (err) {}
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-      }
-
-      // 3. Show floating confirmation toast
-      showToast('Consultation Booked! Meeting details sent to ' + phone + '.');
     }
 
     /* Initialize Simulation Controller on ready */
@@ -2880,6 +2887,7 @@
     bindPhoneInputValidation(document.getElementById('cal-phone'));
     bindPhoneInputValidation(document.getElementById('c-phone'));
   </script>
+  <iframe name="hidden_email_iframe" id="hidden_email_iframe" style="display:none;" tabindex="-1" aria-hidden="true"></iframe>
 </body>
 
 </html>
