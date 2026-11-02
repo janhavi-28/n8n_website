@@ -2354,6 +2354,18 @@
        ========================================================================== */
     const FORMSUBMIT_TOKEN = '5152e22e0dde030452bcf0a9d0a494d7';
 
+        function getISTTimestamp() {
+      return new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }) + ' (IST / India Time)';
+    }
     function validatePhoneNumber(inputEl) {
       if (!inputEl) return true;
       const val = inputEl.value.trim();
@@ -2491,6 +2503,7 @@
       sendBackgroundLead({
         _subject: '[AIVatika Automation Page] Inquiry: ' + autoObj.name + ' - ' + biz,
         'Form Source': 'AIVatika Automation Page',
+        'Submission Time (IST)': getISTTimestamp(),
         'Name': name,
         'Company Name': biz,
         'Number': phone,
@@ -2814,8 +2827,9 @@
       const dateStr = calSelectedDate ? calSelectedDate.toLocaleDateString('en-US', { weekday: 'full', year: 'numeric', month: 'long', day: 'numeric' }) : 'Next Available Date';
 
       sendBackgroundLead({
-        _subject: '[AIVatika Automation Page] Meeting Booking: ' + name + ' (' + biz + ') on ' + dateStr,
+        _subject: '[AIVatika Automation Page] Meeting Booking: ' + name + ' (' + biz + ') at ' + calSelectedSlot + ' on ' + dateStr,
         'Form Source': 'AIVatika Automation Page',
+        'Submission Time (IST)': getISTTimestamp(),
         'Name': name,
         'Company Name': biz,
         'Number': phone,
