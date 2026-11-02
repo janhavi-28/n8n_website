@@ -243,6 +243,66 @@
       font-weight: 600
     }
 
+    
+    /* Custom Automation Patch */
+    .custom-auto-patch {
+      position: sticky;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 24px;
+      background: var(--surface-secondary);
+      border-top: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+
+    .custom-auto-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .custom-auto-title {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.01em;
+    }
+
+    .custom-auto-sub {
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .btn-schedule-call {
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: .92rem;
+      padding: 11px 24px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(242, 86, 63, .28);
+      transition: all .15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn-schedule-call:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(242, 86, 63, .38);
+    }
+
     /* Table Design */
     .scroll {
       overflow-x: auto;
@@ -1025,6 +1085,15 @@
         <tbody id="rows"></tbody>
       </table>
       <div class="empty" id="empty">No automation matches your search. Clear the search box to view all automations.
+      </div>
+      <div class="custom-auto-patch">
+        <div class="custom-auto-info">
+          <div class="custom-auto-title">For any customised automation</div>
+          <div class="custom-auto-sub">Need a bespoke n8n workflow or custom system integration? Talk directly with our automation engineers.</div>
+        </div>
+        <button type="button" class="btn-schedule-call" onclick="openContactModal('custom')">
+          Schedule a Call
+        </button>
       </div>
     </div>
 
