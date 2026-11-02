@@ -2621,17 +2621,22 @@
 
     function isSlotInPast(slotStr, date) {
       if (!date || !slotStr) return false;
-      const now = new Date();
-      const selDateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      const todayOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      try {
+        const dObj = (date instanceof Date) ? date : new Date(date);
+        if (isNaN(dObj.getTime())) return false;
+        const now = new Date();
+        const selDateOnly = new Date(dObj.getFullYear(), dObj.getMonth(), dObj.getDate());
+        const todayOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-      if (selDateOnly < todayOnly) return true;
-      if (selDateOnly > todayOnly) return false;
+        if (selDateOnly < todayOnly) return true;
+        if (selDateOnly > todayOnly) return false;
 
-      // Date is TODAY: compare slot start time with current time
-      const slotMins = getSlotStartMinutes(slotStr);
-      const nowMins = now.getHours() * 60 + now.getMinutes();
-      return slotMins <= nowMins;
+        const slotMins = getSlotStartMinutes(slotStr);
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+        return slotMins <= nowMins;
+      } catch (e) {
+        return false;
+      }
     }
 
     function showSlotError(msg) {
@@ -2820,65 +2825,70 @@
 
     function submitCalendarBooking(e) {
       if (e && e.preventDefault) e.preventDefault();
-      clearSlotError();
-
-      const nameInput = document.getElementById('cal-name');
-      const bizInput = document.getElementById('cal-biz');
-      const phoneInput = document.getElementById('cal-phone');
-      const topicInput = document.getElementById('cal-topic');
-
-      const name = nameInput ? nameInput.value.trim() : '';
-      const biz = bizInput ? bizInput.value.trim() : '';
-      const phone = phoneInput ? phoneInput.value.trim() : '';
-      const topic = topicInput ? topicInput.value.trim() : 'Custom AI Automation';
-
-      if (!name) {
-        if (nameInput) nameInput.focus();
-        showSlotError('Please enter your name.');
-        return;
-      }
-      if (!biz) {
-        if (bizInput) bizInput.focus();
-        showSlotError('Please enter your company name.');
-        return;
-      }
-      if (!phone) {
-        if (phoneInput) phoneInput.focus();
-        showSlotError('Please enter your phone number.');
-        return;
-      }
-      if (!validatePhoneNumber(phoneInput)) return;
-
-      if (!calSelectedSlot || isSlotInPast(calSelectedSlot, calSelectedDate)) {
-        showSlotError('Invalid time: This slot has already passed. Please choose a valid upcoming time.');
-        return;
-      }
-
-      const dateStr = calSelectedDate ? calSelectedDate.toLocaleDateString('en-US', { weekday: 'full', year: 'numeric', month: 'long', day: 'numeric' }) : 'Next Available Date';
-
-      // 1. Close modal IMMEDIATELY and return user smoothly to page
-      closeScheduleModal();
-
-      // 2. Reset form
-      try { document.getElementById('calBookingForm').reset(); } catch (err) {}
-
-      // 3. Show floating toast notification on the page
-      showToast('Consultation Booked! Meeting details sent to ' + phone + '.');
-
-      // 4. Dispatch background lead email
       try {
-        sendBackgroundLead({
-          _subject: '[AIVatika Automation Page] Meeting Booking: ' + name + ' (' + biz + ') at ' + calSelectedSlot + ' on ' + dateStr,
-          'Form Source': 'AIVatika Automation Page',
-          'Submission Time (IST)': getISTTimestamp(),
-          'Name': name,
-          'Company Name': biz,
-          'Number': phone,
-          'Request': 'Asking to schedule a call at ' + calSelectedSlot + ' on ' + dateStr,
-          'Automation Requirement': topic
-        });
-      } catch (err) {
-        console.warn('Background send error:', err);
+        clearSlotError();
+
+        const nameInput = document.getElementById('cal-name');
+        const bizInput = document.getElementById('cal-biz');
+        const phoneInput = document.getElementById('cal-phone');
+        const topicInput = document.getElementById('cal-topic');
+
+        const name = nameInput ? nameInput.value.trim() : '';
+        const biz = bizInput ? bizInput.value.trim() : '';
+        const phone = phoneInput ? phoneInput.value.trim() : '';
+        const topic = topicInput ? topicInput.value.trim() : 'Custom AI Automation';
+
+        if (!name) {
+          if (nameInput) nameInput.focus();
+          showSlotError('Please enter your name.');
+          return;
+        }
+        if (!biz) {
+          if (bizInput) bizInput.focus();
+          showSlotError('Please enter your company name.');
+          return;
+        }
+        if (!phone) {
+          if (phoneInput) phoneInput.focus();
+          showSlotError('Please enter your phone number.');
+          return;
+        }
+        if (!validatePhoneNumber(phoneInput)) return;
+
+        if (!calSelectedSlot || isSlotInPast(calSelectedSlot, calSelectedDate)) {
+          showSlotError('Invalid time: This slot has already passed. Please choose a valid upcoming time.');
+          return;
+        }
+
+        const dateStr = calSelectedDate ? calSelectedDate.toLocaleDateString('en-US', { weekday: 'full', year: 'numeric', month: 'long', day: 'numeric' }) : 'Next Available Date';
+
+        // 1. Close modal IMMEDIATELY
+        closeScheduleModal();
+
+        // 2. Reset form
+        try { document.getElementById('calBookingForm').reset(); } catch (err) {}
+
+        // 3. Show floating confirmation toast
+        showToast('Consultation Booked! Meeting details sent to ' + phone + '.');
+
+        // 4. Dispatch background lead email
+        try {
+          sendBackgroundLead({
+            _subject: '[AIVatika Automation Page] Meeting Booking: ' + name + ' (' + biz + ') at ' + calSelectedSlot + ' on ' + dateStr,
+            'Form Source': 'AIVatika Automation Page',
+            'Submission Time (IST)': getISTTimestamp(),
+            'Name': name,
+            'Company Name': biz,
+            'Number': phone,
+            'Request': 'Asking to schedule a call at ' + calSelectedSlot + ' on ' + dateStr,
+            'Automation Requirement': topic
+          });
+        } catch (err) {
+          console.warn('Background send error:', err);
+        }
+      } catch (fatalErr) {
+        console.error('Submit booking error:', fatalErr);
+        closeScheduleModal();
       }
     }
 
