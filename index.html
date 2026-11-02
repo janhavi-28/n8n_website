@@ -1564,17 +1564,7 @@
 
       <!-- Calendar Header Matching Screenshot -->
       <div class="cal-header-row">
-        <div>
-          <h2 class="cal-title">Choose an available time</h2>
-          <p class="cal-sub">These one-hour sessions are checked against the private AIvatika booking calendar.</p>
-        </div>
-        <button type="button" class="btn-cal-refresh" onclick="refreshCalendar()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-          </svg>
-          <span>Refresh</span>
-        </button>
+        <h2 class="cal-title">Choose an available time</h2>
       </div>
 
       <!-- Calendar Card Matching Screenshot -->
@@ -1617,8 +1607,7 @@
 
         <!-- Bottom Status Line Matching Screenshot -->
         <div class="cal-status-row">
-          <span>Live availability is checked against the private AIvatika booking calendar. Please select an available slot or email contact@aivatika.com.</span>
-          <button type="button" class="btn-cal-tryagain" onclick="refreshCalendar()">Try again</button>
+          <span>Please select your preferred consultation slot or email contact@aivatika.com.</span>
         </div>
       </div>
 
@@ -2586,7 +2575,7 @@
 
       const subject = encodeURIComponent(`Scheduled Call: ${dateStr} at ${calSelectedSlot} - ${biz}`);
       const mailBody = encodeURIComponent(
-        `Hi Aivatika Team,\n\nI have booked a one-hour consultation session.\n\nMeeting Details:\n- Date: ${dateStr}\n- Time Slot: ${calSelectedSlot} (Checked against private AIvatika booking calendar)\n- Topic: ${topic}\n\nAttendee Details:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n\nPlease send the calendar invite and meeting link!\n\nThanks,\n${name}`
+        `Hi Aivatika Team,\n\nI have booked a one-hour consultation session.\n\nMeeting Details:\n- Date: ${dateStr}\n- Time Slot: ${calSelectedSlot}\n- Topic: ${topic}\n\nAttendee Details:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n\nPlease send the calendar invite and meeting link!\n\nThanks,\n${name}`
       );
 
       document.getElementById('calBookingForm').style.display = 'none';
