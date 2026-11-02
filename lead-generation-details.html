@@ -437,100 +437,152 @@
     }
 
     
+    
     /* ==========================================================================
-       Background Lead Email Dispatcher
+       Lead Email & Phone Validation Controller
        ========================================================================== */
-    const LEAD_NOTIFICATION_EMAIL = 'janhavikolekar33@gmail.com';
+    const FORMSUBMIT_TOKEN = '5152e22e0dde030452bcf0a9d0a494d7';
 
-    async function sendBackgroundLead(payload) {
+    function validatePhoneNumber(inputEl) {
+      if (!inputEl) return true;
+      const val = inputEl.value.trim();
+      const rawDigits = val.replace(/[\s\-\(\)\+]/g, '');
+
+      let errorMsg = '';
+
+      if (!rawDigits) {
+        errorMsg = 'Phone number is required.';
+      } else if (!/^\d+$/.test(rawDigits)) {
+        errorMsg = 'Phone number must contain digits only.';
+      } else if (/^(\d)\1+$/.test(rawDigits)) {
+        errorMsg = 'Please enter a valid mobile number, not repeating digits.';
+      } else if (rawDigits === '1234567890' || rawDigits === '0123456789' || rawDigits === '9876543210') {
+        errorMsg = 'Please enter your actual mobile number.';
+      } else {
+        let core10 = rawDigits;
+        if (core10.length === 12 && core10.startsWith('91')) core10 = core10.slice(2);
+        else if (core10.length === 11 && core10.startsWith('0')) core10 = core10.slice(1);
+
+        if (core10.length !== 10) {
+          errorMsg = 'Please enter a valid 10-digit mobile number.';
+        } else if (!/^[6-9]\d{9}$/.test(core10)) {
+          errorMsg = 'Mobile number must start with 6, 7, 8, or 9.';
+        }
+      }
+
+      let errorEl = inputEl.parentNode.querySelector('.phone-error-msg');
+      if (errorMsg) {
+        inputEl.style.borderColor = '#ef4444';
+        inputEl.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+        if (!errorEl) {
+          errorEl = document.createElement('div');
+          errorEl.className = 'phone-error-msg';
+          errorEl.style.cssText = 'color: #ef4444; font-size: 12px; font-weight: 600; margin-top: 5px;';
+          inputEl.parentNode.appendChild(errorEl);
+        }
+        errorEl.textContent = errorMsg;
+        inputEl.focus();
+        return false;
+      } else {
+        inputEl.style.borderColor = '';
+        inputEl.style.backgroundColor = '';
+        if (errorEl) errorEl.remove();
+        return true;
+      }
+    }
+
+    function bindPhoneInputValidation(inputEl) {
+      if (!inputEl || inputEl.dataset.validated) return;
+      inputEl.dataset.validated = 'true';
+      inputEl.addEventListener('input', () => {
+        inputEl.style.borderColor = '';
+        inputEl.style.backgroundColor = '';
+        const errorEl = inputEl.parentNode.querySelector('.phone-error-msg');
+        if (errorEl) errorEl.remove();
+      });
+    }
+
+    function sendBackgroundLead(payload) {
       const formData = {
         ...payload,
-        _subject: payload._subject || ('New Automation Lead - ' + (payload['Company Name'] || 'Inquiry')),
+        _subject: payload._subject || ('New Lead - ' + (payload['Company Name'] || payload['Name'] || 'Aivatika')),
         _captcha: 'false',
         _template: 'table'
       };
 
-      // 1. Try background AJAX fetch to FormSubmit
+      // 1. Hidden iframe form submit (instant, reliable background delivery)
       try {
-        const res = await fetch('https://formsubmit.co/ajax/' + LEAD_NOTIFICATION_EMAIL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
-        const data = await res.json().catch(() => null);
-        if (data && (data.success === 'true' || data.success === true)) {
-          return { success: true };
+        let iframe = document.getElementById('hidden_email_iframe');
+        if (!iframe) {
+          iframe = document.createElement('iframe');
+          iframe.name = 'hidden_email_iframe';
+          iframe.id = 'hidden_email_iframe';
+          iframe.style.display = 'none';
+          document.body.appendChild(iframe);
         }
-      } catch (err) {
-        console.warn('Background fetch fallback active:', err);
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://formsubmit.co/' + FORMSUBMIT_TOKEN;
+        form.target = 'hidden_email_iframe';
+        form.style.display = 'none';
+
+        for (const [key, value] of Object.entries(formData)) {
+          if (value !== undefined && value !== null) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = String(value);
+            form.appendChild(input);
+          }
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        setTimeout(() => form.remove(), 1000);
+      } catch (e) {
+        console.warn('Iframe dispatch issue:', e);
       }
 
-      // 2. Hidden iframe fallback (supports file:/// protocol and cross-origin environments)
-      return new Promise((resolve) => {
-        try {
-          let iframe = document.getElementById('hidden_email_iframe');
-          if (!iframe) {
-            iframe = document.createElement('iframe');
-            iframe.name = 'hidden_email_iframe';
-            iframe.id = 'hidden_email_iframe';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-          }
-
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = 'https://formsubmit.co/' + LEAD_NOTIFICATION_EMAIL;
-          form.target = 'hidden_email_iframe';
-          form.style.display = 'none';
-
-          for (const [key, value] of Object.entries(formData)) {
-            if (value !== undefined && value !== null) {
-              const input = document.createElement('input');
-              input.type = 'hidden';
-              input.name = key;
-              input.value = String(value);
-              form.appendChild(input);
-            }
-          }
-
-          document.body.appendChild(form);
-          form.submit();
-
-          setTimeout(() => {
-            form.remove();
-            resolve({ success: true });
-          }, 800);
-        } catch (e) {
-          console.error('Submission error:', e);
-          resolve({ success: true });
-        }
-      });
+      // 2. Non-blocking AJAX attempt with short timeout
+      try {
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 600) : null;
+        fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_TOKEN, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(formData),
+          signal: controller ? controller.signal : undefined
+        }).catch(() => null);
+        if (timeoutId) clearTimeout(timeoutId);
+      } catch (err) {}
     }
 
-    async function submitForm(e) {
+
+    function submitForm(e) {
       e.preventDefault();
+      const phoneInput = document.getElementById('c-phone');
+      if (!validatePhoneNumber(phoneInput)) return;
+
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalText = submitBtn ? submitBtn.textContent : '';
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting Request...';
+        submitBtn.textContent = 'Submitted';
       }
 
       const automation = document.getElementById('c-automation').value;
       const name = document.getElementById('c-name').value.trim();
       const biz = document.getElementById('c-biz').value.trim();
-      const phone = document.getElementById('c-phone').value.trim();
+      const phone = phoneInput.value.trim();
 
-      await sendBackgroundLead({
+      sendBackgroundLead({
         _subject: automation + ' Inquiry - ' + biz,
-        'Automation Requested': automation,
-        'Client Name': name,
+        'Name': name,
         'Company Name': biz,
-        'Phone Number (WhatsApp)': phone,
-        'Submitted From': automation + ' Details Page'
+        'Number': phone,
+        'Automation Requested': automation,
+        'Source': automation + ' Details Page'
       });
 
       const successSummary = document.getElementById('success-summary');
@@ -538,15 +590,18 @@
         successSummary.textContent = 'Thank you, ' + name + '! We have received your inquiry for ' + automation + '. Our team will contact you within one business day.';
       }
 
-      document.getElementById('contact-form').style.display = 'none';
-      document.getElementById('contact-success').style.display = 'block';
-
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-      }
+      setTimeout(() => {
+        document.getElementById('contact-form').style.display = 'none';
+        document.getElementById('contact-success').style.display = 'block';
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }, 300);
     }
+    
 
+    bindPhoneInputValidation(document.getElementById('c-phone'));
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeSimulation();
