@@ -2460,7 +2460,7 @@
     }
 
 
-    function handleContactSubmit(e) {
+        function handleContactSubmit(e) {
       e.preventDefault();
       const phoneInput = document.getElementById('c-phone');
       if (!validatePhoneNumber(phoneInput)) return;
@@ -2479,25 +2479,31 @@
       const autoObj = AUTOMATIONS.find(a => a.id === autoId) || { name: autoId === 'custom' ? 'Custom AI Automation' : autoId };
 
       sendBackgroundLead({
-        _subject: 'Automation Inquiry: ' + autoObj.name + ' - ' + biz,
+        _subject: '[AIVatika Automation Page] Inquiry: ' + autoObj.name + ' - ' + biz,
+        'Form Source': 'AIVatika Automation Page',
         'Name': name,
         'Company Name': biz,
         'Number': phone,
-        'Automation Requested': autoObj.name,
-        'Source': 'Aivatika Main Dashboard'
+        'Automation Requested': autoObj.name
       });
 
+      document.getElementById('contact-form').style.display = 'none';
+      const successCard = document.getElementById('contact-success');
+      successCard.style.display = 'block';
       document.getElementById('success-summary').textContent =
-        'Thank you, ' + name + '! We have received your request for "' + autoObj.name + '". Our team will contact you within one business day.';
+        'Thank you, ' + name + '! We have received your request for "' + autoObj.name + '".';
 
+      // Automatically return back to the page after 1.2 seconds
       setTimeout(() => {
-        document.getElementById('contact-form').style.display = 'none';
-        document.getElementById('contact-success').style.display = 'block';
+        closeContactModal();
+        document.getElementById('contact-form').reset();
+        document.getElementById('contact-form').style.display = 'block';
+        successCard.style.display = 'none';
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalHtml;
         }
-      }, 300);
+      }, 1200);
     }
     
 
@@ -2687,7 +2693,7 @@
       pillSummary.textContent = `Selected: ${dateStr} · ${calSelectedSlot} (1 Hour)`;
     }
 
-        function submitCalendarBooking(e) {
+            function submitCalendarBooking(e) {
       e.preventDefault();
       const phoneInput = document.getElementById('cal-phone');
       if (!validatePhoneNumber(phoneInput)) return;
@@ -2707,27 +2713,32 @@
       const dateStr = calSelectedDate ? calSelectedDate.toLocaleDateString('en-US', { weekday: 'full', year: 'numeric', month: 'long', day: 'numeric' }) : 'Next Available Date';
 
       sendBackgroundLead({
-        _subject: 'Meeting Booking: ' + name + ' (' + biz + ') on ' + dateStr,
+        _subject: '[AIVatika Automation Page] Meeting Booking: ' + name + ' (' + biz + ') on ' + dateStr,
+        'Form Source': 'AIVatika Automation Page',
         'Name': name,
         'Company Name': biz,
         'Number': phone,
         'Request': 'Asking to schedule a call at ' + calSelectedSlot + ' on ' + dateStr,
-        'Automation Requirement': topic,
-        'Source': 'Aivatika Booking Calendar'
+        'Automation Requirement': topic
       });
 
+      document.getElementById('calBookingForm').style.display = 'none';
+      const successScreen = document.getElementById('calSuccessScreen');
+      successScreen.style.display = 'block';
       document.getElementById('calSuccessSummary').textContent =
-        'Thank you, ' + name + '! Your one-hour session on ' + dateStr + ' at ' + calSelectedSlot + ' is registered. We will send the meeting link to ' + phone + '.';
+        'Thank you, ' + name + '! Your session is registered for ' + dateStr + ' at ' + calSelectedSlot + '.';
 
+      // Automatically return back to the page after 1.2 seconds
       setTimeout(() => {
-        document.getElementById('calBookingForm').style.display = 'none';
-        const successScreen = document.getElementById('calSuccessScreen');
-        successScreen.style.display = 'block';
+        closeScheduleModal();
+        document.getElementById('calBookingForm').reset();
+        document.getElementById('calBookingForm').style.display = 'block';
+        successScreen.style.display = 'none';
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
         }
-      }, 300);
+      }, 1200);
     }
 
     /* Initialize Simulation Controller on ready */

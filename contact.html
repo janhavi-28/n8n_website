@@ -661,22 +661,25 @@ function handleFormSubmit(e) {
   const phone = phoneInput.value.trim();
 
   sendBackgroundLead({
-    _subject: 'Automation Inquiry: ' + auto + ' - ' + biz,
+    _subject: '[AIVatika Automation Page] Inquiry: ' + auto + ' - ' + biz,
+    'Form Source': 'AIVatika Automation Page',
     'Name': name,
     'Company Name': biz,
     'Number': phone,
-    'Automation Requested': auto,
-    'Source': 'Aivatika Contact Page'
+    'Automation Requested': auto
   });
 
+  document.getElementById('contact-form').style.display = 'none';
+  document.getElementById('success-card').style.display = 'block';
+
+  // Automatically return back to previous page or dashboard after 1.2s
   setTimeout(() => {
-    document.getElementById('contact-form').style.display = 'none';
-    document.getElementById('success-card').style.display = 'block';
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalHtml;
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'index.html';
     }
-  }, 300);
+  }, 1200);
 }
 
 
