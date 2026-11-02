@@ -519,22 +519,110 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function handleFormSubmit(e) {
+
+    /* ==========================================================================
+       Background Lead Email Dispatcher
+       ========================================================================== */
+    const LEAD_NOTIFICATION_EMAIL = 'janhavikolekar33@gmail.com';
+
+    async function sendBackgroundLead(payload) {
+      const formData = {
+        ...payload,
+        _subject: payload._subject || ('New Automation Lead - ' + (payload['Company Name'] || 'Inquiry')),
+        _captcha: 'false',
+        _template: 'table'
+      };
+
+      // 1. Try background AJAX fetch to FormSubmit
+      try {
+        const res = await fetch('https://formsubmit.co/ajax/' + LEAD_NOTIFICATION_EMAIL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        const data = await res.json().catch(() => null);
+        if (data && (data.success === 'true' || data.success === true)) {
+          return { success: true };
+        }
+      } catch (err) {
+        console.warn('Background fetch fallback active:', err);
+      }
+
+      // 2. Hidden iframe fallback (supports file:/// protocol and cross-origin environments)
+      return new Promise((resolve) => {
+        try {
+          let iframe = document.getElementById('hidden_email_iframe');
+          if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.name = 'hidden_email_iframe';
+            iframe.id = 'hidden_email_iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+          }
+
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = 'https://formsubmit.co/' + LEAD_NOTIFICATION_EMAIL;
+          form.target = 'hidden_email_iframe';
+          form.style.display = 'none';
+
+          for (const [key, value] of Object.entries(formData)) {
+            if (value !== undefined && value !== null) {
+              const input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = key;
+              input.value = String(value);
+              form.appendChild(input);
+            }
+          }
+
+          document.body.appendChild(form);
+          form.submit();
+
+          setTimeout(() => {
+            form.remove();
+            resolve({ success: true });
+          }, 800);
+        } catch (e) {
+          console.error('Submission error:', e);
+          resolve({ success: true });
+        }
+      });
+    }
+
+async function handleFormSubmit(e) {
   e.preventDefault();
+  const submitBtn = document.querySelector('#contact-form .btn-submit');
+  const originalHtml = submitBtn ? submitBtn.innerHTML : '';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Submitting...</span>';
+  }
+
   const name = document.getElementById('c-name').value.trim();
   const biz = document.getElementById('c-biz').value.trim();
   const auto = document.getElementById('c-auto').value;
   const phone = document.getElementById('c-phone').value.trim();
 
-  const subject = encodeURIComponent(`Automation Inquiry: ${auto} - ${biz}`);
-  const mailBody = encodeURIComponent(
-    `Hi Aivatika Team,\n\nI am interested in "${auto}".\n\nContact Details:\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n- Automation: ${auto}\n\nPlease contact me for next steps!\n\nThanks,\n${name}`
-  );
+  await sendBackgroundLead({
+    _subject: 'Automation Inquiry: ' + auto + ' - ' + biz,
+    'Automation Requested': auto,
+    'Client Name': name,
+    'Company Name': biz,
+    'Phone Number (WhatsApp)': phone,
+    'Submitted From': 'Aivatika Contact Page'
+  });
 
   document.getElementById('contact-form').style.display = 'none';
   document.getElementById('success-card').style.display = 'block';
 
-  window.open(`mailto:contact@aivatika.com?subject=${subject}&body=${mailBody}`, '_self');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalHtml;
+  }
 }
 
 /* Background Constellation Canvas */

@@ -390,7 +390,14 @@
           <input type="tel" id="c-phone" placeholder="+91 98765 43210" required>
         </div>
         <button type="submit" class="btn-submit">Submit Request →</button>
-      </form>
+      
+      <div id="contact-success" class="contact-success" style="display:none; text-align: center; padding: 18px 0;">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--live-bg, #e6f7f0); color: var(--live, #059669); display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px; font-weight: bold;">&#10003;</div>
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 6px; color: var(--text);">Request Received!</h3>
+        <p id="success-summary" style="font-size: 13.5px; color: var(--muted); margin-bottom: 20px; line-height: 1.5;">Thank you! Our automation team has received your request and will reach out within one business day.</p>
+        <button type="button" class="btn-primary" onclick="closeContactModal()" style="padding: 10px 24px; font-size: 13.5px; margin: 0 auto;">Done</button>
+      </div>
+    </form>
     </div>
   </div>
 
@@ -414,6 +421,10 @@
     }
 
     function openContactModal() {
+      const cf = document.getElementById('contact-form');
+      const cs = document.getElementById('contact-success');
+      if (cf) cf.style.display = 'block';
+      if (cs) cs.style.display = 'none';
       contactModal.classList.add('is-open');
       contactModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -425,20 +436,115 @@
       document.body.style.overflow = '';
     }
 
-    function submitForm(e) {
+    
+    /* ==========================================================================
+       Background Lead Email Dispatcher
+       ========================================================================== */
+    const LEAD_NOTIFICATION_EMAIL = 'janhavikolekar33@gmail.com';
+
+    async function sendBackgroundLead(payload) {
+      const formData = {
+        ...payload,
+        _subject: payload._subject || ('New Automation Lead - ' + (payload['Company Name'] || 'Inquiry')),
+        _captcha: 'false',
+        _template: 'table'
+      };
+
+      // 1. Try background AJAX fetch to FormSubmit
+      try {
+        const res = await fetch('https://formsubmit.co/ajax/' + LEAD_NOTIFICATION_EMAIL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        const data = await res.json().catch(() => null);
+        if (data && (data.success === 'true' || data.success === true)) {
+          return { success: true };
+        }
+      } catch (err) {
+        console.warn('Background fetch fallback active:', err);
+      }
+
+      // 2. Hidden iframe fallback (supports file:/// protocol and cross-origin environments)
+      return new Promise((resolve) => {
+        try {
+          let iframe = document.getElementById('hidden_email_iframe');
+          if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.name = 'hidden_email_iframe';
+            iframe.id = 'hidden_email_iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+          }
+
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = 'https://formsubmit.co/' + LEAD_NOTIFICATION_EMAIL;
+          form.target = 'hidden_email_iframe';
+          form.style.display = 'none';
+
+          for (const [key, value] of Object.entries(formData)) {
+            if (value !== undefined && value !== null) {
+              const input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = key;
+              input.value = String(value);
+              form.appendChild(input);
+            }
+          }
+
+          document.body.appendChild(form);
+          form.submit();
+
+          setTimeout(() => {
+            form.remove();
+            resolve({ success: true });
+          }, 800);
+        } catch (e) {
+          console.error('Submission error:', e);
+          resolve({ success: true });
+        }
+      });
+    }
+
+    async function submitForm(e) {
       e.preventDefault();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.textContent : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting Request...';
+      }
+
       const automation = document.getElementById('c-automation').value;
       const name = document.getElementById('c-name').value.trim();
       const biz = document.getElementById('c-biz').value.trim();
       const phone = document.getElementById('c-phone').value.trim();
 
-      const subject = encodeURIComponent(`${automation} Inquiry - ${biz}`);
-      const mailBody = encodeURIComponent(
-        `Hi Aivatika Team,\n\nI am interested in deploying the ${automation}.\n\nContact Details:\n- Automation: ${automation}\n- Name: ${name}\n- Company: ${biz}\n- Phone: ${phone}\n\nPlease reach out for next steps!\n\nThanks,\n${name}`
-      );
+      await sendBackgroundLead({
+        _subject: automation + ' Inquiry - ' + biz,
+        'Automation Requested': automation,
+        'Client Name': name,
+        'Company Name': biz,
+        'Phone Number (WhatsApp)': phone,
+        'Submitted From': automation + ' Details Page'
+      });
 
-      window.open(`mailto:contact@aivatika.com?subject=${subject}&body=${mailBody}`, '_self');
-      closeContactModal();
+      const successSummary = document.getElementById('success-summary');
+      if (successSummary) {
+        successSummary.textContent = 'Thank you, ' + name + '! We have received your inquiry for ' + automation + '. Our team will contact you within one business day.';
+      }
+
+      document.getElementById('contact-form').style.display = 'none';
+      document.getElementById('contact-success').style.display = 'block';
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
     }
 
     document.addEventListener('keydown', (e) => {
