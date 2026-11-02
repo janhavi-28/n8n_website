@@ -2462,15 +2462,33 @@
         ...payload
       };
 
-      // 1. Hidden iframe form submit (instant, reliable background delivery)
+      // 1. Direct Background Fetch (bypasses iframe restrictions entirely)
+      try {
+        const bodyParams = new URLSearchParams();
+        for (const [k, v] of Object.entries(formData)) {
+          if (v !== undefined && v !== null) {
+            bodyParams.append(k, String(v));
+          }
+        }
+        fetch('https://formsubmit.co/' + endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: bodyParams.toString(),
+          mode: 'no-cors'
+        }).catch(() => null);
+      } catch (err) {}
+
+      // 2. Iframe Fallback with active layout tree
       try {
         let iframe = document.getElementById('hidden_email_iframe');
         if (!iframe) {
           iframe = document.createElement('iframe');
           iframe.name = 'hidden_email_iframe';
           iframe.id = 'hidden_email_iframe';
-          iframe.style.display = 'none';
+          iframe.style.cssText = 'position: absolute; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none;';
           document.body.appendChild(iframe);
+        } else {
+          iframe.style.cssText = 'position: absolute; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none;';
         }
 
         const form = document.createElement('form');
@@ -2491,7 +2509,7 @@
 
         document.body.appendChild(form);
         form.submit();
-        setTimeout(() => { try { form.remove(); } catch(e){} }, 2000);
+        setTimeout(() => { try { form.remove(); } catch(e){} }, 3000);
       } catch (e) {
         console.warn('Iframe dispatch issue:', e);
       }
@@ -2890,7 +2908,7 @@
     bindPhoneInputValidation(document.getElementById('cal-phone'));
     bindPhoneInputValidation(document.getElementById('c-phone'));
   </script>
-  <iframe name="hidden_email_iframe" id="hidden_email_iframe" style="display:none;" tabindex="-1" aria-hidden="true"></iframe>
+  <iframe name="hidden_email_iframe" id="hidden_email_iframe" style="position: absolute; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none;" tabindex="-1" aria-hidden="true"></iframe>
 </body>
 
 </html>
